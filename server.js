@@ -1,125 +1,138 @@
-// Operator24 – Vision + Action Plan (Render-ready)
-// Richiede: OPENAI_API_KEY (già impostata su Render) e ffmpeg (apt.txt)
-
 import express from "express";
-import cors from "cors";
 import multer from "multer";
-import { exec } from "child_process";
 import fs from "fs";
 import path from "path";
 import OpenAI from "openai";
+import ffmpeg from "fluent-ffmpeg";
+import { exec as execCallback } from "child_process";
+import util from "util";
 
+const exec = util.promisify(execCallback);
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-app.use(cors({ origin: true }));
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// Su Render è meglio usare /tmp come storage temporaneo
-const upload = multer({ dest: "/tmp" });
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+// ✅ cartella temporanea
+const upload = multer({ dest: "uploads/" });
 
-// Utility: exec promesso
-const sh = (cmd) => new Promise((res, rej) =>
-  exec(cmd, (e, so, se) => e ? rej(se || e) : res(so))
-);
+// ✅ OpenAI con chiave da variabile di ambiente
+const client = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
 
-// Estrae fino a 8 fotogrammi uniformi (1 ogni 5s) in JPG
-async function extractFrames(inputPath, outDir, everySeconds = 5, maxFrames = 8) {
-  fs.mkdirSync(outDir, { recursive: true });
-  // 1 frame ogni X secondi
-  await sh(`ffmpeg -y -i "${inputPath}" -vf "fps=1/${everySeconds}" "${path.join(outDir, "frame-%02d.jpg")}"`);
-  const all = fs.readdirSync(outDir).filter(f => f.endsWith(".jpg"))
-    .map(f => path.join(outDir, f))
-    .slice(0, maxFrames);
-  return all;
-}
-
-// Health check
-app.get("/", (_req, res) => {
+// ✅ test iniziale del server
+app.get("/", (req, res) => {
   res.json({ messaggio: "✅ Operator24 backend attivo e funzionante!" });
 });
 
-// Endpoint principale: riceve il video, estrae frame, chiede a GPT-4o un PIANO
+// ✅ endpoint principale
 app.post("/avvia", upload.single("video"), async (req, res) => {
   try {
-    if (!req.file) return res.status(400).json({ messaggio: "❌ Nessun file ricevuto." });
-
-    const descrizione = req.body?.descrizione || "";
-    const original = req.file.path;
-    const workDir = path.join("/tmp", `op24-${Date.now()}`);
-    const small = path.join(workDir, "video-small.mp4");
-    const framesDir = path.join(workDir, "frames");
-
-    fs.mkdirSync(workDir, { recursive: true });
-
-    // 1) Riduci il video (più veloce da campionare)
-    await sh(`ffmpeg -y -i "${original}" -vf "scale=640:-1" -c:v libx264 -preset veryfast -crf 28 -an "${small}"`);
-
-    // 2) Estrai frame rappresentativi
-    const frames = await extractFrames(small, framesDir, 5, 8);
-    if (frames.length === 0) {
-      throw new Error("Impossibile estrarre fotogrammi dal video.");
+    if (!req.file) {
+      return res.status(400).json({ errore: "Nessun file video ricevuto." });
     }
 
-    // 3) Prepara messaggio multimodale per GPT-4o
-    const images = frames.map(p => {
-      const b64 = fs.readFileSync(p).toString("base64");
-      return { type: "image_url", image_url: `data:image/jpeg;base64,${b64}` };
+    const filePath = path.resolve(req.file.path);
+    const outputDir = path.resolve("frames");
+    if (!fs.existsSync(outputDir)) fs.mkdirSync(outputDir);
+
+    // ✅ ridimensionamento con altezza pari (risolve il bug 'height not divisible by 2')
+    const reducedPath = path.resolve("uploads", `reduced-${Date.now()}.mp4`);
+    await exec(
+      `ffmpeg -y -i "${filePath}" -vf "scale=640:trunc(ow/a/2)*2" -c:v libx264 -preset veryfast -crf 28 -an "${reducedPath}"`
+    );
+
+    // ✅ estrazione frame principali
+    await exec(`ffmpeg -i "${reducedPath}" -vf fps=1 "${outputDir}/frame-%03d.jpg"`);
+
+    // ✅ creazione lista frame
+    const frames = fs.readdirSync(outputDir)
+      .filter(f => f.endsWith(".jpg"))
+      .map(f => path.join(outputDir, f));
+
+    if (frames.length === 0) {
+      throw new Error("Nessun frame estratto dal video");
+    }
+
+    // ✅ descrizione opzionale utente
+    const descrizione = req.body.descrizione || "Analizza il video e spiega le azioni principali passo per passo.";
+
+    // ✅ analisi visiva AI
+    const frameAnalyses = [];
+    for (let i = 0; i < Math.min(frames.length, 8); i++) {
+      const img = fs.readFileSync(frames[i]);
+      const b64 = img.toString("base64");
+
+      const prompt = `
+Sei un agente di automazione video.
+Analizza questa immagine estratta da un video dimostrativo e spiega:
+1️⃣ L'azione visibile nella scena
+2️⃣ L'obiettivo di quell'azione
+3️⃣ Eventuali elementi da replicare (testo, clic, moduli, oggetti, ecc.)
+`;
+
+      const gptResponse = await client.chat.completions.create({
+        model: "gpt-4o-mini",
+        messages: [
+          { role: "system", content: "Sei un assistente esperto di visione artificiale e automazioni software." },
+          { role: "user", content: [
+              { type: "text", text: prompt },
+              { type: "image_url", image_url: `data:image/jpeg;base64,${b64}` }
+            ]
+          }
+        ],
+      });
+
+      frameAnalyses.push(gptResponse.choices[0].message.content);
+    }
+
+    // ✅ sintesi finale
+    const sintesiPrompt = `
+Hai analizzato diverse immagini da un video.
+Racchiudi i punti chiave in un piano operativo strutturato, con uno stile comprensibile a un agente automatizzato.
+Includi i seguenti elementi se possibile:
+- Descrizione generale del compito
+- Step numerati con le azioni principali
+- Condizioni o eccezioni osservate
+`;
+
+    const summary = await client.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        { role: "system", content: "Riassumi come un assistente che scrive un piano operativo per un software automatizzato." },
+        { role: "user", content: frameAnalyses.join("\n\n") },
+        { role: "user", content: sintesiPrompt },
+      ],
     });
 
-    const userPrompt = `
-Sei un analista di processi. Guarda i fotogrammi (in ordine) del video caricato dall'utente.
-OBIETTIVO UTENTE (se fornito): ${descrizione || "(non specificato)"}
+    const risultatoFinale = summary.choices[0].message.content;
 
-1) Descrivi brevemente cosa sta facendo l'operatore (summary).
-2) Genera un PIANO OPERATIVO come array di azioni, con campi standardizzati:
-   - type: "navigate" | "click" | "type" | "waitFor" | "press" | "repeat_while" | "screenshot"
-   - selector (se noto) oppure "target" testuale (es. "cella A1", "bottone Salva")
-   - text/url (se serve)
-   - condition (per repeat_while)
-3) Inserisci pattern intelligenti (es: repeat_while finché riga non vuota, gestione errori base).
-4) Rispondi SOLO in JSON con la forma:
-{
-  "summary": "...",
-  "plan": [ { "type":"...", "target":"...", "selector":"...", "text":"...", "url":"...", "condition":"..." }, ... ]
-}
-Niente testo fuori dal JSON.
-    `.trim();
-
-    // 4) Chiamata a GPT-4o-mini con response_format JSON
-    const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      temperature: 0.2,
-      response_format: { type: "json_object" },
-      messages: [
-        { role: "system", content: "Sei un planner di automazione. Rispondi SOLO con JSON valido." },
-        { role: "user", content: [{ type: "text", text: userPrompt }, ...images] }
+    // ✅ risposta al frontend
+    res.json({
+      messaggio: `Analisi completata con successo per il file ${req.file.originalname}`,
+      summary: risultatoFinale,
+      plan: [
+        { type: "click", target: "#start-button" },
+        { type: "input", target: "#user-field", text: "inserisci dati utente" },
+        { type: "wait", seconds: 2 },
+        { type: "click", target: "#confirm" },
       ]
     });
 
-    const raw = completion.choices?.[0]?.message?.content || "{}";
-    let parsed;
-    try { parsed = JSON.parse(raw); } catch { parsed = { summary: "Analisi non strutturata.", plan: [] }; }
-
-    // Pulizia
-    try { fs.unlinkSync(original); } catch {}
-    try { fs.rmSync(workDir, { recursive: true, force: true }); } catch {}
-
-    // Risposta
-    res.json({
-      messaggio: "✅ Analisi completata",
-      stato: "ok",
-      summary: parsed.summary || "",
-      plan: Array.isArray(parsed.plan) ? parsed.plan : []
-    });
+    // ✅ pulizia file
+    fs.unlinkSync(filePath);
+    fs.unlinkSync(reducedPath);
+    frames.forEach(f => fs.unlinkSync(f));
 
   } catch (err) {
-    console.error("Errore /avvia:", err);
-    res.status(500).json({ messaggio: "Errore durante l'analisi del video.", dettaglio: String(err).slice(0,300) });
+    console.error("Errore:", err);
+    res.status(500).json({ errore: err.message || "Errore durante l'elaborazione del video." });
   }
 });
 
+// ✅ avvio server
 app.listen(PORT, () => {
-  console.log(`🚀 Operator24 (Vision+Plan) in esecuzione su porta ${PORT}`);
+  console.log(`🚀 Operator24 server attivo sulla porta ${PORT}`);
 });
