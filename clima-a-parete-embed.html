@@ -48,7 +48,9 @@
     border-radius:20px;padding:clamp(16px,3vw,30px);
     box-shadow:0 20px 60px rgba(6,20,40,.18);
     -webkit-tap-highlight-color:transparent;
+    box-sizing:border-box;display:flex;flex-direction:column;
   }
+  #fc-clima #fc-home{display:flex;flex-direction:column;flex:1 1 auto}
   #fc-clima img{max-width:100%;display:block}
   #fc-clima h1,#fc-clima h2,#fc-clima h3,#fc-clima h4,#fc-clima h5{color:var(--blu);line-height:1.2}
 
@@ -93,7 +95,7 @@
 
   /* ---- Dettaglio ---- */
   #fc-clima .fc-dettaglio{display:none;animation:fcIn .4s ease}
-  #fc-clima .fc-dettaglio.attiva{display:flex;flex-direction:column}
+  #fc-clima .fc-dettaglio.attiva{display:flex;flex-direction:column;flex:1 1 auto}
   @keyframes fcIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
   #fc-clima .torna{align-self:flex-start;display:inline-flex;align-items:center;gap:8px;background:none;border:none;cursor:pointer;color:var(--blu);font-weight:700;font-size:.95rem;padding:8px 4px;margin:6px 0 8px;font-family:inherit}
   #fc-clima .torna:hover{color:var(--accent)}
@@ -103,6 +105,7 @@
   #fc-clima .cta-fill.premium{background:linear-gradient(135deg,#06213f,#0a3d62 55%,#1e6091)}
   #fc-clima .cta-fill.plus{background:linear-gradient(135deg,#0a3d62,#1e6091 60%,#2e7bb0)}
   #fc-clima .cta-fill.smart{background:linear-gradient(135deg,#0f4d78,#1e6091 55%,#00a8e8)}
+  #fc-clima .cta-fill.home{background:linear-gradient(135deg,#0a3d62,#1e6091 60%,#2e7bb0)}
   #fc-clima .cta-fill .cta-inner{max-width:760px;text-align:center}
   #fc-clima .cta-fill h4{color:#fff;font-size:clamp(1.2rem,2.5vw,1.7rem);margin-bottom:12px}
   #fc-clima .cta-fill p{color:rgba(255,255,255,.92);font-size:1rem;margin:0 auto 22px;max-width:640px}
@@ -222,6 +225,8 @@
     <p>In questa categoria troverai diverse soluzioni per chi preferisce il classico climatizzatore a parete. Dai modelli base a quelli più avanzati, avrai davvero l'imbarazzo della scelta. Scorri le opzioni, dai un'occhiata alle caratteristiche e ai dettagli tecnici e ricorda: siamo qui per consigliarti nella scelta. Un sopralluogo ci aiuterà a individuare il climatizzatore perfetto per i tuoi ambienti.</p>
   </div>
 
+  <!-- ===================== HOME (landing + info generali) ===================== -->
+  <div id="fc-home">
   <!-- ===================== LANDING ===================== -->
   <div class="fc-scelta" id="fc-scelta">
     <button class="card premium" data-linea="premium" type="button">
@@ -256,12 +261,7 @@
     </button>
   </div>
 
-  <!-- ===================== DETTAGLIO LINEE (render JS) ===================== -->
-  <section class="fc-dettaglio" id="linea-premium"></section>
-  <section class="fc-dettaglio" id="linea-plus"></section>
-  <section class="fc-dettaglio" id="linea-smart"></section>
-
-  <!-- ============= INFO GENERALI (sezione lunga, sempre visibile con la landing) ============= -->
+  <!-- ============= INFO GENERALI ============= -->
   <section id="fc-generali">
     <div class="gen-head">
       <span class="badge info">Info</span>
@@ -333,6 +333,23 @@
       <details><summary>Qual è il tempo medio di risposta per le riparazioni?<span class="pm">+</span></summary><p>Il nostro team si impegna a rispondere entro 24 ore per le richieste di riparazione urgenti.</p></details>
     </div>
   </section>
+
+  <div class="cta-fill home"><div class="cta-inner">
+    <h4>Non sai quale modello scegliere?</h4>
+    <p>Ti guidiamo noi: un sopralluogo gratuito ci permette di individuare il climatizzatore Mitsubishi Electric perfetto per i tuoi ambienti, con installazione a regola d'arte in Ticino.</p>
+    <div class="cta-points">
+      <span class="pt"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6"/></svg>Refrigerante R32 ecologico</span>
+      <span class="pt"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>Sopralluogo gratuito</span>
+      <span class="pt"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Installazione professionale</span>
+      <span class="pt"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/></svg>Assistenza in Ticino</span>
+    </div>
+  </div></div>
+  </div><!-- /#fc-home -->
+
+  <!-- ===================== DETTAGLIO LINEE (render JS) ===================== -->
+  <section class="fc-dettaglio" id="linea-premium"></section>
+  <section class="fc-dettaglio" id="linea-plus"></section>
+  <section class="fc-dettaglio" id="linea-smart"></section>
 
   <!-- ===================== SCRIPT ===================== -->
   <script>
@@ -493,30 +510,29 @@
       document.getElementById('linea-'+k).innerHTML=renderLinea(k);
     });
 
-    /* ---------- Stessa altezza per tutte le linee (le corte si riempiono, mai vuote) ---------- */
+    /* ---------- Stessa altezza per TUTTO (home + ogni linea) ---------- */
     var LINEKEYS=['premium','plus','smart'];
-    function equalize(){
-      var secs=LINEKEYS.map(function(k){return document.getElementById('linea-'+k);});
-      secs.forEach(function(s){ s.style.minHeight=''; });
-      var cs=getComputedStyle(root);
-      var w=root.clientWidth-(parseFloat(cs.paddingLeft)||0)-(parseFloat(cs.paddingRight)||0);
+    var fcHome=document.getElementById('fc-home');
+    var detailEls=LINEKEYS.map(function(k){return document.getElementById('linea-'+k);});
+    function setState(which){
+      if(which==='home'){ fcHome.style.display='flex'; detailEls.forEach(function(d){d.classList.remove('attiva');}); }
+      else { fcHome.style.display='none'; detailEls.forEach(function(d){ if(d.id==='linea-'+which) d.classList.add('attiva'); else d.classList.remove('attiva'); }); }
+    }
+    function currentState(){
+      var act=root.querySelector('.fc-dettaglio.attiva');
+      return act ? act.id.replace('linea-','') : 'home';
+    }
+    function equalizeAll(){
+      var cur=currentState();
+      root.style.minHeight='';
       var max=0;
-      secs.forEach(function(s){
-        var active=s.classList.contains('attiva');
-        if(!active){
-          s.style.display='flex'; s.style.flexDirection='column';
-          s.style.position='absolute'; s.style.visibility='hidden';
-          s.style.left='0'; s.style.top='0'; s.style.width=w+'px';
-        }
-        var h=s.scrollHeight;
+      ['home'].concat(LINEKEYS).forEach(function(st){
+        setState(st);
+        var h=root.getBoundingClientRect().height;
         if(h>max) max=h;
-        if(!active){
-          s.style.display=''; s.style.flexDirection='';
-          s.style.position=''; s.style.visibility='';
-          s.style.left=''; s.style.top=''; s.style.width='';
-        }
       });
-      if(max>0) secs.forEach(function(s){ s.style.minHeight=max+'px'; });
+      setState(cur);
+      root.style.minHeight=Math.ceil(max)+'px';
     }
 
     /* ---------- Cambio immagine principale al click ---------- */
@@ -552,20 +568,16 @@
     }
 
     /* ---------- Landing "clicca e appare" ---------- */
-    var scelta=document.getElementById('fc-scelta');
-    var generali=document.getElementById('fc-generali');
     var hero=root.querySelector('.fc-hero');
     function apri(linea){
-      var sez=document.getElementById('linea-'+linea); if(!sez) return;
-      root.querySelectorAll('.fc-dettaglio').forEach(function(s){s.classList.remove('attiva');});
-      scelta.style.display='none'; if(generali) generali.style.display='none';
-      sez.classList.add('attiva');
-      equalize();
-      goTo(sez);
+      if(!document.getElementById('linea-'+linea)) return;
+      setState(linea);
+      equalizeAll();
+      goTo(document.getElementById('linea-'+linea));
     }
     function home(){
-      root.querySelectorAll('.fc-dettaglio').forEach(function(s){s.classList.remove('attiva');});
-      scelta.style.display=''; if(generali) generali.style.display='';
+      setState('home');
+      equalizeAll();
       goTo(hero);
     }
     root.querySelectorAll('.card[data-linea]').forEach(function(c){c.addEventListener('click',function(){apri(c.getAttribute('data-linea'));});});
@@ -577,12 +589,12 @@
 
     /* ---------- Equalizza le altezze + comunica l'altezza (una sola scrollbar) ---------- */
     var reTimer=null;
-    function onResize(){ clearTimeout(reTimer); reTimer=setTimeout(function(){ equalize(); postHeight(); },150); }
-    equalize();
+    function onResize(){ clearTimeout(reTimer); reTimer=setTimeout(function(){ equalizeAll(); postHeight(); },150); }
+    equalizeAll();
     window.addEventListener('resize',onResize);
-    window.addEventListener('load',function(){ equalize(); postHeight(); });
-    setTimeout(function(){ equalize(); postHeight(); },400);
-    setTimeout(function(){ equalize(); postHeight(); },1400);
+    window.addEventListener('load',function(){ equalizeAll(); postHeight(); });
+    setTimeout(function(){ equalizeAll(); postHeight(); },400);
+    setTimeout(function(){ equalizeAll(); postHeight(); },1400);
     if(inIframe){
       if('ResizeObserver' in window){ new ResizeObserver(postHeight).observe(root); }
       root.addEventListener('toggle',postHeight,true); // <details> FAQ
