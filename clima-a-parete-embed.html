@@ -7,6 +7,32 @@
      - Tutti i testi, le schede tecniche e la tabella del cliente
      - Nessun video YouTube · Protezione immagini (no drag / no menu / overlay)
      Self-contained: CSS + JS inline, nessuna dipendenza esterna.
+
+     ---------------------------------------------------------------------
+     COME EMBEDDARE SENZA DOPPIO SCROLL
+     ---------------------------------------------------------------------
+     OPZIONE A (consigliata) — incolla questo file dentro un blocco
+     "HTML personalizzato / Custom HTML" della pagina. Il widget scorre
+     insieme alla pagina: UNA sola scrollbar, niente iframe. Nulla da fare.
+
+     OPZIONE B — se DEVI usare un <iframe>, l'altezza si adatta da sola al
+     contenuto (anche cambiando scheda / da mobile): non ci sarà scroll
+     interno all'iframe. Incolla nella pagina questo snippet e imposta la
+     src del file:
+
+       <iframe id="fcClimaFrame" src="URL-DEL-FILE.html"
+               style="width:100%;border:0;display:block;overflow:hidden"
+               scrolling="no" title="Climatizzatori a parete"></iframe>
+       <script>
+       (function(){
+         window.addEventListener('message',function(e){
+           var d=e.data||{}; if(d.id!=='fc-clima') return;
+           var f=document.getElementById('fcClimaFrame'); if(!f) return;
+           if(d.type==='fc-clima-height'){ f.style.height=(d.height+2)+'px'; }
+           if(d.type==='fc-clima-scrolltop'){ f.scrollIntoView({behavior:'smooth',block:'start'}); }
+         });
+       })();
+       </script>
      ===================================================================== -->
 <div id="fc-clima" class="fc-clima">
   <style>
@@ -455,6 +481,23 @@
       });
     });
 
+    /* ---------- Rilevamento contesto iframe + auto-altezza (no doppio scroll) ---------- */
+    var inIframe=false; try{ inIframe=(window.self!==window.top); }catch(e){ inIframe=true; }
+    function postHeight(){
+      if(!inIframe) return;
+      var h=Math.ceil(root.getBoundingClientRect().height)+
+            (parseInt(getComputedStyle(root).marginTop)||0)+
+            (parseInt(getComputedStyle(root).marginBottom)||0);
+      try{ window.parent.postMessage({type:'fc-clima-height',id:'fc-clima',height:h},'*'); }catch(e){}
+    }
+    function goTo(el){
+      // Fuori da iframe: scroll interno normale. Dentro iframe: chiedi al genitore
+      // di riportare in vista l'inizio del widget (evita scroll interni all'embed).
+      if(!inIframe){ if(el) el.scrollIntoView({behavior:'smooth',block:'start'}); return; }
+      postHeight();
+      try{ window.parent.postMessage({type:'fc-clima-scrolltop',id:'fc-clima'},'*'); }catch(e){}
+    }
+
     /* ---------- Landing "clicca e appare" ---------- */
     var scelta=document.getElementById('fc-scelta');
     var generali=document.getElementById('fc-generali');
@@ -464,12 +507,12 @@
       root.querySelectorAll('.fc-dettaglio').forEach(function(s){s.classList.remove('attiva');});
       scelta.style.display='none'; if(generali) generali.style.display='none';
       sez.classList.add('attiva');
-      sez.scrollIntoView({behavior:'smooth',block:'start'});
+      goTo(sez);
     }
     function home(){
       root.querySelectorAll('.fc-dettaglio').forEach(function(s){s.classList.remove('attiva');});
       scelta.style.display=''; if(generali) generali.style.display='';
-      if(hero) hero.scrollIntoView({behavior:'smooth',block:'start'});
+      goTo(hero);
     }
     root.querySelectorAll('.card[data-linea]').forEach(function(c){c.addEventListener('click',function(){apri(c.getAttribute('data-linea'));});});
     root.addEventListener('click',function(e){ if(e.target.closest('[data-torna]')) home(); });
@@ -477,6 +520,16 @@
     /* ---------- Protezione immagini ---------- */
     root.addEventListener('contextmenu',function(e){ if(e.target.closest('.protetta,img,.thumbs,.vetrina')) e.preventDefault(); });
     root.addEventListener('dragstart',function(e){ if(e.target.tagName==='IMG') e.preventDefault(); });
+
+    /* ---------- Comunica l'altezza ad ogni cambiamento (una sola scrollbar) ---------- */
+    if(inIframe){
+      if('ResizeObserver' in window){ new ResizeObserver(postHeight).observe(root); }
+      window.addEventListener('resize',postHeight);
+      window.addEventListener('load',postHeight);
+      root.addEventListener('toggle',postHeight,true); // <details> FAQ
+      root.querySelectorAll('img').forEach(function(im){ im.addEventListener('load',postHeight); });
+      postHeight(); setTimeout(postHeight,300); setTimeout(postHeight,1200); setTimeout(postHeight,2500);
+    }
   })();
   </script>
 </div>
