@@ -117,6 +117,13 @@
   #fc-clima table.tec tr.gruppo th{background:var(--blu2);color:#fff;text-align:left;letter-spacing:.03em}
   #fc-clima table.tec td.na{color:var(--muto)}
 
+  /* ---- Sezione Informazioni generali (lunga, sempre visibile) ---- */
+  #fc-clima #fc-generali{margin-top:40px;padding-top:30px;border-top:2px solid var(--bordo)}
+  #fc-clima .gen-head{text-align:center;max-width:760px;margin:0 auto 22px}
+  #fc-clima .gen-head .badge{margin-bottom:12px}
+  #fc-clima .gen-head h2{font-size:clamp(1.4rem,3vw,2rem);margin-bottom:8px}
+  #fc-clima .gen-head p{color:var(--muto);font-size:1rem}
+
   /* ---- Sotto-titoli generali ---- */
   #fc-clima .sez-tit{font-size:1.35rem;font-weight:800;margin:8px 0 4px}
   #fc-clima .sez-sub{color:var(--muto);margin-bottom:8px}
@@ -174,16 +181,6 @@
         <span class="apri">Scopri la linea <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
       </div>
     </button>
-    <button class="card info" data-linea="info" type="button">
-      <div class="card-img protetta contain"><img src="https://frigocontrolch.10web.me/wp-content/uploads/2025/10/PLASMA-QUAD-PLUS-SCH-1.webp" alt="Informazioni tecniche generali" loading="lazy"></div>
-      <div class="card-body">
-        <span class="badge">Info</span>
-        <h3>Informazioni generali &amp; schede tecniche</h3>
-        <div class="modello">Monosplit · Multisplit · Filtri</div>
-        <p>Tabella tecnica completa, sistemi mono/multisplit, filtri dell'aria e qualità dell'aria.</p>
-        <span class="apri">Apri le schede <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
-      </div>
-    </button>
   </div>
 
   <!-- ===================== DETTAGLIO LINEE (render JS) ===================== -->
@@ -191,12 +188,13 @@
   <section class="fc-dettaglio" id="linea-plus"></section>
   <section class="fc-dettaglio" id="linea-smart"></section>
 
-  <!-- ===================== DETTAGLIO: INFO GENERALI ===================== -->
-  <section class="fc-dettaglio" id="linea-info">
-    <button class="torna" type="button" data-torna>
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M11 6l-6 6 6 6"/></svg> Torna alle linee
-    </button>
-    <div class="linea-head info"><span class="badge">Info</span><h2>Climatizzatori a parete — Informazioni generali</h2></div>
+  <!-- ============= INFO GENERALI (sezione lunga, sempre visibile con la landing) ============= -->
+  <section id="fc-generali">
+    <div class="gen-head">
+      <span class="badge info">Info</span>
+      <h2>Climatizzatori a parete — Informazioni generali</h2>
+      <p>Schede tecniche, sistemi mono e multisplit, filtri dell'aria e qualità dell'aria: le informazioni comuni a tutte le linee.</p>
+    </div>
 
     <h3 class="sez-tit">Sistema Monosplit — Esempio Modello LN</h3>
     <p class="sez-sub">Nella tabella sottostante sono indicati gli abbinamenti dell'unità interna e della relativa unità esterna LN con le principali caratteristiche tecniche.</p>
@@ -424,16 +422,19 @@
 
     /* ---------- Landing "clicca e appare" ---------- */
     var scelta=document.getElementById('fc-scelta');
+    var generali=document.getElementById('fc-generali');
     var hero=root.querySelector('.fc-hero');
     function apri(linea){
       var sez=document.getElementById('linea-'+linea); if(!sez) return;
       root.querySelectorAll('.fc-dettaglio').forEach(function(s){s.classList.remove('attiva');});
-      scelta.style.display='none'; sez.classList.add('attiva');
+      scelta.style.display='none'; if(generali) generali.style.display='none';
+      sez.classList.add('attiva');
       sez.scrollIntoView({behavior:'smooth',block:'start'});
     }
     function home(){
       root.querySelectorAll('.fc-dettaglio').forEach(function(s){s.classList.remove('attiva');});
-      scelta.style.display=''; if(hero) hero.scrollIntoView({behavior:'smooth',block:'start'});
+      scelta.style.display=''; if(generali) generali.style.display='';
+      if(hero) hero.scrollIntoView({behavior:'smooth',block:'start'});
     }
     root.querySelectorAll('.card[data-linea]').forEach(function(c){c.addEventListener('click',function(){apri(c.getAttribute('data-linea'));});});
     root.addEventListener('click',function(e){ if(e.target.closest('[data-torna]')) home(); });
