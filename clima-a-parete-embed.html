@@ -1,521 +1,446 @@
 <!-- =====================================================================
      Frigo Control Ticino — Climatizzatori a parete
-     Landing "clicca e appare" per embed (WordPress / iframe)
+     HTML da embeddare in una pagina (WordPress / iframe / shortcode HTML)
+     - Landing "clicca e appare": card che aprono la linea scelta
      - 3 linee: PREMIUM (MSZ-LN), PLUS (MSZ-AY), SMART (MSZ-HR)
-     - Ogni linea: riquadri con foto + galleria (lightbox)
-     - Nessun video YouTube
-     - Protezione immagini (no drag / no menu contestuale / overlay)
-     Tutto self-contained: CSS + JS inline, nessuna dipendenza esterna.
+     - Galleria: click sulla miniatura => cambia l'immagine principale (no popup)
+     - Tutti i testi, le schede tecniche e la tabella del cliente
+     - Nessun video YouTube · Protezione immagini (no drag / no menu / overlay)
+     Self-contained: CSS + JS inline, nessuna dipendenza esterna.
      ===================================================================== -->
 <div id="fc-clima" class="fc-clima">
   <style>
-  /* ------------------------------ Reset locale ------------------------ */
   #fc-clima *{box-sizing:border-box;margin:0;padding:0}
   #fc-clima{
-    --blu:#0a3d62;
-    --blu-chiaro:#1e6091;
-    --accent:#00a8e8;
-    --grigio:#f4f6f8;
-    --testo:#22303a;
-    --muto:#6b7b88;
-    --radius:16px;
-    --ombra:0 10px 30px rgba(10,61,98,.12);
-    --ombra-hover:0 18px 44px rgba(10,61,98,.22);
+    --blu:#0a3d62;--blu2:#1e6091;--accent:#00a8e8;
+    --grigio:#f4f6f8;--bordo:#e3e9ef;--testo:#22303a;--muto:#6b7b88;
+    --radius:16px;--ombra:0 10px 30px rgba(10,61,98,.10);--ombra-h:0 18px 44px rgba(10,61,98,.20);
     font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-    color:var(--testo);
-    line-height:1.55;
-    max-width:1180px;
-    margin:0 auto;
-    padding:14px;
+    color:var(--testo);line-height:1.55;max-width:1180px;margin:0 auto;padding:14px;
     -webkit-tap-highlight-color:transparent;
   }
   #fc-clima img{max-width:100%;display:block}
+  #fc-clima h1,#fc-clima h2,#fc-clima h3,#fc-clima h4,#fc-clima h5{color:var(--blu);line-height:1.2}
 
-  /* --------------------------- Protezione immagini -------------------- */
-  #fc-clima .protetta{position:relative;overflow:hidden;border-radius:12px}
+  /* ---- Protezione immagini ---- */
+  #fc-clima .protetta{position:relative;overflow:hidden;border-radius:12px;background:#eef2f5}
   #fc-clima .protetta img{
     width:100%;height:100%;object-fit:cover;
-    -webkit-user-drag:none;user-drag:none;
-    -webkit-user-select:none;user-select:none;
-    pointer-events:none;               /* nessuna interazione diretta col file */
+    -webkit-user-drag:none;user-drag:none;-webkit-user-select:none;user-select:none;pointer-events:none;
   }
-  #fc-clima .protetta::after{         /* overlay trasparente: cattura tap/menu */
-    content:"";position:absolute;inset:0;z-index:2;
-    background:transparent;
-  }
+  #fc-clima .protetta.contain img{object-fit:contain;background:#fff}
+  #fc-clima .protetta::after{content:"";position:absolute;inset:0;z-index:2;background:transparent}
 
-  /* ------------------------------ Intestazione ------------------------ */
-  #fc-clima .fc-hero{
-    text-align:center;padding:26px 12px 8px;
-  }
-  #fc-clima .fc-hero .kicker{
-    display:inline-block;letter-spacing:.14em;text-transform:uppercase;
-    font-size:.72rem;font-weight:700;color:var(--accent);margin-bottom:10px;
-  }
-  #fc-clima .fc-hero h1{
-    font-size:clamp(1.5rem,3.4vw,2.35rem);color:var(--blu);font-weight:800;
-    line-height:1.15;margin-bottom:10px;
-  }
-  #fc-clima .fc-hero p{max-width:640px;margin:0 auto;color:var(--muto);font-size:1.02rem}
+  /* ---- Intestazione ---- */
+  #fc-clima .fc-hero{text-align:center;padding:22px 12px 6px}
+  #fc-clima .fc-hero .kicker{display:inline-block;letter-spacing:.14em;text-transform:uppercase;font-size:.72rem;font-weight:700;color:var(--accent);margin-bottom:10px}
+  #fc-clima .fc-hero h1{font-size:clamp(1.5rem,3.4vw,2.35rem);font-weight:800;margin-bottom:12px}
+  #fc-clima .fc-hero p{max-width:760px;margin:0 auto;color:var(--muto);font-size:1.02rem}
 
-  /* ------------------------------ Landing (scelta) -------------------- */
-  #fc-clima .fc-scelta{
-    display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:26px;
-  }
-  @media(max-width:820px){#fc-clima .fc-scelta{grid-template-columns:1fr}}
-
+  /* ---- Landing ---- */
+  #fc-clima .fc-scelta{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:26px}
+  @media(max-width:860px){#fc-clima .fc-scelta{grid-template-columns:1fr}}
   #fc-clima .card{
-    position:relative;border:none;cursor:pointer;text-align:left;
-    background:#fff;border-radius:var(--radius);overflow:hidden;
-    box-shadow:var(--ombra);transition:transform .28s ease,box-shadow .28s ease;
-    display:flex;flex-direction:column;font:inherit;color:inherit;padding:0;
+    position:relative;border:1px solid var(--bordo);cursor:pointer;text-align:left;background:#fff;
+    border-radius:var(--radius);overflow:hidden;box-shadow:var(--ombra);
+    transition:transform .28s,box-shadow .28s;display:flex;flex-direction:column;font:inherit;color:inherit;padding:0;
   }
-  #fc-clima .card:hover,#fc-clima .card:focus-visible{
-    transform:translateY(-6px);box-shadow:var(--ombra-hover);outline:none;
-  }
-  #fc-clima .card .card-img{height:190px}
-  #fc-clima .card .card-body{padding:18px 20px 22px}
-  #fc-clima .card .badge{
-    display:inline-block;font-size:.68rem;font-weight:800;letter-spacing:.12em;
-    text-transform:uppercase;padding:5px 11px;border-radius:999px;color:#fff;margin-bottom:10px;
-  }
-  #fc-clima .card.premium .badge{background:linear-gradient(135deg,#8e2de2,#c0392b)}
-  #fc-clima .card.plus .badge{background:linear-gradient(135deg,var(--blu),var(--blu-chiaro))}
-  #fc-clima .card.smart .badge{background:linear-gradient(135deg,#0f9b8e,#16a085)}
-  #fc-clima .card h3{font-size:1.2rem;color:var(--blu);margin-bottom:4px}
-  #fc-clima .card .modello{font-size:.86rem;color:var(--muto);font-weight:600;margin-bottom:10px}
-  #fc-clima .card p{font-size:.92rem;color:var(--testo)}
-  #fc-clima .card .apri{
-    margin-top:14px;font-weight:700;color:var(--accent);font-size:.9rem;
-    display:inline-flex;align-items:center;gap:6px;
-  }
-  #fc-clima .card .apri svg{transition:transform .25s ease}
+  #fc-clima .card:hover,#fc-clima .card:focus-visible{transform:translateY(-6px);box-shadow:var(--ombra-h);outline:none}
+  #fc-clima .card .card-img{height:180px}
+  #fc-clima .card .card-body{padding:16px 20px 20px}
+  #fc-clima .badge{display:inline-block;font-size:.68rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;padding:5px 11px;border-radius:999px;color:#fff}
+  #fc-clima .premium .badge,#fc-clima .badge.premium{background:linear-gradient(135deg,#8e2de2,#c0392b)}
+  #fc-clima .plus .badge,#fc-clima .badge.plus{background:linear-gradient(135deg,var(--blu),var(--blu2))}
+  #fc-clima .smart .badge,#fc-clima .badge.smart{background:linear-gradient(135deg,#0f9b8e,#16a085)}
+  #fc-clima .info .badge,#fc-clima .badge.info{background:linear-gradient(135deg,#48576a,#2c3e50)}
+  #fc-clima .card h3{font-size:1.18rem;margin:10px 0 3px}
+  #fc-clima .card .modello{font-size:.85rem;color:var(--muto);font-weight:600;margin-bottom:9px}
+  #fc-clima .card p{font-size:.92rem}
+  #fc-clima .card .apri{margin-top:13px;font-weight:700;color:var(--accent);font-size:.9rem;display:inline-flex;align-items:center;gap:6px}
+  #fc-clima .card .apri svg{transition:transform .25s}
   #fc-clima .card:hover .apri svg{transform:translateX(4px)}
 
-  /* ------------------------------ Dettaglio linea -------------------- */
+  /* ---- Dettaglio ---- */
   #fc-clima .fc-dettaglio{display:none;animation:fcIn .4s ease}
   #fc-clima .fc-dettaglio.attiva{display:block}
   @keyframes fcIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
-
-  #fc-clima .torna{
-    display:inline-flex;align-items:center;gap:8px;background:none;border:none;
-    cursor:pointer;color:var(--blu);font-weight:700;font-size:.95rem;padding:8px 4px;
-    margin:6px 0 4px;font-family:inherit;
-  }
+  #fc-clima .torna{display:inline-flex;align-items:center;gap:8px;background:none;border:none;cursor:pointer;color:var(--blu);font-weight:700;font-size:.95rem;padding:8px 4px;margin:6px 0 8px;font-family:inherit}
   #fc-clima .torna:hover{color:var(--accent)}
-
-  #fc-clima .linea-head{
-    display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin:6px 0 4px;
-  }
-  #fc-clima .linea-head .badge{
-    display:inline-block;font-size:.7rem;font-weight:800;letter-spacing:.12em;
-    text-transform:uppercase;padding:6px 13px;border-radius:999px;color:#fff;
-  }
-  #fc-clima .linea-head.premium .badge{background:linear-gradient(135deg,#8e2de2,#c0392b)}
-  #fc-clima .linea-head.plus .badge{background:linear-gradient(135deg,var(--blu),var(--blu-chiaro))}
-  #fc-clima .linea-head.smart .badge{background:linear-gradient(135deg,#0f9b8e,#16a085)}
-  #fc-clima .linea-head h2{font-size:clamp(1.4rem,3vw,2rem);color:var(--blu)}
+  #fc-clima .linea-head{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin:4px 0 6px}
+  #fc-clima .linea-head h2{font-size:clamp(1.4rem,3vw,2rem)}
   #fc-clima .linea-head .mod{color:var(--muto);font-weight:600}
 
-  /* Riquadro principale: foto + descrizione */
-  #fc-clima .riquadro{
-    display:grid;grid-template-columns:1.1fr 1fr;gap:26px;align-items:center;
-    background:#fff;border-radius:var(--radius);box-shadow:var(--ombra);
-    padding:22px;margin:16px 0 22px;
-  }
-  @media(max-width:780px){#fc-clima .riquadro{grid-template-columns:1fr}}
-  #fc-clima .riquadro .foto-main{height:340px}
-  @media(max-width:780px){#fc-clima .riquadro .foto-main{height:250px}}
-  #fc-clima .riquadro h4{color:var(--blu);font-size:1.05rem;margin-bottom:8px}
-  #fc-clima .riquadro p{color:var(--testo);font-size:.96rem;margin-bottom:14px}
-  #fc-clima .caratteristiche{list-style:none;display:grid;gap:9px}
-  #fc-clima .caratteristiche li{
-    display:flex;gap:9px;align-items:flex-start;font-size:.93rem;color:var(--testo);
-  }
-  #fc-clima .caratteristiche li svg{flex:0 0 18px;margin-top:2px;color:var(--accent)}
-  #fc-clima .colori{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
-  #fc-clima .colori span{
-    display:inline-flex;align-items:center;gap:7px;font-size:.85rem;color:var(--muto);font-weight:600;
-  }
-  #fc-clima .colori .dot{width:15px;height:15px;border-radius:50%;box-shadow:0 0 0 1px rgba(0,0,0,.12)}
+  /* ---- Vetrina: immagine principale + miniature ---- */
+  #fc-clima .vetrina{display:grid;grid-template-columns:1.05fr .95fr;gap:26px;align-items:start;background:#fff;border:1px solid var(--bordo);border-radius:var(--radius);box-shadow:var(--ombra);padding:22px;margin:14px 0 26px}
+  @media(max-width:820px){#fc-clima .vetrina{grid-template-columns:1fr}}
+  #fc-clima .main-foto{width:100%;height:360px}
+  @media(max-width:820px){#fc-clima .main-foto{height:280px}}
+  #fc-clima .thumbs{display:grid;grid-template-columns:repeat(auto-fill,minmax(84px,1fr));gap:10px;margin-top:12px}
+  #fc-clima .thumbs .thumb{height:62px;border-radius:9px;overflow:hidden;cursor:pointer;border:2px solid transparent;transition:border-color .2s,transform .2s}
+  #fc-clima .thumbs .thumb:hover{transform:translateY(-2px)}
+  #fc-clima .thumbs .thumb.attiva{border-color:var(--accent)}
+  #fc-clima .thumbs .thumb .protetta,#fc-clima .thumbs .thumb img{height:100%;border-radius:0}
+  #fc-clima .caption{font-size:.85rem;color:var(--muto);margin-top:10px;min-height:1.2em}
 
-  /* Galleria */
-  #fc-clima .galleria-tit{
-    font-size:1.05rem;color:var(--blu);font-weight:700;margin:6px 0 12px;
-    display:flex;align-items:center;gap:9px;
-  }
-  #fc-clima .galleria{
-    display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px;
-  }
-  #fc-clima .galleria .thumb{
-    height:130px;border-radius:12px;overflow:hidden;cursor:pointer;
-    box-shadow:var(--ombra);transition:transform .22s ease,box-shadow .22s ease;
-  }
-  #fc-clima .galleria .thumb:hover{transform:translateY(-4px);box-shadow:var(--ombra-hover)}
-  #fc-clima .galleria .thumb .protetta,#fc-clima .galleria .thumb img{height:100%}
+  /* Colonna caratteristiche accanto alla vetrina */
+  #fc-clima .vetrina .lato h4{font-size:1.15rem;margin-bottom:6px}
+  #fc-clima .serie{display:inline-block;font-size:.72rem;font-weight:700;letter-spacing:.1em;color:var(--muto);text-transform:uppercase;margin-bottom:12px}
+  #fc-clima .spec{list-style:none;display:grid;gap:8px;margin-bottom:16px}
+  #fc-clima .spec li{display:flex;gap:9px;align-items:flex-start;font-size:.94rem}
+  #fc-clima .spec li svg{flex:0 0 18px;margin-top:2px;color:var(--accent)}
+  #fc-clima .chips{display:flex;flex-wrap:wrap;gap:8px}
+  #fc-clima .chip{display:inline-flex;align-items:center;gap:6px;background:var(--grigio);border:1px solid var(--bordo);color:var(--blu);border-radius:999px;padding:6px 12px;font-size:.78rem;font-weight:600}
+  #fc-clima .chip svg{color:var(--accent)}
 
-  /* Lightbox */
-  #fc-clima .lightbox{
-    position:fixed;inset:0;z-index:99999;display:none;
-    background:rgba(6,20,30,.88);align-items:center;justify-content:center;padding:24px;
-  }
-  #fc-clima .lightbox.attiva{display:flex}
-  #fc-clima .lightbox .lb-inner{position:relative;max-width:min(92vw,1000px);width:100%}
-  #fc-clima .lightbox .lb-img{
-    width:100%;max-height:82vh;border-radius:12px;overflow:hidden;
-    background:#000 center/contain no-repeat;
-  }
-  #fc-clima .lightbox .lb-img::after{content:"";position:absolute;inset:0} /* protezione */
-  #fc-clima .lightbox .lb-nav{
-    position:absolute;top:50%;transform:translateY(-50%);
-    background:rgba(255,255,255,.9);border:none;cursor:pointer;
-    width:46px;height:46px;border-radius:50%;font-size:1.4rem;color:var(--blu);
-    display:flex;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(0,0,0,.3);
-  }
-  #fc-clima .lightbox .lb-prev{left:-10px}
-  #fc-clima .lightbox .lb-next{right:-10px}
-  @media(max-width:640px){#fc-clima .lightbox .lb-prev{left:6px}#fc-clima .lightbox .lb-next{right:6px}}
-  #fc-clima .lightbox .lb-close{
-    position:absolute;top:-14px;right:-14px;background:#fff;border:none;cursor:pointer;
-    width:40px;height:40px;border-radius:50%;font-size:1.3rem;color:var(--blu);
-    box-shadow:0 4px 14px rgba(0,0,0,.3);
-  }
-  @media(max-width:640px){#fc-clima .lightbox .lb-close{top:6px;right:6px}}
-  #fc-clima .lb-caption{color:#fff;text-align:center;margin-top:12px;font-size:.9rem;opacity:.9}
+  /* ---- Intro linea ---- */
+  #fc-clima .intro-linea{background:linear-gradient(135deg,#f7fafc,#eef4f8);border-left:4px solid var(--accent);border-radius:12px;padding:16px 20px;margin:0 0 24px;font-size:1rem;color:var(--testo)}
 
-  #fc-clima .fc-foot{text-align:center;color:var(--muto);font-size:.82rem;padding:26px 10px 8px}
+  /* ---- Sezioni feature (riquadri foto + testo) ---- */
+  #fc-clima .feat-tit{font-size:1.15rem;font-weight:700;margin:26px 0 14px;display:flex;align-items:center;gap:9px}
+  #fc-clima .feat{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:center;background:#fff;border:1px solid var(--bordo);border-radius:var(--radius);box-shadow:var(--ombra);padding:20px;margin-bottom:18px}
+  #fc-clima .feat.rev .feat-img{order:2}
+  #fc-clima .feat.notxt-img{grid-template-columns:1fr}
+  @media(max-width:760px){#fc-clima .feat{grid-template-columns:1fr}#fc-clima .feat.rev .feat-img{order:0}}
+  #fc-clima .feat-img{height:250px}
+  #fc-clima .feat h5{font-size:1.1rem;margin-bottom:8px}
+  #fc-clima .feat p{font-size:.95rem;margin-bottom:10px}
+  #fc-clima .feat ul.sub{list-style:none;display:grid;gap:7px}
+  #fc-clima .feat ul.sub li{display:flex;gap:8px;font-size:.92rem;align-items:flex-start}
+  #fc-clima .feat ul.sub li svg{flex:0 0 16px;margin-top:3px;color:var(--accent)}
+
+  /* ---- Tabella tecnica ---- */
+  #fc-clima .tab-wrap{overflow-x:auto;border:1px solid var(--bordo);border-radius:var(--radius);box-shadow:var(--ombra);margin:14px 0 26px;background:#fff}
+  #fc-clima table.tec{border-collapse:collapse;width:100%;min-width:720px;font-size:.86rem}
+  #fc-clima table.tec th,#fc-clima table.tec td{border:1px solid var(--bordo);padding:9px 11px;text-align:center;vertical-align:middle}
+  #fc-clima table.tec thead th{background:var(--blu);color:#fff;font-weight:700}
+  #fc-clima table.tec tbody th{background:var(--grigio);color:var(--blu);text-align:left;white-space:nowrap;font-weight:700}
+  #fc-clima table.tec tr.gruppo th{background:var(--blu2);color:#fff;text-align:left;letter-spacing:.03em}
+  #fc-clima table.tec td.na{color:var(--muto)}
+
+  /* ---- Sotto-titoli generali ---- */
+  #fc-clima .sez-tit{font-size:1.35rem;font-weight:800;margin:8px 0 4px}
+  #fc-clima .sez-sub{color:var(--muto);margin-bottom:8px}
+  #fc-clima .lista-ext{list-style:none;display:flex;flex-wrap:wrap;gap:10px;margin:12px 0}
+  #fc-clima .lista-ext li{background:var(--grigio);border:1px solid var(--bordo);border-radius:10px;padding:9px 14px;font-weight:700;color:var(--blu)}
+
+  /* ---- FAQ ---- */
+  #fc-clima .faq{margin:22px 0 6px}
+  #fc-clima .faq h3{font-size:1.35rem;margin-bottom:4px}
+  #fc-clima .faq .faq-sub{color:var(--muto);margin-bottom:14px}
+  #fc-clima .faq details{background:#fff;border:1px solid var(--bordo);border-radius:12px;margin-bottom:10px;box-shadow:var(--ombra);overflow:hidden}
+  #fc-clima .faq summary{cursor:pointer;list-style:none;padding:15px 18px;font-weight:700;color:var(--blu);display:flex;justify-content:space-between;align-items:center;gap:10px}
+  #fc-clima .faq summary::-webkit-details-marker{display:none}
+  #fc-clima .faq summary .pm{transition:transform .25s;flex:0 0 auto}
+  #fc-clima .faq details[open] summary .pm{transform:rotate(45deg)}
+  #fc-clima .faq details p{padding:0 18px 16px;color:var(--testo);font-size:.95rem}
   </style>
 
-  <!-- ============================ HERO ============================ -->
+  <!-- ===================== HERO ===================== -->
   <div class="fc-hero">
     <span class="kicker">Frigo Control Ticino · Mitsubishi Electric</span>
-    <h1>Climatizzatori a parete</h1>
-    <p>Scegli la linea più adatta a te. Clicca su una gamma per scoprire foto, dettagli e galleria.</p>
+    <h1>Le nostre proposte a Parete: semplicità e performance</h1>
+    <p>In questa categoria troverai diverse soluzioni per chi preferisce il classico climatizzatore a parete. Dai modelli base a quelli più avanzati, avrai davvero l'imbarazzo della scelta. Scorri le opzioni, dai un'occhiata alle caratteristiche e ai dettagli tecnici e ricorda: siamo qui per consigliarti nella scelta. Un sopralluogo ci aiuterà a individuare il climatizzatore perfetto per i tuoi ambienti.</p>
   </div>
 
-  <!-- ============================ LANDING ========================= -->
+  <!-- ===================== LANDING ===================== -->
   <div class="fc-scelta" id="fc-scelta">
-
     <button class="card premium" data-linea="premium" type="button">
-      <div class="card-img protetta">
-        <img src="https://frigocontrolch.10web.me/wp-content/uploads/2025/08/climatizzatore-premium-mitsubishi-ln-tre-colori-frigo-control-ticino.webp" alt="Climatizzatore Premium Mitsubishi MSZ-LN" loading="lazy">
-      </div>
+      <div class="card-img protetta"><img src="https://frigocontrolch.10web.me/wp-content/uploads/2025/08/climatizzatore-premium-mitsubishi-ln-tre-colori-frigo-control-ticino.webp" alt="Climatizzatore Premium Mitsubishi MSZ-LN" loading="lazy"></div>
       <div class="card-body">
         <span class="badge">Premium</span>
-        <h3>Kirigamine Style</h3>
+        <h3>Mitsubishi LN · Kirigamine Style</h3>
         <div class="modello">Serie MSZ-LN</div>
-        <p>Design elegante, 3D i-see sensor e Plasma Quad Plus. Disponibile in tre colori.</p>
-        <span class="apri">Scopri la linea
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-        </span>
+        <p>Il top di gamma: 3D i-see sensor, Dual Barrier Coating e Plasma Quad Plus. Tre colori.</p>
+        <span class="apri">Scopri la linea <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
       </div>
     </button>
-
     <button class="card plus" data-linea="plus" type="button">
-      <div class="card-img protetta">
-        <img src="https://frigocontrolch.10web.me/wp-content/uploads/2025/08/climatizzatore-plus-mitsubishi-ay-singolo-frigo-control-ticino.webp" alt="Climatizzatore Plus Mitsubishi MSZ-AY" loading="lazy">
-      </div>
+      <div class="card-img protetta"><img src="https://frigocontrolch.10web.me/wp-content/uploads/2025/08/climatizzatore-plus-mitsubishi-ay-singolo-frigo-control-ticino.webp" alt="Climatizzatore Plus Mitsubishi MSZ-AY" loading="lazy"></div>
       <div class="card-body">
         <span class="badge">Plus</span>
-        <h3>Serie M · Design sofisticato</h3>
+        <h3>Mitsubishi AY · Serie M</h3>
         <div class="modello">Serie MSZ-AY</div>
-        <p>Compatto e silenzioso (18 dB), Self Clean Mode e controllo Wi-Fi opzionale.</p>
-        <span class="apri">Scopri la linea
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-        </span>
+        <p>Design satinato compatto, Self Clean Mode e silenziosità fino a 18 dB(A).</p>
+        <span class="apri">Scopri la linea <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
       </div>
     </button>
-
     <button class="card smart" data-linea="smart" type="button">
-      <div class="card-img protetta">
-        <img src="https://frigocontrolch.10web.me/wp-content/uploads/2025/08/climatizzatore-smart-mitsubishi-hr-soggiorno-frigo-control-ticino-600x399.webp" alt="Climatizzatore Smart Mitsubishi MSZ-HR" loading="lazy">
-      </div>
+      <div class="card-img protetta"><img src="https://frigocontrolch.10web.me/wp-content/uploads/2025/08/climatizzatore-smart-mitsubishi-hr-soggiorno-frigo-control-ticino-600x399.webp" alt="Climatizzatore Smart Mitsubishi MSZ-HR" loading="lazy"></div>
       <div class="card-body">
         <span class="badge">Smart</span>
-        <h3>Serie M · Flat panel</h3>
+        <h3>Mitsubishi HR · Serie M</h3>
         <div class="modello">Serie MSZ-HR</div>
-        <p>Pannello piatto e design compatto, alta efficienza R32 e kit Wi-Fi opzionale.</p>
-        <span class="apri">Scopri la linea
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-        </span>
+        <p>Flat panel e design compatto, alta efficienza R32 e kit Wi-Fi opzionale.</p>
+        <span class="apri">Scopri la linea <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
       </div>
     </button>
-
+    <button class="card info" data-linea="info" type="button">
+      <div class="card-img protetta contain"><img src="https://frigocontrolch.10web.me/wp-content/uploads/2025/10/PLASMA-QUAD-PLUS-SCH-1.webp" alt="Informazioni tecniche generali" loading="lazy"></div>
+      <div class="card-body">
+        <span class="badge">Info</span>
+        <h3>Informazioni generali &amp; schede tecniche</h3>
+        <div class="modello">Monosplit · Multisplit · Filtri</div>
+        <p>Tabella tecnica completa, sistemi mono/multisplit, filtri dell'aria e qualità dell'aria.</p>
+        <span class="apri">Apri le schede <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+      </div>
+    </button>
   </div>
 
-  <!-- ==================== DETTAGLIO: PREMIUM ==================== -->
-  <section class="fc-dettaglio" id="linea-premium">
+  <!-- ===================== DETTAGLIO LINEE (render JS) ===================== -->
+  <section class="fc-dettaglio" id="linea-premium"></section>
+  <section class="fc-dettaglio" id="linea-plus"></section>
+  <section class="fc-dettaglio" id="linea-smart"></section>
+
+  <!-- ===================== DETTAGLIO: INFO GENERALI ===================== -->
+  <section class="fc-dettaglio" id="linea-info">
     <button class="torna" type="button" data-torna>
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>
-      Torna alle linee
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M11 6l-6 6 6 6"/></svg> Torna alle linee
     </button>
-    <div class="linea-head premium">
-      <span class="badge">Premium</span>
-      <h2>Kirigamine Style</h2>
-      <span class="mod">Serie MSZ-LN</span>
+    <div class="linea-head info"><span class="badge">Info</span><h2>Climatizzatori a parete — Informazioni generali</h2></div>
+
+    <h3 class="sez-tit">Sistema Monosplit — Esempio Modello LN</h3>
+    <p class="sez-sub">Nella tabella sottostante sono indicati gli abbinamenti dell'unità interna e della relativa unità esterna LN con le principali caratteristiche tecniche.</p>
+    <div class="feat notxt-img"><div class="feat-img protetta contain" style="height:200px"><img src="https://frigocontrolch.10web.me/wp-content/uploads/2025/10/monosplit_0-a-parete.webp" alt="Sistema monosplit a parete" loading="lazy"></div></div>
+
+    <div class="tab-wrap">
+      <table class="tec">
+        <thead>
+          <tr><th>Unità interna</th><th>MSZ-AY15VGKP</th><th>MSZ-AY20VGKP</th><th>MSZ-AY25VGKP</th><th>MSZ-AY35VGKP</th><th>MSZ-AY42VGKP</th><th>MSZ-AY50VGKP</th></tr>
+        </thead>
+        <tbody>
+          <tr><th>Unità esterna</th><td>MULTISPLIT</td><td>MUZ-AY20VG</td><td>MUZ-AY25VG</td><td>MUZ-AY35VG</td><td>MUZ-AY42VG</td><td>MUZ-AY50VG</td></tr>
+          <tr class="gruppo"><th colspan="7">Raffrescamento secondo standard EN14825</th></tr>
+          <tr><th>Potenza (kW)</th><td class="na">Solo con Multisplit</td><td>2</td><td>2,5</td><td>3,5</td><td>4,2</td><td>5,0</td></tr>
+          <tr><th>SEER</th><td class="na">—</td><td>8,6</td><td>8,7</td><td>8,7</td><td>7,9</td><td>7,5</td></tr>
+          <tr><th>Efficienza energetica*</th><td class="na">—</td><td>A+++</td><td>A+++</td><td>A+++</td><td>A++</td><td>A++</td></tr>
+          <tr><th>Pressione sonora (dB)</th><td>19-26-30-35-40</td><td>19-26-30-35-42</td><td>18-24-30-36-42</td><td>18-24-30-36-42</td><td>21-29-34-38-42</td><td>28-33-36-40-44</td></tr>
+          <tr class="gruppo"><th colspan="7">Riscaldamento secondo standard EN14825</th></tr>
+          <tr><th>Potenza (kW)</th><td class="na">Solo con Multisplit</td><td>2,3</td><td>2,4</td><td>2,9</td><td>3,8</td><td>4,2</td></tr>
+          <tr><th>SCOP</th><td class="na">—</td><td>4,2</td><td>4,8</td><td>4,7</td><td>4,7</td><td>4,7</td></tr>
+          <tr><th>Efficienza energetica*</th><td class="na">—</td><td>A+</td><td>A++</td><td>A++</td><td>A++</td><td>A++</td></tr>
+          <tr><th>Pressione sonora (dB)</th><td>19-26-30-35-40</td><td>19-26-30-35-42</td><td>18-24-34-39-45</td><td>18-24-31-38-45</td><td>21-29-35-40-45</td><td>28-33-38-43-48</td></tr>
+        </tbody>
+      </table>
     </div>
 
-    <div class="riquadro">
-      <div class="foto-main protetta">
-        <img src="https://frigocontrolch.10web.me/wp-content/uploads/2025/08/climatizzatore-premium-mitsubishi-ln-tre-colori-frigo-control-ticino.webp" alt="Mitsubishi MSZ-LN tre colori" loading="lazy">
-      </div>
+    <h3 class="sez-tit">Sistema Multisplit</h3>
+    <p class="sez-sub">È possibile abbinare le unità interne alle seguenti unità esterne per sistemi multisplit:</p>
+    <ul class="lista-ext"><li>MXZ</li><li>MXZ HYPER HEATING</li><li>PUMY-SP</li></ul>
+    <div class="feat notxt-img"><div class="feat-img protetta contain" style="height:200px"><img src="https://frigocontrolch.10web.me/wp-content/uploads/2025/10/multisplit_5.webp" alt="Sistema multisplit" loading="lazy"></div></div>
+
+    <div class="feat">
+      <div class="feat-img protetta contain"><img src="https://frigocontrolch.10web.me/wp-content/uploads/2025/10/v-blocking.webp" alt="Filtro V Blocking" loading="lazy"></div>
+      <div><h5>Filtro purificatore dell'aria V Blocking</h5><p>V Blocking è un nuovo filtro purificatore che migliora il precedente sistema filtrante agli ioni d'argento, aggiungendo un'azione antivirale in grado di inibire fino al 99% di virus, batteri, muffe e allergeni.</p></div>
+    </div>
+
+    <div class="feat rev">
+      <div class="feat-img protetta contain"><img src="https://frigocontrolch.10web.me/wp-content/uploads/2025/10/PLASMA-QUAD-PLUS-SCH-1.webp" alt="Filtro Plasma Quad Plus" loading="lazy"></div>
       <div>
-        <h4>Il top di gamma Mitsubishi Electric</h4>
-        <p>Refrigerante R32, sensore 3D i-see, Dual Barrier Coating e purificazione dell'aria Plasma Quad Plus. Un design che si integra con eleganza in ogni ambiente.</p>
-        <ul class="caratteristiche">
-          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg> Sensore 3D i-see per il comfort ottimale</li>
-          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg> Plasma Quad Plus: filtrazione dell'aria avanzata</li>
-          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg> Dual Barrier Coating anti-sporco</li>
-          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg> Refrigerante ecologico R32</li>
-        </ul>
-        <div class="colori">
-          <span><span class="dot" style="background:#b0332c"></span>Ruby Red</span>
-          <span><span class="dot" style="background:#1a1a1a"></span>Onyx Black</span>
-          <span><span class="dot" style="background:#f2efe9"></span>Pearl White</span>
-        </div>
+        <h5>Filtro Plasma Quad Plus <span style="font-weight:600;color:var(--muto);font-size:.85rem">(in dotazione per LN e AY, opzionale per HR)</span></h5>
+        <p>L'innovativo sistema di filtrazione attivo dell'aria Plasma Quad Plus rende l'unità interna distintiva per nuclei famigliari particolarmente attenti alla qualità dell'aria o per installazioni in ambienti dall'aria spesso compromessa (es. locali affacciati su zone trafficate, in città, in prossimità di attività di produzione…).</p>
+        <p>Attraverso l'utilizzo della tecnologia Plasma Quad Plus l'unità è in grado di eliminare batteri e virus grazie ad una tecnologia che sfrutta un campo elettrico ed una serie di scariche elettriche attraverso cui passa l'aria immessa in ambiente.</p>
+        <p>Il sistema Plasma Quad PLUS è un sistema di filtrazione attiva in grado di inibire fino al 99% di virus, batteri, muffe e PM2.5 presenti nell'aria, fino al 98% di allergeni e pollini e fino al 99,7% di acari e polveri.</p>
       </div>
     </div>
 
-    <div class="galleria-tit">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
-      Galleria
+    <div class="feat">
+      <div class="feat-img protetta contain"><img src="https://frigocontrolch.10web.me/wp-content/uploads/2025/10/Esploso-LN-sfondo-bianco-1.webp" alt="Filtrazione e distribuzione aria" loading="lazy"></div>
+      <div>
+        <h5>Filtrazione, distribuzione e qualità dell'aria</h5>
+        <p>La qualità dell'aria è la misura di quanto l'aria sia priva di elementi caratteristici dell'inquinamento atmosferico.</p>
+        <p>Misura, dunque, quanto l'aria che respiriamo sia salubre. Conoscere quali contaminanti siano presenti, e controllarne la quantità, aiuta a ridurre, o addirittura limitare fortemente, i rischi di futuri problemi di salute e a garantire maggior comfort per tutti.</p>
+        <p>I sistemi Mitsubishi Electric sono progettati per migliorare la qualità dell'aria nel modo migliore, creando le condizioni ottimali per un comfort impareggiabile negli ambienti confinati in cui vivi e trascorri il tempo.</p>
+      </div>
     </div>
-    <div class="galleria" data-galleria="premium"></div>
+
+    <div class="faq">
+      <h3>Domande Frequenti</h3>
+      <p class="faq-sub">Scopri le risposte alle domande più comuni sui nostri servizi di refrigerazione e manutenzione.</p>
+      <details><summary>Quali tipi di sistemi di refrigerazione offrite?<span class="pm">+</span></summary><p>Offriamo una vasta gamma di sistemi di refrigerazione, inclusi impianti industriali e commerciali.</p></details>
+      <details><summary>Come posso richiedere assistenza per la riparazione?<span class="pm">+</span></summary><p>Puoi contattarci tramite il nostro modulo online o telefonicamente per richiedere assistenza.</p></details>
+      <details><summary>Qual è il tempo medio di risposta per le riparazioni?<span class="pm">+</span></summary><p>Il nostro team si impegna a rispondere entro 24 ore per le richieste di riparazione urgenti.</p></details>
+    </div>
   </section>
 
-  <!-- ==================== DETTAGLIO: PLUS ==================== -->
-  <section class="fc-dettaglio" id="linea-plus">
-    <button class="torna" type="button" data-torna>
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>
-      Torna alle linee
-    </button>
-    <div class="linea-head plus">
-      <span class="badge">Plus</span>
-      <h2>Serie M · Design sofisticato</h2>
-      <span class="mod">Serie MSZ-AY</span>
-    </div>
-
-    <div class="riquadro">
-      <div class="foto-main protetta">
-        <img src="https://frigocontrolch.10web.me/wp-content/uploads/2025/08/climatizzatore-plus-mitsubishi-ay-singolo-frigo-control-ticino.webp" alt="Mitsubishi MSZ-AY" loading="lazy">
-      </div>
-      <div>
-        <h4>Comfort compatto e silenzioso</h4>
-        <p>Dimensioni compatte, funzionamento estremamente silenzioso (fino a 18 dB) e Self Clean Mode per mantenere l'unità sempre pulita. Refrigerante R32 e controllo Wi-Fi opzionale.</p>
-        <ul class="caratteristiche">
-          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg> Silenziosità fino a 18 dB</li>
-          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg> Self Clean Mode: asciugatura automatica</li>
-          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg> Dimensioni compatte, ideale in camera</li>
-          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg> Refrigerante R32 · Wi-Fi opzionale</li>
-        </ul>
-        <div class="colori">
-          <span><span class="dot" style="background:#f2efe9"></span>Bianco</span>
-          <span>Potenze da 2,0 a 5,0 kW · MSZ-AY15 → AY50</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="galleria-tit">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
-      Galleria
-    </div>
-    <div class="galleria" data-galleria="plus"></div>
-  </section>
-
-  <!-- ==================== DETTAGLIO: SMART ==================== -->
-  <section class="fc-dettaglio" id="linea-smart">
-    <button class="torna" type="button" data-torna>
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>
-      Torna alle linee
-    </button>
-    <div class="linea-head smart">
-      <span class="badge">Smart</span>
-      <h2>Serie M · Flat panel</h2>
-      <span class="mod">Serie MSZ-HR</span>
-    </div>
-
-    <div class="riquadro">
-      <div class="foto-main protetta">
-        <img src="https://frigocontrolch.10web.me/wp-content/uploads/2025/08/climatizzatore-smart-mitsubishi-hr-soggiorno-frigo-control-ticino-600x399.webp" alt="Mitsubishi MSZ-HR" loading="lazy">
-      </div>
-      <div>
-        <h4>Essenziale, efficiente, discreto</h4>
-        <p>Pannello frontale piatto e design compatto che si integra in ogni stanza. Alta efficienza con refrigerante R32, funzionamento silenzioso e kit Wi-Fi opzionale.</p>
-        <ul class="caratteristiche">
-          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg> Flat panel: superficie liscia e pulita</li>
-          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg> Alta efficienza energetica</li>
-          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg> Funzionamento silenzioso</li>
-          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg> Refrigerante R32 · kit Wi-Fi opzionale</li>
-        </ul>
-        <div class="colori">
-          <span><span class="dot" style="background:#f2efe9"></span>Bianco</span>
-          <span>Soluzioni mono e multisplit</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="galleria-tit">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
-      Galleria
-    </div>
-    <div class="galleria" data-galleria="smart"></div>
-  </section>
-
-  <div class="fc-foot">© Frigo Control Ticino · Immagini Mitsubishi Electric — riproduzione riservata</div>
-
-  <!-- ============================ LIGHTBOX ============================ -->
-  <div class="lightbox" id="fc-lightbox" aria-hidden="true">
-    <div class="lb-inner">
-      <button class="lb-close" type="button" data-lb-close aria-label="Chiudi">&times;</button>
-      <button class="lb-nav lb-prev" type="button" data-lb-prev aria-label="Precedente">&#8249;</button>
-      <div class="lb-img protetta" id="fc-lb-img"></div>
-      <button class="lb-nav lb-next" type="button" data-lb-next aria-label="Successiva">&#8250;</button>
-      <div class="lb-caption" id="fc-lb-caption"></div>
-    </div>
-  </div>
-
-  <!-- ============================ SCRIPT ============================ -->
+  <!-- ===================== SCRIPT ===================== -->
   <script>
   (function(){
-    var root = document.getElementById('fc-clima');
-    if(!root || root.dataset.init) return;
-    root.dataset.init = '1';
+    var root=document.getElementById('fc-clima');
+    if(!root||root.dataset.init) return; root.dataset.init='1';
 
-    /* ---------------- Dati gallerie ---------------- */
-    var GALLERIE = {
-      premium: [
-        {src:'https://frigocontrolch.10web.me/wp-content/uploads/2025/08/climatizzatore-premium-mitsubishi-ln-tre-colori-frigo-control-ticino.webp', cap:'Disponibile in tre colori'},
-        {src:'https://frigocontrolch.10web.me/wp-content/uploads/2025/08/limatizzatore-premium-mitsubishi-ln-sensore-3d-frigo-control-ticino.webp', cap:'Sensore 3D i-see'},
-        {src:'https://frigocontrolch.10web.me/wp-content/uploads/2025/08/climatizzatore-premium-mitsubishi-ln-alette-frigo-control-ticino.webp', cap:'Alette di distribuzione aria'},
-        {src:'https://frigocontrolch.10web.me/wp-content/uploads/2025/08/climatizzatore-premium-mitsubishi-ln-rosso-frigo-control-ticino.webp', cap:'Finitura Ruby Red'},
-        {src:'https://frigocontrolch.10web.me/wp-content/uploads/2025/08/climatizzatore-premium-mitsubishi-ln-rosso-soggiorno-frigo-control-ticino.webp', cap:'Ruby Red in soggiorno'},
-        {src:'https://frigocontrolch.10web.me/wp-content/uploads/2025/08/climatizzatore-premium-mitsubishi-ln-nero-soggiorno-frigo-control-ticino.webp', cap:'Onyx Black in soggiorno'},
-        {src:'https://frigocontrolch.10web.me/wp-content/uploads/2025/08/climatizzatore-premium-mitsubishi-ln-bianco-soggiorno-frigo-control-ticino.webp', cap:'Pearl White in soggiorno'},
-        {src:'https://frigocontrolch.10web.me/wp-content/uploads/2025/08/telecomandi-climatizzatore-premium-mitsubishi-ln-frigo-control-ticino.webp', cap:'Telecomando e comandi'}
-      ],
-      plus: [
-        {src:'https://frigocontrolch.10web.me/wp-content/uploads/2025/08/climatizzatore-plus-mitsubishi-ay-singolo-frigo-control-ticino.webp', cap:'Unità singola MSZ-AY'},
-        {src:'https://frigocontrolch.10web.me/wp-content/uploads/2025/08/climatizzatore-plus-mitsubishi-ay-dual-split-frigo-control-ticino.webp', cap:'Soluzione dual split'},
-        {src:'https://frigocontrolch.10web.me/wp-content/uploads/2025/08/climatizzatore-plus-mitsubishi-ay-camera-letto-frigo-control-ticino.webp', cap:'In camera da letto'},
-        {src:'https://frigocontrolch.10web.me/wp-content/uploads/2025/08/climatizzatore-plus-mitsubishi-ay-soggiorno-frigo-control-ticino.webp', cap:'In soggiorno'},
-        {src:'https://frigocontrolch.10web.me/wp-content/uploads/2025/10/dimensioni-msz-ay15.webp', cap:'Dimensioni compatte'},
-        {src:'https://frigocontrolch.10web.me/wp-content/uploads/2025/10/MSZ-AY-SenzaCon-Self-Clean-Mode.webp', cap:'Self Clean Mode'},
-        {src:'https://frigocontrolch.10web.me/wp-content/uploads/2025/10/funzionamento-silenzioso-MSZ-AY.webp', cap:'Funzionamento silenzioso'},
-        {src:'https://frigocontrolch.10web.me/wp-content/uploads/2025/10/MSZ-AP-Night-Mode.webp', cap:'Night Mode'}
-      ],
-      smart: [
-        {src:'https://frigocontrolch.10web.me/wp-content/uploads/2025/08/climatizzatore-smart-mitsubishi-hr-soggiorno-frigo-control-ticino-600x399.webp', cap:'MSZ-HR in soggiorno'},
-        {src:'https://frigocontrolch.10web.me/wp-content/uploads/2025/08/climatizzatore-smart-mitsubishi-hr-frigo-control-ticino-600x344.webp', cap:'Pannello piatto flat panel'},
-        {src:'https://frigocontrolch.10web.me/wp-content/uploads/2025/10/Filtro-plasma-quad-connect_0.webp', cap:'Filtrazione dell\'aria'},
-        {src:'https://frigocontrolch.10web.me/wp-content/uploads/2025/10/monosplit_0-a-parete.webp', cap:'Soluzione monosplit'},
-        {src:'https://frigocontrolch.10web.me/wp-content/uploads/2025/10/multisplit_5.webp', cap:'Soluzione multisplit'}
-      ]
+    /* ---------- Icone SVG per i chip ---------- */
+    var ICN={
+      check:'<path d="M20 6L9 17l-5-5"/>',
+      leaf:'<path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6"/>',
+      wifi:'<path d="M5 13a10 10 0 0 1 14 0"/><path d="M8.5 16.5a5 5 0 0 1 7 0"/><path d="M2 8.82a15 15 0 0 1 20 0"/><line x1="12" y1="20" x2="12.01" y2="20"/>',
+      volume:'<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>',
+      air:'<path d="M17.7 7.7A2.5 2.5 0 1 1 19.5 12H2"/><path d="M9.6 4.6A2 2 0 1 1 11 8H2"/><path d="M12.6 19.4A2 2 0 1 0 14 16H2"/>',
+      remote:'<rect x="7" y="2" width="10" height="20" rx="3"/><line x1="12" y1="6" x2="12" y2="6.01"/><circle cx="12" cy="12" r="1.5"/>',
+      eye:'<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/>',
+      thermo:'<path d="M14 4v10.54a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0Z"/>',
+      shield:'<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/>',
+      moon:'<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"/>',
+      clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>'
+    };
+    function chipIcon(t){
+      t=t.toLowerCase();
+      if(/r32|refriger/.test(t)) return ICN.leaf;
+      if(/wi-fi|wifi|melcloud/.test(t)) return ICN.wifi;
+      if(/silenz/.test(t)) return ICN.volume;
+      if(/purific|air/.test(t)) return ICN.air;
+      if(/remote|telecom/.test(t)) return ICN.remote;
+      if(/i-see|see sensor|3d/.test(t)) return ICN.eye;
+      if(/raffredd|riscald/.test(t)) return ICN.thermo;
+      if(/sars|testat/.test(t)) return ICN.shield;
+      if(/notte|night/.test(t)) return ICN.moon;
+      if(/timer/.test(t)) return ICN.clock;
+      return ICN.check;
+    }
+    function svg(path,extra){return '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"'+(extra||'')+'>'+path+'</svg>';}
+
+    /* ---------- Dati linee (tutti i testi del cliente) ---------- */
+    var U='https://frigocontrolch.10web.me/wp-content/uploads/';
+    var LINES={
+      premium:{
+        badge:'Premium',cls:'premium',titolo:'Kirigamine Style',modello:'Serie MSZ-LN',
+        serie:'Series M · Kirigamine Style Line',
+        headline:'Climatizzatore MSZ-LN',
+        spec:['Gas refrigerante R32 a basso impatto ambientale','Design elegante','Sensore 3D I-see-Sensor per comfort e risparmio energetico','Tecnologia Dual Barrier Coating','Purificazione dell’aria con sistema Plasma Quad Plus','Elevata efficienza energetica stagionale','Timer settimanale','Controllo Wi-Fi MELCloud integrato'],
+        chips:['3D i-see sensor','Remote control','Gas Refrigerante R32','Air purification','Raffreddamento e riscaldamento aria','Testato contro SARS-Cov 2','Silenziosità'],
+        intro:'Kirigamine Style è sinonimo di stile, minimalismo e comfort. Progettato per valorizzare qualsiasi ambiente, il suo design essenziale è disponibile in tre eleganti varianti cromatiche (Ruby Red, Onyx Black e Pearl White).',
+        gallery:[
+          {src:U+'2025/08/climatizzatore-premium-mitsubishi-ln-tre-colori-frigo-control-ticino.webp',cap:'Disponibile in tre colori: nero, bianco e rosso'},
+          {src:U+'2025/08/limatizzatore-premium-mitsubishi-ln-sensore-3d-frigo-control-ticino.webp',cap:'Dettaglio sensore 3D per il rilevamento presenza'},
+          {src:U+'2025/08/climatizzatore-premium-mitsubishi-ln-alette-frigo-control-ticino.webp',cap:'Dettaglio alette per la distribuzione dell’aria'},
+          {src:U+'2025/08/climatizzatore-premium-mitsubishi-ln-rosso-frigo-control-ticino.webp',cap:'Finitura Ruby Red con purificazione aria'},
+          {src:U+'2025/08/telecomandi-climatizzatore-premium-mitsubishi-ln-frigo-control-ticino.webp',cap:'Telecomandi nei tre colori coordinati'},
+          {src:U+'2025/08/climatizzatore-premium-mitsubishi-ln-bianco-soggiorno-frigo-control-ticino.webp',cap:'Pearl White in soggiorno moderno'},
+          {src:U+'2025/08/climatizzatore-premium-mitsubishi-ln-nero-soggiorno-frigo-control-ticino.webp',cap:'Onyx Black su parete moderna'},
+          {src:U+'2025/08/climatizzatore-premium-mitsubishi-ln-rosso-soggiorno-frigo-control-ticino.webp',cap:'Ruby Red in soggiorno di design'}
+        ],
+        features:[
+          {img:U+'2025/10/Comandi-MSZ-LN-1.webp',t:'Design nelle tue mani',p:['L’attenzione ai dettagli di Mitsubishi Electric si riflette anche negli accessori della linea Kirigamine Style. I telecomandi sono intuitivi, retroilluminati per l’uso notturno e disponibili in vari colori perfettamente abbinati all’unità.']},
+          {img:U+'2025/10/Distribuzione-dellar-2-1.webp',t:'Distribuzione dell’aria',p:['La geometria totalmente innovativa del doppio deflettore garantisce una distribuzione ottimale dell’aria; è possibile orientare indipendentemente i flussi in uscita dal lato destro e sinistro dell’unità.'],sub:['Oscillazione deflettore orizzontale: l’oscillazione continua assicura un’ottima diffusione dell’aria nella stanza.','Oscillazione deflettore verticale: il deflettore motorizzato permette al flusso d’aria di raggiungere ogni angolo dell’ambiente.','Ventola automatica: la velocità della ventola si regola automaticamente in base al comfort richiesto.']},
+          {img:U+'2025/10/DISTRIBUZIONE-ARIA-S_0-1.webp',t:'Wide & Long',p:['Un’elevata gittata d’aria unita a un ampio raggio di diffusione consente di raggiungere ogni angolo degli ambienti più spaziosi.']},
+          {img:U+'2025/10/I-SEE-SENSOR-move-ey_0-1.webp',t:'Sensore 3D i-see',p:['Il sistema 3D I-see rileva il numero di persone presenti e la loro posizione. Con la funzione “diretto/indiretto” puoi decidere dove orientare il flusso d’aria. Il sensore riduce automaticamente la potenza in base al livello di affollamento, ottimizzando comfort ed efficienza energetica.']},
+          {img:U+'2025/10/Dual-Barrier-Coating_0-1.webp',t:'Dual Barrier Coating',p:['Con l’unità MSZ-LN, Mitsubishi Electric introduce la rivoluzionaria tecnologia Dual Barrier Coating. Polveri e impurità si depositano normalmente sui componenti interni, aumentando i consumi fino al 18%. Il doppio rivestimento protettivo impedisce l’accumulo di sporco, riduce i consumi e azzera la manutenzione legata a questa problematica.']},
+          {t:'Filtro purificatore V Blocking opzionale',p:['V Blocking è un nuovo filtro che, rispetto al precedente agli ioni d’argento, aggiunge un’azione antivirale in grado di inibire virus, batteri, muffe e allergeni.']}
+        ]
+      },
+      plus:{
+        badge:'Plus',cls:'plus',titolo:'Serie M · Design sofisticato',modello:'Serie MSZ-AY',
+        serie:'Serie M',headline:'Climatizzatore MSZ-AY',
+        spec:['Gas refrigerante R32 a basso impatto ambientale','Finitura Matt e design elegante','Elevata efficienza energetica stagionale','Timer settimanale','Tecnologia Dual Barrier Coating','Self Clean Mode per una migliore qualità dell’aria','Controllo Wi-Fi MELCloud integrato'],
+        chips:['Remote control','Gas Refrigerante R32','Modalità notte','Air purification','Raffreddamento e riscaldamento aria','Testato contro SARS-Cov 2','Silenziosità'],
+        intro:'Le unità MSZ-AY uniscono un design sofisticato dalla finitura satinata a dimensioni ultra-compatte, con soluzioni pensate per la camera da letto e la zona living.',
+        gallery:[
+          {src:U+'2025/08/climatizzatore-plus-mitsubishi-ay-singolo-frigo-control-ticino.webp',cap:'Unità singola con telecomando, classe A+++'},
+          {src:U+'2025/08/climatizzatore-plus-mitsubishi-ay-dual-split-frigo-control-ticino.webp',cap:'Soluzione Dual Split: due unità interne'},
+          {src:U+'2025/08/climatizzatore-plus-mitsubishi-ay-camera-letto-frigo-control-ticino.webp',cap:'In camera da letto per un comfort silenzioso'},
+          {src:U+'2025/08/climatizzatore-plus-mitsubishi-ay-soggiorno-frigo-control-ticino.webp',cap:'In soggiorno moderno, climatizzazione efficiente'}
+        ],
+        features:[
+          {img:U+'2025/10/dimensioni-msz-ay15.webp',t:'Design sofisticato e dimensioni compatte',p:['Le unità MSZ-AY sono caratterizzate da un design sofisticato dalla finitura satinata e da dimensioni ultra-compatte, con due soli livelli dimensionali per 6 potenze differenti.']},
+          {img:U+'2025/10/MSZ-AY-SenzaCon-Self-Clean-Mode.webp',t:'Funzione «Self Clean»',p:['La nuova funzione «Self Clean» presente su MSZ-AY consente di asciugare l’unità interna al termine del ciclo di raffreddamento o deumidificazione, prevenendo la formazione di muffe e cattivi odori.']},
+          {img:U+'2025/10/funzionamento-silenzioso-MSZ-AY.webp',t:'Funzionamento silenzioso',p:['Il comfort ambientale è legato anche al livello sonoro ed è importante specialmente nelle camere da letto o negli studi. La linea MSZ-AY consente di garantire il clima ideale tutto l’anno con un livello sonoro virtualmente impercettibile dall’orecchio umano. I 18 dB(A) raggiunti dal modello MSZ-AY (taglie 25 e 35) sono più silenziosi del rumore generato dal frusciare delle foglie nel vento, rendendo il climatizzatore di fatto non udibile dagli occupanti della stanza. Ecco perché MSZ-AY è particolarmente adatto ad ambienti domestici quali camera da letto e zona living, in cui trascorriamo la maggior parte del nostro tempo e svolgiamo le nostre attività quotidiane.']},
+          {img:U+'2025/10/MSZ-AP-Night-Mode.webp',t:'Night Mode',p:['Attivando la funzione Night Mode dal comando remoto è possibile predisporre il climatizzatore per il funzionamento notturno:'],sub:['Riduzione luminosità LED','Disattivazione suono «beep»','Riduzione di 3 dB emissione sonora unità esterna']},
+          {img:U+'2025/10/Screenshot-2023-05-24-111122.webp',t:'Dima di installazione',p:['Il nuovo MSZ-AY è equipaggiato di una nuova dima di installazione. La nuova dima dispone di un ampio foro centrale che rende l’installazione più agevole soprattutto in presenza di cassette di predisposizione.']}
+        ]
+      },
+      smart:{
+        badge:'Smart',cls:'smart',titolo:'Serie M · Flat panel',modello:'Serie MSZ-HR',
+        serie:'Serie M',headline:'Climatizzatore MSZ-HR',
+        spec:['Gas refrigerante R32 a basso impatto ambientale','Flat panel e design compatto','Alta efficienza energetica stagionale','Funzionamento silenzioso','MELCloud - KIT WI-FI opzionale','Timer giornaliero'],
+        chips:['Gas Refrigerante R32','Air purification','Raffreddamento e riscaldamento aria','Testato contro SARS-Cov 2','Silenziosità'],
+        intro:'La linea MSZ-HR propone un pannello frontale piatto e un design compatto che si integra con discrezione in ogni ambiente, con alta efficienza R32.',
+        gallery:[
+          {src:U+'2025/08/climatizzatore-smart-mitsubishi-hr-soggiorno-frigo-control-ticino-600x399.webp',cap:'In soggiorno moderno con ampie vetrate'},
+          {src:U+'2025/08/climatizzatore-smart-mitsubishi-hr-frigo-control-ticino-600x344.webp',cap:'Unità interna bianca compatta, pannello flat'}
+        ],
+        features:[
+          {t:'Filtro purificatore standard in dotazione',p:['Il filtro purificatore standard garantisce la rimozione dall’aria di particelle inquinanti grossolane come polvere e impurità con un aggiuntivo effetto antibatterico, antimuffa e in grado di catturare gli odori.']},
+          {img:U+'2025/10/Filtro-plasma-quad-connect_0.webp',t:'Filtro Plasma Quad Connect opzionale',p:['Il sistema Plasma Quad Connect è un sistema di filtrazione attiva in grado di inibire fino al 99% di virus, batteri, muffe e PM2.5 presenti nell’aria, fino al 98% di allergeni e pollini e fino al 99,7% di acari e polveri.']}
+        ]
+      }
     };
 
-    /* ---------------- Costruzione thumbnails ---------------- */
-    Object.keys(GALLERIE).forEach(function(linea){
-      var cont = root.querySelector('[data-galleria="'+linea+'"]');
-      if(!cont) return;
-      GALLERIE[linea].forEach(function(item, i){
-        var t = document.createElement('div');
-        t.className = 'thumb';
-        t.setAttribute('data-linea', linea);
-        t.setAttribute('data-index', i);
-        var wrap = document.createElement('div');
-        wrap.className = 'protetta';
-        var img = document.createElement('img');
-        img.src = item.src;
-        img.alt = item.cap;
-        img.loading = 'lazy';
-        img.setAttribute('draggable','false');
-        wrap.appendChild(img);
-        t.appendChild(wrap);
-        cont.appendChild(t);
+    /* ---------- Render di una linea ---------- */
+    function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+    function renderLinea(key){
+      var d=LINES[key];
+      var thumbs=d.gallery.map(function(g,i){
+        return '<button type="button" class="thumb'+(i===0?' attiva':'')+'" data-i="'+i+'" aria-label="'+esc(g.cap)+'"><span class="protetta"><img src="'+g.src+'" alt="'+esc(g.cap)+'" loading="lazy" draggable="false"></span></button>';
+      }).join('');
+      var spec=d.spec.map(function(s){return '<li>'+svg(ICN.check)+' <span>'+esc(s)+'</span></li>';}).join('');
+      var chips=d.chips.map(function(c){return '<span class="chip">'+svg(chipIcon(c))+esc(c)+'</span>';}).join('');
+      var feats=d.features.map(function(f,i){
+        var body='<div><h5>'+esc(f.t)+'</h5>'+f.p.map(function(x){return '<p>'+esc(x)+'</p>';}).join('')
+                +(f.sub?('<ul class="sub">'+f.sub.map(function(s){return '<li>'+svg(ICN.check)+' <span>'+esc(s)+'</span></li>';}).join('')+'</ul>'):'')
+                +'</div>';
+        if(!f.img) return '<div class="feat notxt-img">'+body+'</div>';
+        var img='<div class="feat-img protetta contain"><img src="'+f.img+'" alt="'+esc(f.t)+'" loading="lazy" draggable="false"></div>';
+        return '<div class="feat'+(i%2?' rev':'')+'">'+(i%2?body+img:img+body)+'</div>';
+      }).join('');
+
+      return ''+
+      '<button class="torna" type="button" data-torna><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M11 6l-6 6 6 6"/></svg> Torna alle linee</button>'+
+      '<div class="linea-head '+d.cls+'"><span class="badge">'+esc(d.badge)+'</span><h2>'+esc(d.titolo)+'</h2><span class="mod">'+esc(d.modello)+'</span></div>'+
+      '<div class="vetrina">'+
+        '<div class="galleria-col">'+
+          '<div class="main-foto protetta contain"><img id="main-'+key+'" src="'+d.gallery[0].src+'" alt="'+esc(d.gallery[0].cap)+'" draggable="false"></div>'+
+          '<div class="caption" id="cap-'+key+'">'+esc(d.gallery[0].cap)+'</div>'+
+          '<div class="thumbs" data-thumbs="'+key+'">'+thumbs+'</div>'+
+        '</div>'+
+        '<div class="lato">'+
+          '<div class="serie">'+esc(d.headline)+' · '+esc(d.serie)+'</div>'+
+          '<h4>Caratteristiche principali</h4>'+
+          '<ul class="spec">'+spec+'</ul>'+
+          '<div class="chips">'+chips+'</div>'+
+        '</div>'+
+      '</div>'+
+      '<div class="intro-linea">'+esc(d.intro)+'</div>'+
+      '<div class="feat-tit">'+svg(ICN.check)+' Dettagli e tecnologie</div>'+
+      feats;
+    }
+
+    ['premium','plus','smart'].forEach(function(k){
+      document.getElementById('linea-'+k).innerHTML=renderLinea(k);
+    });
+
+    /* ---------- Cambio immagine principale al click ---------- */
+    root.querySelectorAll('.thumbs').forEach(function(row){
+      var key=row.getAttribute('data-thumbs');
+      row.addEventListener('click',function(e){
+        var b=e.target.closest('.thumb'); if(!b) return;
+        var i=parseInt(b.getAttribute('data-i'),10);
+        var g=LINES[key].gallery[i];
+        var main=document.getElementById('main-'+key);
+        var cap=document.getElementById('cap-'+key);
+        main.src=g.src; main.alt=g.cap; cap.textContent=g.cap;
+        row.querySelectorAll('.thumb').forEach(function(t){t.classList.remove('attiva');});
+        b.classList.add('attiva');
       });
     });
 
-    /* ---------------- Landing "clicca e appare" ---------------- */
-    var scelta = document.getElementById('fc-scelta');
-    var hero = root.querySelector('.fc-hero');
-
-    function apriLinea(linea){
-      var sez = document.getElementById('linea-'+linea);
-      if(!sez) return;
+    /* ---------- Landing "clicca e appare" ---------- */
+    var scelta=document.getElementById('fc-scelta');
+    var hero=root.querySelector('.fc-hero');
+    function apri(linea){
+      var sez=document.getElementById('linea-'+linea); if(!sez) return;
       root.querySelectorAll('.fc-dettaglio').forEach(function(s){s.classList.remove('attiva');});
-      scelta.style.display = 'none';
-      sez.classList.add('attiva');
-      if(hero) sez.scrollIntoView({behavior:'smooth', block:'start'});
+      scelta.style.display='none'; sez.classList.add('attiva');
+      sez.scrollIntoView({behavior:'smooth',block:'start'});
     }
-    function tornaHome(){
+    function home(){
       root.querySelectorAll('.fc-dettaglio').forEach(function(s){s.classList.remove('attiva');});
-      scelta.style.display = '';
-      if(hero) hero.scrollIntoView({behavior:'smooth', block:'start'});
+      scelta.style.display=''; if(hero) hero.scrollIntoView({behavior:'smooth',block:'start'});
     }
+    root.querySelectorAll('.card[data-linea]').forEach(function(c){c.addEventListener('click',function(){apri(c.getAttribute('data-linea'));});});
+    root.addEventListener('click',function(e){ if(e.target.closest('[data-torna]')) home(); });
 
-    root.querySelectorAll('.card[data-linea]').forEach(function(c){
-      c.addEventListener('click', function(){ apriLinea(c.getAttribute('data-linea')); });
-    });
-    root.querySelectorAll('[data-torna]').forEach(function(b){
-      b.addEventListener('click', tornaHome);
-    });
-
-    /* ---------------- Lightbox ---------------- */
-    var lb = document.getElementById('fc-lightbox');
-    var lbImg = document.getElementById('fc-lb-img');
-    var lbCap = document.getElementById('fc-lb-caption');
-    var stato = {linea:null, index:0};
-
-    function mostra(){
-      var arr = GALLERIE[stato.linea];
-      if(!arr) return;
-      var item = arr[stato.index];
-      lbImg.style.backgroundImage = 'url("'+item.src+'")';
-      lbCap.textContent = item.cap || '';
-    }
-    function apriLb(linea, index){
-      stato.linea = linea; stato.index = index;
-      lb.classList.add('attiva');
-      lb.setAttribute('aria-hidden','false');
-      mostra();
-    }
-    function chiudiLb(){
-      lb.classList.remove('attiva');
-      lb.setAttribute('aria-hidden','true');
-      lbImg.style.backgroundImage = '';
-    }
-    function passo(d){
-      var arr = GALLERIE[stato.linea]; if(!arr) return;
-      stato.index = (stato.index + d + arr.length) % arr.length;
-      mostra();
-    }
-
-    root.querySelectorAll('.galleria').forEach(function(g){
-      g.addEventListener('click', function(e){
-        var t = e.target.closest('.thumb'); if(!t) return;
-        apriLb(t.getAttribute('data-linea'), parseInt(t.getAttribute('data-index'),10));
-      });
-    });
-    root.querySelector('[data-lb-close]').addEventListener('click', chiudiLb);
-    root.querySelector('[data-lb-prev]').addEventListener('click', function(){passo(-1);});
-    root.querySelector('[data-lb-next]').addEventListener('click', function(){passo(1);});
-    lb.addEventListener('click', function(e){ if(e.target === lb) chiudiLb(); });
-    document.addEventListener('keydown', function(e){
-      if(!lb.classList.contains('attiva')) return;
-      if(e.key === 'Escape') chiudiLb();
-      else if(e.key === 'ArrowLeft') passo(-1);
-      else if(e.key === 'ArrowRight') passo(1);
-    });
-
-    /* ---------------- Protezione immagini ---------------- */
-    // Blocca menu contestuale e trascinamento all'interno del widget
-    root.addEventListener('contextmenu', function(e){
-      if(e.target.closest('.protetta, .galleria, .lightbox, img')) e.preventDefault();
-    });
-    root.addEventListener('dragstart', function(e){
-      if(e.target.tagName === 'IMG') e.preventDefault();
-    });
-    // stesso blocco sul lightbox (montato dentro root, ma per sicurezza)
-    lb.addEventListener('contextmenu', function(e){ e.preventDefault(); });
+    /* ---------- Protezione immagini ---------- */
+    root.addEventListener('contextmenu',function(e){ if(e.target.closest('.protetta,img,.thumbs,.vetrina')) e.preventDefault(); });
+    root.addEventListener('dragstart',function(e){ if(e.target.tagName==='IMG') e.preventDefault(); });
   })();
   </script>
 </div>
