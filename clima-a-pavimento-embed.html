@@ -1,0 +1,557 @@
+<!-- =====================================================================
+     Frigo Control Ticino — Climatizzatori a pavimento
+     HTML da embeddare in una pagina (WordPress / iframe / shortcode HTML)
+     - Landing "clicca e appare": card che aprono il prodotto scelto
+     - 2 prodotti: INCASSO (SFZ-M · Serie S), A PAVIMENTO (MFZ-KT · Serie M)
+     - Galleria: click sulla miniatura => cambia l'immagine principale (no popup)
+     - Tutti i testi e le schede tecniche del cliente · stessa altezza schede
+     - Nessun video YouTube · Protezione immagini (no drag / no menu / overlay)
+     Self-contained: CSS + JS inline, nessuna dipendenza esterna.
+
+     ---------------------------------------------------------------------
+     COME EMBEDDARE SENZA DOPPIO SCROLL
+     ---------------------------------------------------------------------
+     OPZIONE A (consigliata) — incolla questo file dentro un blocco
+     "HTML personalizzato / Custom HTML" della pagina. Il widget scorre
+     insieme alla pagina: UNA sola scrollbar, niente iframe. Nulla da fare.
+
+     OPZIONE B — se DEVI usare un <iframe>, l'altezza si adatta da sola al
+     contenuto (anche cambiando scheda / da mobile): non ci sarà scroll
+     interno all'iframe. Incolla nella pagina questo snippet e imposta la
+     src del file:
+
+       <iframe id="fcClimaFrame" src="URL-DEL-FILE.html"
+               style="width:100%;border:0;display:block;overflow:hidden"
+               scrolling="no" title="Climatizzatori a pavimento"></iframe>
+       <script>
+       (function(){
+         window.addEventListener('message',function(e){
+           var d=e.data||{}; if(d.id!=='fc-clima') return;
+           var f=document.getElementById('fcClimaFrame'); if(!f) return;
+           if(d.type==='fc-clima-height'){ f.style.height=(d.height+2)+'px'; }
+           if(d.type==='fc-clima-scrolltop'){ f.scrollIntoView({behavior:'smooth',block:'start'}); }
+         });
+       })();
+       </script>
+     ===================================================================== -->
+<div id="fc-clima" class="fc-clima">
+  <style>
+  #fc-clima *{box-sizing:border-box;margin:0;padding:0}
+  #fc-clima{
+    --blu:#0a3d62;--blu2:#1e6091;--accent:#00a8e8;
+    --grigio:#f4f6f8;--bordo:#e3e9ef;--testo:#22303a;--muto:#6b7b88;
+    --radius:16px;--ombra:0 10px 30px rgba(10,61,98,.10);--ombra-h:0 18px 44px rgba(10,61,98,.20);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    color:var(--testo);line-height:1.55;max-width:1200px;margin:0 auto;
+    background:linear-gradient(180deg,#ffffff 0%,#f4f8fc 100%);
+    border-radius:20px;padding:clamp(16px,3vw,30px);
+    box-shadow:0 20px 60px rgba(6,20,40,.18);
+    -webkit-tap-highlight-color:transparent;
+  }
+  #fc-clima img{max-width:100%;display:block}
+  #fc-clima h1,#fc-clima h2,#fc-clima h3,#fc-clima h4,#fc-clima h5{color:var(--blu);line-height:1.2}
+
+  /* ---- Protezione immagini ---- */
+  #fc-clima .protetta{position:relative;overflow:hidden;border-radius:12px;background:#eef2f5}
+  #fc-clima .protetta img{
+    width:100%;height:100%;object-fit:cover;
+    -webkit-user-drag:none;user-drag:none;-webkit-user-select:none;user-select:none;pointer-events:none;
+  }
+  #fc-clima .protetta.contain img{object-fit:contain;background:#fff}
+  #fc-clima .protetta.nat img{height:auto;object-fit:contain}
+  #fc-clima .protetta::after{content:"";position:absolute;inset:0;z-index:2;background:transparent}
+
+  /* ---- Intestazione ---- */
+  #fc-clima .fc-hero{text-align:center;padding:22px 12px 6px}
+  #fc-clima .fc-hero .kicker{display:inline-block;letter-spacing:.14em;text-transform:uppercase;font-size:.72rem;font-weight:700;color:var(--accent);margin-bottom:10px}
+  #fc-clima .fc-hero h1{font-size:clamp(1.5rem,3.4vw,2.35rem);font-weight:800;margin-bottom:12px}
+  #fc-clima .fc-hero p{max-width:760px;margin:0 auto;color:var(--muto);font-size:1.02rem}
+
+  /* ---- Landing ---- */
+  #fc-clima .fc-scelta{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;margin:26px auto 0;max-width:880px}
+  @media(max-width:760px){#fc-clima .fc-scelta{grid-template-columns:1fr}}
+  #fc-clima .card{
+    position:relative;border:1px solid var(--bordo);cursor:pointer;text-align:left;background:#fff;
+    border-radius:var(--radius);overflow:hidden;box-shadow:var(--ombra);
+    transition:transform .28s,box-shadow .28s;display:flex;flex-direction:column;font:inherit;color:inherit;padding:0;
+  }
+  #fc-clima .card:hover,#fc-clima .card:focus-visible{transform:translateY(-6px);box-shadow:var(--ombra-h);outline:none}
+  #fc-clima .card .card-img{height:200px}
+  #fc-clima .card .card-body{padding:16px 20px 20px}
+  #fc-clima .badge{display:inline-block;font-size:.68rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;padding:5px 11px;border-radius:999px;color:#fff}
+  /* Palette coerente: sempre sfumature di blu (come il sito) */
+  #fc-clima .sfz .badge,#fc-clima .badge.sfz{background:linear-gradient(135deg,#062a4d,#1e6091)}
+  #fc-clima .mfz .badge,#fc-clima .badge.mfz{background:linear-gradient(135deg,#12557f,#00a8e8)}
+  #fc-clima .info .badge,#fc-clima .badge.info{background:linear-gradient(135deg,#0a3d62,#1e6091)}
+  #fc-clima .card h3{font-size:1.18rem;margin:10px 0 3px}
+  #fc-clima .card .modello{font-size:.85rem;color:var(--muto);font-weight:600;margin-bottom:9px}
+  #fc-clima .card p{font-size:.92rem}
+  #fc-clima .card .apri{margin-top:13px;font-weight:700;color:var(--accent);font-size:.9rem;display:inline-flex;align-items:center;gap:6px}
+  #fc-clima .card .apri svg{transition:transform .25s}
+  #fc-clima .card:hover .apri svg{transform:translateX(4px)}
+
+  /* ---- Dettaglio ---- */
+  #fc-clima .fc-dettaglio{display:none;animation:fcIn .4s ease}
+  #fc-clima .fc-dettaglio.attiva{display:flex;flex-direction:column}
+  @keyframes fcIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+  #fc-clima .torna{align-self:flex-start;display:inline-flex;align-items:center;gap:8px;background:none;border:none;cursor:pointer;color:var(--blu);font-weight:700;font-size:.95rem;padding:8px 4px;margin:6px 0 8px;font-family:inherit}
+  #fc-clima .torna:hover{color:var(--accent)}
+
+  /* Pannello di riempimento (cresce a occupare lo spazio: nessun vuoto sotto) */
+  #fc-clima .cta-fill{flex:1 1 auto;min-height:210px;margin-top:24px;border-radius:var(--radius);color:#fff;display:flex;align-items:center;justify-content:center;padding:34px 26px;overflow:hidden;box-shadow:var(--ombra)}
+  #fc-clima .cta-fill.sfz{background:linear-gradient(135deg,#06213f,#0a3d62 55%,#1e6091)}
+  #fc-clima .cta-fill.mfz{background:linear-gradient(135deg,#0f4d78,#1e6091 55%,#00a8e8)}
+  #fc-clima .cta-fill .cta-inner{max-width:760px;text-align:center}
+  #fc-clima .cta-fill h4{color:#fff;font-size:clamp(1.2rem,2.5vw,1.7rem);margin-bottom:12px}
+  #fc-clima .cta-fill p{color:rgba(255,255,255,.92);font-size:1rem;margin:0 auto 22px;max-width:640px}
+  #fc-clima .cta-points{display:flex;flex-wrap:wrap;gap:12px;justify-content:center}
+  #fc-clima .cta-points .pt{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.28);border-radius:999px;padding:9px 16px;font-size:.85rem;font-weight:600}
+  #fc-clima .cta-points .pt svg{color:#bfe9ff;flex:0 0 auto}
+  #fc-clima .linea-head{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin:4px 0 6px}
+  #fc-clima .linea-head h2{font-size:clamp(1.4rem,3vw,2rem)}
+  #fc-clima .linea-head .mod{color:var(--muto);font-weight:600}
+
+  /* ---- Vetrina: immagine principale + miniature ---- */
+  #fc-clima .vetrina{display:grid;grid-template-columns:1.05fr .95fr;gap:26px;align-items:start;background:#fff;border:1px solid var(--bordo);border-radius:var(--radius);box-shadow:var(--ombra);padding:22px;margin:14px 0 26px}
+  @media(max-width:820px){#fc-clima .vetrina{grid-template-columns:1fr}}
+  #fc-clima .main-foto{width:100%;height:360px}
+  @media(max-width:820px){#fc-clima .main-foto{height:280px}}
+  #fc-clima .thumbs{display:grid;grid-template-columns:repeat(auto-fill,minmax(84px,1fr));gap:10px;margin-top:12px}
+  #fc-clima .thumbs .thumb{height:62px;border-radius:9px;overflow:hidden;cursor:pointer;border:2px solid transparent;transition:border-color .2s,transform .2s}
+  #fc-clima .thumbs .thumb:hover{transform:translateY(-2px)}
+  #fc-clima .thumbs .thumb.attiva{border-color:var(--accent)}
+  #fc-clima .thumbs .thumb .protetta,#fc-clima .thumbs .thumb img{height:100%;border-radius:0}
+  #fc-clima .caption{font-size:.85rem;color:var(--muto);margin-top:10px;min-height:1.2em}
+
+  /* Colonna caratteristiche accanto alla vetrina */
+  #fc-clima .vetrina .lato h4{font-size:1.15rem;margin-bottom:6px}
+  #fc-clima .serie{display:inline-block;font-size:.72rem;font-weight:700;letter-spacing:.1em;color:var(--muto);text-transform:uppercase;margin-bottom:12px}
+  #fc-clima .spec{list-style:none;display:grid;gap:8px;margin-bottom:16px}
+  #fc-clima .spec li{display:flex;gap:9px;align-items:flex-start;font-size:.94rem}
+  #fc-clima .spec li svg{flex:0 0 18px;margin-top:2px;color:var(--accent)}
+  #fc-clima .chips{display:flex;flex-wrap:wrap;gap:8px}
+  #fc-clima .chip{display:inline-flex;align-items:center;gap:6px;background:var(--grigio);border:1px solid var(--bordo);color:var(--blu);border-radius:999px;padding:6px 12px;font-size:.78rem;font-weight:600}
+  #fc-clima .chip svg{color:var(--accent)}
+
+  /* ---- Intro ---- */
+  #fc-clima .intro-linea{background:linear-gradient(135deg,#f7fafc,#eef4f8);border-left:4px solid var(--accent);border-radius:12px;padding:16px 20px;margin:0 0 24px;font-size:1rem;color:var(--testo)}
+
+  /* ---- Sezioni feature (riquadri foto + testo) ---- */
+  #fc-clima .feat-tit{font-size:1.15rem;font-weight:700;margin:26px 0 14px;display:flex;align-items:center;gap:9px}
+  #fc-clima .feat{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:center;background:#fff;border:1px solid var(--bordo);border-radius:var(--radius);box-shadow:var(--ombra);padding:20px;margin-bottom:18px}
+  #fc-clima .feat.rev .feat-img{order:2}
+  #fc-clima .feat.notxt-img{grid-template-columns:1fr}
+  @media(max-width:760px){#fc-clima .feat{grid-template-columns:1fr}#fc-clima .feat.rev .feat-img{order:0}}
+  #fc-clima .feat-img{height:250px}
+  #fc-clima .feat h5{font-size:1.1rem;margin-bottom:8px}
+  #fc-clima .feat p{font-size:.95rem;margin-bottom:10px}
+  #fc-clima .feat ul.sub{list-style:none;display:grid;gap:7px}
+  #fc-clima .feat ul.sub li{display:flex;gap:8px;font-size:.92rem;align-items:flex-start}
+  #fc-clima .feat ul.sub li svg{flex:0 0 16px;margin-top:3px;color:var(--accent)}
+
+  /* ---- Tabella / schede tecniche ---- */
+  #fc-clima .tab-wrap{overflow-x:auto;border:1px solid var(--bordo);border-radius:var(--radius);box-shadow:var(--ombra);margin:14px 0 12px;background:#fff}
+  #fc-clima table.tec{border-collapse:collapse;width:100%;min-width:560px;font-size:.86rem}
+  #fc-clima table.tec th,#fc-clima table.tec td{border:1px solid var(--bordo);padding:9px 11px;text-align:center;vertical-align:middle}
+  #fc-clima table.tec thead th{background:var(--blu);color:#fff;font-weight:700}
+  #fc-clima table.tec tbody th{background:var(--grigio);color:var(--blu);text-align:left;white-space:nowrap;font-weight:700}
+  #fc-clima table.tec tr.gruppo th{background:var(--blu2);color:#fff;text-align:left;letter-spacing:.03em}
+  #fc-clima .tec-img{border:1px solid var(--bordo);border-radius:var(--radius);box-shadow:var(--ombra);background:#fff;padding:14px;margin:14px 0 12px}
+
+  /* ---- Sezione Informazioni generali ---- */
+  #fc-clima #fc-generali{margin-top:40px;padding-top:30px;border-top:2px solid var(--bordo)}
+  #fc-clima .gen-head{text-align:center;max-width:760px;margin:0 auto 22px}
+  #fc-clima .gen-head .badge{margin-bottom:12px}
+  #fc-clima .gen-head h2{font-size:clamp(1.4rem,3vw,2rem);margin-bottom:8px}
+  #fc-clima .gen-head p{color:var(--muto);font-size:1rem}
+
+  #fc-clima .sez-tit{font-size:1.35rem;font-weight:800;margin:8px 0 4px}
+  #fc-clima .sez-sub{color:var(--muto);margin-bottom:8px}
+  #fc-clima .lista-ext{list-style:none;display:flex;flex-wrap:wrap;gap:10px;margin:12px 0}
+  #fc-clima .lista-ext li{background:var(--grigio);border:1px solid var(--bordo);border-radius:10px;padding:9px 14px;font-weight:700;color:var(--blu)}
+
+  /* ---- FAQ ---- */
+  #fc-clima .faq{margin:22px 0 6px}
+  #fc-clima .faq h3{font-size:1.35rem;margin-bottom:4px}
+  #fc-clima .faq .faq-sub{color:var(--muto);margin-bottom:14px}
+  #fc-clima .faq details{background:#fff;border:1px solid var(--bordo);border-radius:12px;margin-bottom:10px;box-shadow:var(--ombra);overflow:hidden}
+  #fc-clima .faq summary{cursor:pointer;list-style:none;padding:15px 18px;font-weight:700;color:var(--blu);display:flex;justify-content:space-between;align-items:center;gap:10px}
+  #fc-clima .faq summary::-webkit-details-marker{display:none}
+  #fc-clima .faq summary .pm{transition:transform .25s;flex:0 0 auto}
+  #fc-clima .faq details[open] summary .pm{transform:rotate(45deg)}
+  #fc-clima .faq details p{padding:0 18px 16px;color:var(--testo);font-size:.95rem}
+
+  /* =====================  OTTIMIZZAZIONE MOBILE  ===================== */
+  @media(max-width:600px){
+    #fc-clima{padding:14px;border-radius:14px}
+    #fc-clima .fc-hero{padding:8px 4px 4px}
+    #fc-clima .fc-hero p{font-size:.95rem}
+    #fc-clima .fc-scelta{gap:14px;margin-top:18px}
+    #fc-clima .card .card-img{height:200px}
+    #fc-clima .card .card-body{padding:14px 16px 18px}
+    #fc-clima .vetrina{padding:14px;gap:16px;margin:12px 0 20px}
+    #fc-clima .main-foto{height:230px}
+    #fc-clima .thumbs{grid-template-columns:repeat(auto-fill,minmax(64px,1fr));gap:8px}
+    #fc-clima .thumbs .thumb{height:52px}
+    #fc-clima .feat{padding:14px;gap:14px}
+    #fc-clima .feat-img{height:200px}
+    #fc-clima .feat-tit{font-size:1.05rem;margin:20px 0 12px}
+    #fc-clima .chip{font-size:.74rem;padding:5px 10px}
+    #fc-clima .intro-linea{padding:14px 16px;font-size:.94rem}
+    #fc-clima #fc-generali{margin-top:28px;padding-top:22px}
+    #fc-clima .sez-tit{font-size:1.15rem}
+    #fc-clima table.tec{font-size:.8rem}
+    #fc-clima table.tec th,#fc-clima table.tec td{padding:7px 9px}
+    #fc-clima .torna{font-size:.9rem}
+    #fc-clima .linea-head h2{font-size:1.3rem}
+    #fc-clima .tab-hint{display:block}
+  }
+  #fc-clima .tab-hint{display:none;text-align:center;color:var(--muto);font-size:.8rem;margin:0 0 20px}
+  @media(hover:none){#fc-clima .card:hover,#fc-clima .card:focus-visible{transform:none}}
+  </style>
+
+  <!-- ===================== HERO ===================== -->
+  <div class="fc-hero">
+    <span class="kicker">Frigo Control Ticino · Mitsubishi Electric</span>
+    <h1>Climatizzatori a pavimento: comfort discreto, prestazioni assicurate</h1>
+    <p>Queste unità si installano a livello del suolo, ideali dove non è possibile o non si desidera montare il climatizzatore in alto. Sono perfette per ambienti eleganti, mansarde o stanze con pareti basse. Dai un'occhiata alle due opzioni disponibili: se hai dubbi, siamo sempre qui per aiutarti a scegliere la soluzione più adatta.</p>
+  </div>
+
+  <!-- ===================== LANDING ===================== -->
+  <div class="fc-scelta" id="fc-scelta">
+    <button class="card sfz" data-linea="sfz" type="button">
+      <div class="card-img protetta"><img src="https://frigocontrolch.10web.me/wp-content/uploads/2025/08/climatizzatore-a-pavimento-incasso-soggiorno-frigo-control-ticino-600x449.webp" alt="Climatizzatore a pavimento ad incasso SFZ-M" loading="lazy"></div>
+      <div class="card-body">
+        <span class="badge">Incasso</span>
+        <h3>Unità ad incasso SFZ-M</h3>
+        <div class="modello">Serie SFZ-M · Serie S</div>
+        <p>Si integra nella parete: doppia aspirazione dell'aria, ventilatore DC Inverter e dimensioni super compatte.</p>
+        <span class="apri">Scopri il prodotto <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+      </div>
+    </button>
+    <button class="card mfz" data-linea="mfz" type="button">
+      <div class="card-img protetta"><img src="https://frigocontrolch.10web.me/wp-content/uploads/2025/08/climatizzatore-a-pavimento-mfz-kt-soggiorno-frigo-control-ticino.webp" alt="Climatizzatore a pavimento MFZ-KT" loading="lazy"></div>
+      <div class="card-body">
+        <span class="badge">A pavimento</span>
+        <h3>A pavimento MFZ-KT</h3>
+        <div class="modello">Serie MFZ-KT · Serie M</div>
+        <p>Estetica moderna ed elegante, filtro V Blocking in dotazione e sistema Multi-flow vane.</p>
+        <span class="apri">Scopri il prodotto <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+      </div>
+    </button>
+  </div>
+
+  <!-- ===================== DETTAGLIO PRODOTTI (render JS) ===================== -->
+  <section class="fc-dettaglio" id="linea-sfz"></section>
+  <section class="fc-dettaglio" id="linea-mfz"></section>
+
+  <!-- ===================== INFO GENERALI ===================== -->
+  <section id="fc-generali">
+    <div class="gen-head">
+      <span class="badge info">Info</span>
+      <h2>Informazioni generali</h2>
+      <p>Qualità dell'aria e controllo da remoto MelCloud: le informazioni comuni a tutte le unità a pavimento.</p>
+    </div>
+
+    <div class="feat notxt-img">
+      <div>
+        <h5>Filtrazione, distribuzione e qualità dell'aria</h5>
+        <p>La qualità dell'aria è la misura di quanto l'aria sia priva di elementi caratteristici dell'inquinamento atmosferico.</p>
+        <p>Misura, dunque, quanto l'aria che respiriamo sia salubre. Conoscere quali contaminanti siano presenti, e controllarne la quantità, aiuta a ridurre, o addirittura limitare fortemente, i rischi di futuri problemi di salute e a garantire maggior comfort per tutti.</p>
+        <p>I sistemi Mitsubishi Electric sono progettati per migliorare la qualità dell'aria nel modo migliore, creando le condizioni ottimali per un comfort impareggiabile negli ambienti confinati in cui vivi e trascorri il tempo.</p>
+      </div>
+    </div>
+
+    <div class="feat">
+      <div class="feat-img protetta contain"><img src="https://frigocontrolch.10web.me/wp-content/uploads/2025/10/Melcloud-rev.jpg-1.webp" alt="MelCloud controllo da remoto" loading="lazy"></div>
+      <div>
+        <h5>MelCloud: la soluzione opzionale per il controllo da remoto</h5>
+        <p><strong>Il controllo Wi-Fi per il tuo sistema Mitsubishi Electric.</strong></p>
+        <p>Sfruttando l'appoggio della nuvola (il "Cloud") per trasmettere e ricevere informazioni e l'interfaccia Wi-Fi dedicata opzionale (MAC-587IF-E), potrai facilmente controllare il tuo impianto ovunque tu sia tramite il PC, il tablet o lo smartphone; basterà avere a disposizione la connessione ad internet. Il servizio MELCloud è stato realizzato per avere la massima compatibilità con PC, Tablet e Smartphone grazie ad App dedicate o tramite Web Browser. Controllare i tuoi climatizzatori sarà ancora più smart grazie alla compatibilità con gli assistenti vocali Amazon Alexa e Google Home.</p>
+      </div>
+    </div>
+
+    <div class="faq">
+      <h3>Domande Frequenti</h3>
+      <p class="faq-sub">Scopri le risposte alle domande più comuni sui nostri servizi di refrigerazione e manutenzione.</p>
+      <details><summary>Quali tipi di sistemi di refrigerazione offrite?<span class="pm">+</span></summary><p>Offriamo una vasta gamma di sistemi di refrigerazione, inclusi impianti industriali e commerciali.</p></details>
+      <details><summary>Come posso richiedere assistenza per la riparazione?<span class="pm">+</span></summary><p>Puoi contattarci tramite il nostro modulo online o telefonicamente per richiedere assistenza.</p></details>
+      <details><summary>Qual è il tempo medio di risposta per le riparazioni?<span class="pm">+</span></summary><p>Il nostro team si impegna a rispondere entro 24 ore per le richieste di riparazione urgenti.</p></details>
+    </div>
+  </section>
+
+  <!-- ===================== SCRIPT ===================== -->
+  <script>
+  (function(){
+    var root=document.getElementById('fc-clima');
+    if(!root || root.dataset.init) return; root.dataset.init='1';
+
+    /* ---------- Icone ---------- */
+    var ICN={
+      check:'<path d="M20 6L9 17l-5-5"/>',
+      leaf:'<path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6"/>',
+      wifi:'<path d="M5 13a10 10 0 0 1 14 0"/><path d="M8.5 16.5a5 5 0 0 1 7 0"/><path d="M2 8.82a15 15 0 0 1 20 0"/><line x1="12" y1="20" x2="12.01" y2="20"/>',
+      volume:'<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>',
+      air:'<path d="M17.7 7.7A2.5 2.5 0 1 1 19.5 12H2"/><path d="M9.6 4.6A2 2 0 1 1 11 8H2"/><path d="M12.6 19.4A2 2 0 1 0 14 16H2"/>',
+      remote:'<rect x="7" y="2" width="10" height="20" rx="3"/><line x1="12" y1="6" x2="12" y2="6.01"/><circle cx="12" cy="12" r="1.5"/>',
+      thermo:'<path d="M14 4v10.54a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0Z"/>',
+      shield:'<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/>',
+      clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+      floor:'<path d="M3 20h18"/><rect x="6" y="9" width="12" height="8" rx="1"/>',
+      doc:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M8 13h8M8 17h8"/>'
+    };
+    function chipIcon(t){
+      t=t.toLowerCase();
+      if(/pavimento/.test(t)) return ICN.floor;
+      if(/r32|refriger/.test(t)) return ICN.leaf;
+      if(/wi-fi|wifi|melcloud/.test(t)) return ICN.wifi;
+      if(/silenz/.test(t)) return ICN.volume;
+      if(/purific|filtro|air|aria/.test(t)) return ICN.air;
+      if(/remote|telecom|remoto|controllo/.test(t)) return ICN.remote;
+      if(/raffredd|raffresc|riscald/.test(t)) return ICN.thermo;
+      if(/sars|test/.test(t)) return ICN.shield;
+      if(/timer/.test(t)) return ICN.clock;
+      return ICN.check;
+    }
+    function svg(path){return '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+path+'</svg>';}
+    function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+    var U='https://frigocontrolch.10web.me/wp-content/uploads/';
+    var M='https://climatizzazione.mitsubishielectric.it/sites/default/files/inline-images/';
+
+    /* Tabella tecnica MFZ-KT */
+    var TAB_MFZ=''+
+      '<div class="tab-wrap"><table class="tec">'+
+      '<thead><tr><th>Unità interna</th><th>MFZ-KT25VG</th><th>MFZ-KT35VG</th><th>MFZ-KT50VG</th></tr></thead>'+
+      '<tbody>'+
+      '<tr><th>Unità esterna</th><td>SUZ-M25VA</td><td>SUZ-M35VA</td><td>SUZ-M50VA</td></tr>'+
+      '<tr class="gruppo"><th colspan="4">Raffrescamento secondo standard EN14825</th></tr>'+
+      '<tr><th>Potenza (kW)</th><td>2,5</td><td>3,5</td><td>5,0</td></tr>'+
+      '<tr><th>SEER</th><td>6,5</td><td>6,6</td><td>6,8</td></tr>'+
+      '<tr><th>Efficienza energetica*</th><td>A++</td><td>A++</td><td>A++</td></tr>'+
+      '<tr><th>Pressione sonora (dB)</th><td>19-24-31-37-41</td><td>19-24-31-37-41</td><td>28-32-37-42-48</td></tr>'+
+      '<tr class="gruppo"><th colspan="4">Riscaldamento secondo standard EN14825</th></tr>'+
+      '<tr><th>Potenza (kW)</th><td>2,2</td><td>2,6</td><td>4,3</td></tr>'+
+      '<tr><th>SCOP</th><td>4,2</td><td>4,4</td><td>4,2</td></tr>'+
+      '<tr><th>Efficienza energetica*</th><td>A+</td><td>A+</td><td>A+</td></tr>'+
+      '<tr><th>Pressione sonora (dB)</th><td>19-23-30-37-44</td><td>19-23-30-37-44</td><td>29-35-40-44-49</td></tr>'+
+      '</tbody></table></div>'+
+      '<div class="tab-hint">← scorri per vedere tutta la tabella →</div>';
+
+    /* Schede tecniche (Scheda tecnica) per prodotto */
+    var TECH={
+      sfz:''+
+        '<div class="feat-tit">'+svg(ICN.doc)+' Scheda tecnica</div>'+
+        '<h4 class="sez-tit">Sistema monosplit</h4>'+
+        '<p class="sez-sub">Nella tabella sottostante sono indicati gli abbinamenti dell’unità interna e della relativa unità esterna con le principali caratteristiche tecniche.</p>'+
+        '<div class="tec-img protetta nat contain"><img src="'+M+'Monosplit%20a%20pavimento.png" alt="Abbinamento monosplit a pavimento SFZ-M" loading="lazy" draggable="false"></div>'+
+        '<div class="tec-img protetta nat contain"><img src="'+M+'image_17.png" alt="Caratteristiche tecniche SFZ-M" loading="lazy" draggable="false"></div>'+
+        '<p class="sez-sub">*Classi di efficienza energetica da A+++ a D</p>'+
+        '<h4 class="sez-tit">Sistema multisplit</h4>'+
+        '<p class="sez-sub">È possibile abbinare l’unità interna all’unità esterna MXZ e MXZ-HYPER HEATING.</p>'+
+        '<ul class="lista-ext"><li>MXZ</li><li>MXZ HYPER HEATING</li></ul>'+
+        '<div class="feat notxt-img"><div class="feat-img protetta contain" style="height:200px"><img src="'+U+'2025/10/multisplit_5.webp" alt="Sistema multisplit" loading="lazy" draggable="false"></div></div>',
+      mfz:''+
+        '<div class="feat-tit">'+svg(ICN.doc)+' Scheda tecnica</div>'+
+        '<h4 class="sez-tit">Sistema monosplit</h4>'+
+        '<p class="sez-sub">Nella tabella sottostante sono indicati gli abbinamenti dell’unità interna e della relativa unità esterna con le principali caratteristiche tecniche.</p>'+
+        TAB_MFZ+
+        '<p class="sez-sub">*Classi di efficienza energetica da A+++ a D</p>'+
+        '<h4 class="sez-tit">Sistema multisplit</h4>'+
+        '<p class="sez-sub">È possibile abbinare le unità interne alle seguenti unità esterne per sistemi multisplit:</p>'+
+        '<ul class="lista-ext"><li>MXZ</li><li>MXZ HYPER HEATING</li><li>PUMY-SP</li></ul>'+
+        '<div class="feat notxt-img"><div class="feat-img protetta contain" style="height:200px"><img src="'+U+'2025/10/multisplit_5.webp" alt="Sistema multisplit" loading="lazy" draggable="false"></div></div>'
+    };
+
+    /* ---------- Dati prodotti ---------- */
+    var LINES={
+      sfz:{
+        badge:'Incasso',cls:'sfz',titolo:'Unità a pavimento ad incasso',modello:'Serie SFZ-M',
+        serie:'Serie S',headline:'Unità a pavimento ad incasso SFZ-M',
+        spec:['Alta efficienza energetica','Portata d’aria regolabile','Silenziosità e comfort','Flessibilità di installazione, con doppia possibilità di aspirazione dell’aria','Gas refrigerante R32 a basso impatto ambientale','Dimensioni super compatte','Alta efficienza energetica stagionale','Controllo Wi-Fi MELCloud opzionale'],
+        chips:['A pavimento','Controllo remoto','Gas Refrigerante R32','Raffresc/Riscald. ad aria','Silenziosità'],
+        intro:'Unità a pavimento ad incasso che si integra nella parete per un risultato pulito e discreto. Doppia possibilità di aspirazione dell’aria, ventilatore DC Inverter e dimensioni super compatte: ideale anche in strutture ad incasso particolarmente ristrette.',
+        gallery:[
+          {src:U+'2025/08/climatizzatore-a-pavimento-incasso-soggiorno-frigo-control-ticino-600x449.webp',cap:'Installata in soggiorno moderno, climatizzazione discreta'},
+          {src:U+'2025/08/climatizzatore-a-pavimento-incasso-sfz-m-kit-frigo-control-ticino.webp',cap:'Kit unità interna ed esterna SFZ-M'},
+          {src:U+'2025/08/climatizzatore-a-pavimento-incasso-sfz-m-frigo-control-ticino-600x600.webp',cap:'Unità interna ad incasso SFZ-M'},
+          {src:U+'2025/08/climatizzatore-a-pavimento-incasso-soggiorno-moderno-frigo-control-ticino-600x449.webp',cap:'Installata sotto finestra, discreta e silenziosa'}
+        ],
+        features:[
+          {img:U+'2025/10/Dimensioni-sfz-m.webp',t:'Dimensioni compatte',p:['Le ridotte dimensioni della linea SFZ-M rendono idonea l’installazione anche in strutture ad incasso particolarmente ristrette.']},
+          {img:U+'2025/10/Installazione-flessibile-sfz-m.webp',t:'Installazione flessibile',p:['La direzione di ingresso dell’aria dal basso o dalla parete anteriore può essere selezionata cambiando il pannello, la griglia e il filtro.']},
+          {img:U+'2025/10/standard-inverter-sfz-m.webp',t:'Alta efficienza energetica',p:['Le unità interne ad alta efficienza energetica della serie SFZ riescono a raggiungere una classe energetica A++ in raffreddamento e A+ in riscaldamento.']},
+          {img:U+'2025/10/DC-Inverter-sfz-m.webp',t:'Portata d’aria regolabile',p:['Ventilatore pilotato da DC Inverter. Il ventilatore pilotato dal motore DC Inverter rende le unità della linea SFZ particolarmente versatili: 4 differenti selezioni di pressione statica selezionabili dal comando (0-25-40-60 Pascal) consentono l’installazione sia con canalizzazioni lunghe sia a scarico diretto, bilanciando ottimamente portata d’aria e silenziosità di funzionamento.']},
+          {img:U+'2025/10/Silenziosita-sfz-m.webp',t:'Elevato comfort acustico',p:['La qualità dell’ambiente in cui soggiorniamo dipende anche dal livello di rumore percepito. I climatizzatori Mitsubishi Electric contribuiscono a mantenere il più elevato comfort acustico riducendo al minimo le emissioni sonore, grazie alla grande cura nella progettazione e nei dettagli costruttivi.']},
+          {t:'Gas refrigerante R32',p:['Il gas refrigerante R32 risponde alle direttive europee in materia di riduzione dell’effetto serra, presentando un GWP inferiore all’R410A e non danneggiando lo strato di ozono. Grazie al R32 si ottiene:'],sub:['una maggiore efficienza energetica;','la riduzione della quantità di gas refrigerante utilizzata;','un ridotto impatto ambientale;','facilmente caricabile e recuperabile in quanto gas puro;','bassa tossicità e bassa infiammabilità.']}
+        ]
+      },
+      mfz:{
+        badge:'A pavimento',cls:'mfz',titolo:'Climatizzatore a pavimento MFZ-KT',modello:'Serie MFZ-KT',
+        serie:'Serie M',headline:'Climatizzatore a pavimento MFZ-KT',
+        spec:['Gas refrigerante R32 a basso impatto ambientale','Estetica moderna ed elegante','Filtro purificatore dell’aria V Blocking in dotazione','Filtro standard in dotazione','Elevata capacità di riscaldamento','Multi-flow vane','Elevata silenziosità'],
+        chips:['A pavimento','Controllo remoto','Filtro di serie','Gas Refrigerante R32','Purificazione aria','Raffresc/Riscald. ad aria','SARS-Cov 2 Tested','Silenziosità'],
+        intro:'Climatizzatore a pavimento dall’estetica moderna ed elegante, con filtro purificatore dell’aria V Blocking in dotazione, sistema Multi-flow vane ed elevata capacità di riscaldamento.',
+        gallery:[
+          {src:U+'2025/08/climatizzatore-a-pavimento-mfz-kt-soggiorno-frigo-control-ticino.webp',cap:'In soggiorno moderno con parete grigia'},
+          {src:U+'2025/08/climatizzatore-a-pavimento-mfz-kt-design-moderno-frigo-control-ticino.webp',cap:'Design moderno, parete blu'},
+          {src:U+'2025/08/climatizzatore-a-pavimento-mfz-kt-frontale-frigo-control-ticino.webp',cap:'Vista frontale, compatto ed efficiente'},
+          {src:U+'2025/08/climatizzatore-a-pavimento-mfz-kt-dimensioni-frigo-control-ticino.webp',cap:'Dimensioni in millimetri'}
+        ],
+        features:[
+          {img:U+'2025/10/Screenshot-2023-05-25-163025.webp',t:'Il sistema Multi-flow vane',p:['La bocchetta di mandata è caratterizzata dalla presenza di tre diversi deflettori, ognuno con un profilo appositamente studiato per ottimizzare la distribuzione dell’aria in uscita, massimizzando il comfort sia in raffrescamento che in riscaldamento.','All’avviamento del riscaldamento, parte dell’aria riscaldata viene indirizzata verso il basso, in prossimità della ripresa, in modo che venga aspirata dall’unità e permetta di alzare più velocemente la temperatura dell’aria in uscita. La direzione del flusso in uscita può essere impostata liberamente.']},
+          {img:U+'2025/10/v-blocking.webp',t:'Filtro purificatore dell’aria V Blocking in dotazione',p:['V Blocking è un nuovo filtro purificatore che migliora il precedente sistema filtrante agli ioni d’argento, aggiungendo un’azione antivirale in grado di inibire fino al 99% di virus, batteri, muffe e allergeni.']},
+          {img:U+'2025/10/Screenshot-2023-05-25-163344.webp',t:'Filtro purificatore standard in dotazione',p:['Il filtro purificatore standard garantisce la rimozione dall’aria di particelle inquinanti grossolane come polvere e impurità con un aggiuntivo effetto antibatterico, antimuffa e in grado di catturare gli odori.']},
+          {img:U+'2025/10/Screenshot-2024-01-16-093646.webp',t:'L’unità a pavimento: design e dimensioni',p:['Le unità a pavimento hanno un design caratterizzato da linee semplici e superfici piatte che conferiscono eleganza e modernità all’estetica e permettono di abbinarle perfettamente ad ogni tipo di arredamento.']}
+        ]
+      }
+    };
+
+    /* ---------- Render ---------- */
+    function renderLinea(key){
+      var d=LINES[key];
+      var thumbs=d.gallery.map(function(g,i){
+        return '<button type="button" class="thumb'+(i===0?' attiva':'')+'" data-i="'+i+'" aria-label="'+esc(g.cap)+'"><span class="protetta"><img src="'+g.src+'" alt="'+esc(g.cap)+'" loading="lazy" draggable="false"></span></button>';
+      }).join('');
+      var spec=d.spec.map(function(s){return '<li>'+svg(ICN.check)+' <span>'+esc(s)+'</span></li>';}).join('');
+      var chips=d.chips.map(function(c){return '<span class="chip">'+svg(chipIcon(c))+esc(c)+'</span>';}).join('');
+      var feats=d.features.map(function(f,i){
+        var body='<div><h5>'+esc(f.t)+'</h5>'+f.p.map(function(x){return '<p>'+esc(x)+'</p>';}).join('')
+                +(f.sub?('<ul class="sub">'+f.sub.map(function(s){return '<li>'+svg(ICN.check)+' <span>'+esc(s)+'</span></li>';}).join('')+'</ul>'):'')
+                +'</div>';
+        if(!f.img) return '<div class="feat notxt-img">'+body+'</div>';
+        var img='<div class="feat-img protetta contain"><img src="'+f.img+'" alt="'+esc(f.t)+'" loading="lazy" draggable="false"></div>';
+        return '<div class="feat'+(i%2?' rev':'')+'">'+(i%2?body+img:img+body)+'</div>';
+      }).join('');
+
+      return ''+
+      '<button class="torna" type="button" data-torna><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M11 6l-6 6 6 6"/></svg> Torna ai prodotti</button>'+
+      '<div class="linea-head '+d.cls+'"><span class="badge">'+esc(d.badge)+'</span><h2>'+esc(d.titolo)+'</h2><span class="mod">'+esc(d.modello)+'</span></div>'+
+      '<div class="vetrina">'+
+        '<div class="galleria-col">'+
+          '<div class="main-foto protetta contain"><img id="main-'+key+'" src="'+d.gallery[0].src+'" alt="'+esc(d.gallery[0].cap)+'" draggable="false"></div>'+
+          '<div class="caption" id="cap-'+key+'">'+esc(d.gallery[0].cap)+'</div>'+
+          '<div class="thumbs" data-thumbs="'+key+'">'+thumbs+'</div>'+
+        '</div>'+
+        '<div class="lato">'+
+          '<div class="serie">'+esc(d.headline)+' · '+esc(d.serie)+'</div>'+
+          '<h4>Caratteristiche principali</h4>'+
+          '<ul class="spec">'+spec+'</ul>'+
+          '<div class="chips">'+chips+'</div>'+
+        '</div>'+
+      '</div>'+
+      '<div class="intro-linea">'+esc(d.intro)+'</div>'+
+      '<div class="feat-tit">'+svg(ICN.check)+' Dettagli e tecnologie</div>'+
+      feats+
+      (TECH[key]||'')+
+      '<div class="cta-fill '+d.cls+'"><div class="cta-inner">'+
+        '<h4>Non sai quale soluzione a pavimento scegliere?</h4>'+
+        '<p>Ti guidiamo noi: un sopralluogo gratuito ci permette di individuare il climatizzatore Mitsubishi Electric perfetto per i tuoi ambienti, con installazione a regola d’arte in Ticino.</p>'+
+        '<div class="cta-points">'+
+          '<span class="pt">'+svg(ICN.leaf)+'Refrigerante R32 ecologico</span>'+
+          '<span class="pt">'+svg(ICN.floor)+'Installazione discreta a pavimento</span>'+
+          '<span class="pt">'+svg(ICN.check)+'Installazione professionale</span>'+
+          '<span class="pt">'+svg(ICN.shield)+'Assistenza in Ticino</span>'+
+        '</div>'+
+      '</div></div>';
+    }
+
+    ['sfz','mfz'].forEach(function(k){ document.getElementById('linea-'+k).innerHTML=renderLinea(k); });
+
+    /* ---------- Stessa altezza per i prodotti (i corti si riempiono) ---------- */
+    var LINEKEYS=['sfz','mfz'];
+    function equalize(){
+      var secs=LINEKEYS.map(function(k){return document.getElementById('linea-'+k);});
+      secs.forEach(function(s){ s.style.minHeight=''; });
+      var cs=getComputedStyle(root);
+      var w=root.clientWidth-(parseFloat(cs.paddingLeft)||0)-(parseFloat(cs.paddingRight)||0);
+      var max=0;
+      secs.forEach(function(s){
+        var active=s.classList.contains('attiva');
+        if(!active){
+          s.style.display='flex'; s.style.flexDirection='column';
+          s.style.position='absolute'; s.style.visibility='hidden';
+          s.style.left='0'; s.style.top='0'; s.style.width=w+'px';
+        }
+        var h=s.scrollHeight;
+        if(h>max) max=h;
+        if(!active){
+          s.style.display=''; s.style.flexDirection='';
+          s.style.position=''; s.style.visibility='';
+          s.style.left=''; s.style.top=''; s.style.width='';
+        }
+      });
+      if(max>0) secs.forEach(function(s){ s.style.minHeight=max+'px'; });
+    }
+
+    /* ---------- Cambio immagine principale al click ---------- */
+    root.querySelectorAll('.thumbs').forEach(function(row){
+      var key=row.getAttribute('data-thumbs');
+      row.addEventListener('click',function(e){
+        var b=e.target.closest('.thumb'); if(!b) return;
+        var i=parseInt(b.getAttribute('data-i'),10);
+        var g=LINES[key].gallery[i];
+        var main=document.getElementById('main-'+key);
+        var cap=document.getElementById('cap-'+key);
+        main.src=g.src; main.alt=g.cap; cap.textContent=g.cap;
+        row.querySelectorAll('.thumb').forEach(function(t){t.classList.remove('attiva');});
+        b.classList.add('attiva');
+      });
+    });
+
+    /* ---------- Iframe: auto-altezza (no doppio scroll) ---------- */
+    var inIframe=false; try{ inIframe=(window.self!==window.top); }catch(e){ inIframe=true; }
+    function postHeight(){
+      if(!inIframe) return;
+      var h=Math.ceil(root.getBoundingClientRect().height)+
+            (parseInt(getComputedStyle(root).marginTop)||0)+
+            (parseInt(getComputedStyle(root).marginBottom)||0);
+      try{ window.parent.postMessage({type:'fc-clima-height',id:'fc-clima',height:h},'*'); }catch(e){}
+    }
+    function goTo(el){
+      if(!inIframe){ if(el) el.scrollIntoView({behavior:'smooth',block:'start'}); return; }
+      postHeight();
+      try{ window.parent.postMessage({type:'fc-clima-scrolltop',id:'fc-clima'},'*'); }catch(e){}
+    }
+
+    /* ---------- Landing "clicca e appare" ---------- */
+    var scelta=document.getElementById('fc-scelta');
+    var generali=document.getElementById('fc-generali');
+    var hero=root.querySelector('.fc-hero');
+    function apri(linea){
+      var sez=document.getElementById('linea-'+linea); if(!sez) return;
+      root.querySelectorAll('.fc-dettaglio').forEach(function(s){s.classList.remove('attiva');});
+      scelta.style.display='none'; if(generali) generali.style.display='none';
+      sez.classList.add('attiva');
+      equalize();
+      goTo(sez);
+    }
+    function home(){
+      root.querySelectorAll('.fc-dettaglio').forEach(function(s){s.classList.remove('attiva');});
+      scelta.style.display=''; if(generali) generali.style.display='';
+      goTo(hero);
+    }
+    root.querySelectorAll('.card[data-linea]').forEach(function(c){c.addEventListener('click',function(){apri(c.getAttribute('data-linea'));});});
+    root.addEventListener('click',function(e){ if(e.target.closest('[data-torna]')) home(); });
+
+    /* ---------- Protezione immagini ---------- */
+    root.addEventListener('contextmenu',function(e){ if(e.target.closest('.protetta,img,.thumbs,.vetrina')) e.preventDefault(); });
+    root.addEventListener('dragstart',function(e){ if(e.target.tagName==='IMG') e.preventDefault(); });
+
+    /* ---------- Equalizza + comunica altezza ---------- */
+    var reTimer=null;
+    function onResize(){ clearTimeout(reTimer); reTimer=setTimeout(function(){ equalize(); postHeight(); },150); }
+    equalize();
+    window.addEventListener('resize',onResize);
+    window.addEventListener('load',function(){ equalize(); postHeight(); });
+    setTimeout(function(){ equalize(); postHeight(); },400);
+    setTimeout(function(){ equalize(); postHeight(); },1400);
+    if(inIframe){
+      if('ResizeObserver' in window){ new ResizeObserver(postHeight).observe(root); }
+      root.addEventListener('toggle',postHeight,true);
+      root.querySelectorAll('img').forEach(function(im){ im.addEventListener('load',postHeight); });
+      postHeight(); setTimeout(postHeight,300); setTimeout(postHeight,2500);
+    }
+  })();
+  </script>
+</div>
