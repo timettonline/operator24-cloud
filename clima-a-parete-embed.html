@@ -92,10 +92,22 @@
 
   /* ---- Dettaglio ---- */
   #fc-clima .fc-dettaglio{display:none;animation:fcIn .4s ease}
-  #fc-clima .fc-dettaglio.attiva{display:block}
+  #fc-clima .fc-dettaglio.attiva{display:flex;flex-direction:column}
   @keyframes fcIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
-  #fc-clima .torna{display:inline-flex;align-items:center;gap:8px;background:none;border:none;cursor:pointer;color:var(--blu);font-weight:700;font-size:.95rem;padding:8px 4px;margin:6px 0 8px;font-family:inherit}
+  #fc-clima .torna{align-self:flex-start;display:inline-flex;align-items:center;gap:8px;background:none;border:none;cursor:pointer;color:var(--blu);font-weight:700;font-size:.95rem;padding:8px 4px;margin:6px 0 8px;font-family:inherit}
   #fc-clima .torna:hover{color:var(--accent)}
+
+  /* Pannello di riempimento (cresce a occupare lo spazio: nessun vuoto sotto) */
+  #fc-clima .cta-fill{flex:1 1 auto;min-height:210px;margin-top:24px;border-radius:var(--radius);color:#fff;display:flex;align-items:center;justify-content:center;padding:34px 26px;overflow:hidden;box-shadow:var(--ombra)}
+  #fc-clima .cta-fill.premium{background:linear-gradient(135deg,#5b2a86,#8e2de2 55%,#c0392b)}
+  #fc-clima .cta-fill.plus{background:linear-gradient(135deg,var(--blu),var(--blu2))}
+  #fc-clima .cta-fill.smart{background:linear-gradient(135deg,#0f766e,#16a085)}
+  #fc-clima .cta-fill .cta-inner{max-width:760px;text-align:center}
+  #fc-clima .cta-fill h4{color:#fff;font-size:clamp(1.2rem,2.5vw,1.7rem);margin-bottom:12px}
+  #fc-clima .cta-fill p{color:rgba(255,255,255,.92);font-size:1rem;margin:0 auto 22px;max-width:640px}
+  #fc-clima .cta-points{display:flex;flex-wrap:wrap;gap:12px;justify-content:center}
+  #fc-clima .cta-points .pt{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.28);border-radius:999px;padding:9px 16px;font-size:.85rem;font-weight:600}
+  #fc-clima .cta-points .pt svg{color:#bfe9ff;flex:0 0 auto}
   #fc-clima .linea-head{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin:4px 0 6px}
   #fc-clima .linea-head h2{font-size:clamp(1.4rem,3vw,2rem)}
   #fc-clima .linea-head .mod{color:var(--muto);font-weight:600}
@@ -403,7 +415,8 @@
           {img:U+'2025/10/MSZ-AY-SenzaCon-Self-Clean-Mode.webp',t:'Funzione «Self Clean»',p:['La nuova funzione «Self Clean» presente su MSZ-AY consente di asciugare l’unità interna al termine del ciclo di raffreddamento o deumidificazione, prevenendo la formazione di muffe e cattivi odori.']},
           {img:U+'2025/10/funzionamento-silenzioso-MSZ-AY.webp',t:'Funzionamento silenzioso',p:['Il comfort ambientale è legato anche al livello sonoro ed è importante specialmente nelle camere da letto o negli studi. La linea MSZ-AY consente di garantire il clima ideale tutto l’anno con un livello sonoro virtualmente impercettibile dall’orecchio umano. I 18 dB(A) raggiunti dal modello MSZ-AY (taglie 25 e 35) sono più silenziosi del rumore generato dal frusciare delle foglie nel vento, rendendo il climatizzatore di fatto non udibile dagli occupanti della stanza. Ecco perché MSZ-AY è particolarmente adatto ad ambienti domestici quali camera da letto e zona living, in cui trascorriamo la maggior parte del nostro tempo e svolgiamo le nostre attività quotidiane.']},
           {img:U+'2025/10/MSZ-AP-Night-Mode.webp',t:'Night Mode',p:['Attivando la funzione Night Mode dal comando remoto è possibile predisporre il climatizzatore per il funzionamento notturno:'],sub:['Riduzione luminosità LED','Disattivazione suono «beep»','Riduzione di 3 dB emissione sonora unità esterna']},
-          {img:U+'2025/10/Screenshot-2023-05-24-111122.webp',t:'Dima di installazione',p:['Il nuovo MSZ-AY è equipaggiato di una nuova dima di installazione. La nuova dima dispone di un ampio foro centrale che rende l’installazione più agevole soprattutto in presenza di cassette di predisposizione.']}
+          {img:U+'2025/10/Screenshot-2023-05-24-111122.webp',t:'Dima di installazione',p:['Il nuovo MSZ-AY è equipaggiato di una nuova dima di installazione. La nuova dima dispone di un ampio foro centrale che rende l’installazione più agevole soprattutto in presenza di cassette di predisposizione.']},
+          {img:U+'2025/10/PLASMA-QUAD-PLUS-SCH-1.webp',t:'Filtro Plasma Quad Plus in dotazione',p:['La linea MSZ-AY include il sistema di filtrazione attiva Plasma Quad Plus, in grado di inibire fino al 99% di virus, batteri, muffe e PM2.5 presenti nell’aria, fino al 98% di allergeni e pollini e fino al 99,7% di acari e polveri.']}
         ]
       },
       smart:{
@@ -418,7 +431,10 @@
         ],
         features:[
           {t:'Filtro purificatore standard in dotazione',p:['Il filtro purificatore standard garantisce la rimozione dall’aria di particelle inquinanti grossolane come polvere e impurità con un aggiuntivo effetto antibatterico, antimuffa e in grado di catturare gli odori.']},
-          {img:U+'2025/10/Filtro-plasma-quad-connect_0.webp',t:'Filtro Plasma Quad Connect opzionale',p:['Il sistema Plasma Quad Connect è un sistema di filtrazione attiva in grado di inibire fino al 99% di virus, batteri, muffe e PM2.5 presenti nell’aria, fino al 98% di allergeni e pollini e fino al 99,7% di acari e polveri.']}
+          {img:U+'2025/10/Filtro-plasma-quad-connect_0.webp',t:'Filtro Plasma Quad Connect opzionale',p:['Il sistema Plasma Quad Connect è un sistema di filtrazione attiva in grado di inibire fino al 99% di virus, batteri, muffe e PM2.5 presenti nell’aria, fino al 98% di allergeni e pollini e fino al 99,7% di acari e polveri.']},
+          {img:U+'2025/10/monosplit_0-a-parete.webp',t:'Soluzioni monosplit e multisplit',p:['MSZ-HR è disponibile in configurazione monosplit oppure collegabile a unità esterne multisplit (MXZ, MXZ Hyper Heating, PUMY-SP) per climatizzare più ambienti con un unico motore esterno.']},
+          {img:U+'2025/10/PLASMA-QUAD-PLUS-SCH-1.webp',t:'Filtro Plasma Quad Plus (opzionale)',p:['Su MSZ-HR è disponibile in opzione anche il sistema Plasma Quad Plus: filtrazione attiva che inibisce fino al 99% di virus, batteri, muffe e PM2.5 presenti nell’aria, fino al 98% di allergeni e pollini e fino al 99,7% di acari e polveri.']},
+          {img:U+'2025/10/Esploso-LN-sfondo-bianco-1.webp',t:'Filtrazione, distribuzione e qualità dell’aria',p:['I sistemi Mitsubishi Electric sono progettati per migliorare la qualità dell’aria degli ambienti in cui vivi, creando le condizioni ottimali per un comfort impareggiabile con una filtrazione efficace e una distribuzione uniforme del flusso.']}
         ]
       }
     };
@@ -459,12 +475,48 @@
       '</div>'+
       '<div class="intro-linea">'+esc(d.intro)+'</div>'+
       '<div class="feat-tit">'+svg(ICN.check)+' Dettagli e tecnologie</div>'+
-      feats;
+      feats+
+      '<div class="cta-fill '+d.cls+'"><div class="cta-inner">'+
+        '<h4>Non sai quale modello scegliere?</h4>'+
+        '<p>Ti guidiamo noi: un sopralluogo gratuito ci permette di individuare il climatizzatore Mitsubishi Electric perfetto per i tuoi ambienti, con installazione a regola d’arte in Ticino.</p>'+
+        '<div class="cta-points">'+
+          '<span class="pt">'+svg(ICN.leaf)+'Refrigerante R32 ecologico</span>'+
+          '<span class="pt">'+svg(ICN.eye)+'Sopralluogo gratuito</span>'+
+          '<span class="pt">'+svg(ICN.check)+'Installazione professionale</span>'+
+          '<span class="pt">'+svg(ICN.shield)+'Assistenza in Ticino</span>'+
+        '</div>'+
+      '</div></div>';
     }
 
     ['premium','plus','smart'].forEach(function(k){
       document.getElementById('linea-'+k).innerHTML=renderLinea(k);
     });
+
+    /* ---------- Stessa altezza per tutte le linee (le corte si riempiono, mai vuote) ---------- */
+    var LINEKEYS=['premium','plus','smart'];
+    function equalize(){
+      var secs=LINEKEYS.map(function(k){return document.getElementById('linea-'+k);});
+      secs.forEach(function(s){ s.style.minHeight=''; });
+      var cs=getComputedStyle(root);
+      var w=root.clientWidth-(parseFloat(cs.paddingLeft)||0)-(parseFloat(cs.paddingRight)||0);
+      var max=0;
+      secs.forEach(function(s){
+        var active=s.classList.contains('attiva');
+        if(!active){
+          s.style.display='flex'; s.style.flexDirection='column';
+          s.style.position='absolute'; s.style.visibility='hidden';
+          s.style.left='0'; s.style.top='0'; s.style.width=w+'px';
+        }
+        var h=s.scrollHeight;
+        if(h>max) max=h;
+        if(!active){
+          s.style.display=''; s.style.flexDirection='';
+          s.style.position=''; s.style.visibility='';
+          s.style.left=''; s.style.top=''; s.style.width='';
+        }
+      });
+      if(max>0) secs.forEach(function(s){ s.style.minHeight=max+'px'; });
+    }
 
     /* ---------- Cambio immagine principale al click ---------- */
     root.querySelectorAll('.thumbs').forEach(function(row){
@@ -507,6 +559,7 @@
       root.querySelectorAll('.fc-dettaglio').forEach(function(s){s.classList.remove('attiva');});
       scelta.style.display='none'; if(generali) generali.style.display='none';
       sez.classList.add('attiva');
+      equalize();
       goTo(sez);
     }
     function home(){
@@ -521,14 +574,19 @@
     root.addEventListener('contextmenu',function(e){ if(e.target.closest('.protetta,img,.thumbs,.vetrina')) e.preventDefault(); });
     root.addEventListener('dragstart',function(e){ if(e.target.tagName==='IMG') e.preventDefault(); });
 
-    /* ---------- Comunica l'altezza ad ogni cambiamento (una sola scrollbar) ---------- */
+    /* ---------- Equalizza le altezze + comunica l'altezza (una sola scrollbar) ---------- */
+    var reTimer=null;
+    function onResize(){ clearTimeout(reTimer); reTimer=setTimeout(function(){ equalize(); postHeight(); },150); }
+    equalize();
+    window.addEventListener('resize',onResize);
+    window.addEventListener('load',function(){ equalize(); postHeight(); });
+    setTimeout(function(){ equalize(); postHeight(); },400);
+    setTimeout(function(){ equalize(); postHeight(); },1400);
     if(inIframe){
       if('ResizeObserver' in window){ new ResizeObserver(postHeight).observe(root); }
-      window.addEventListener('resize',postHeight);
-      window.addEventListener('load',postHeight);
       root.addEventListener('toggle',postHeight,true); // <details> FAQ
       root.querySelectorAll('img').forEach(function(im){ im.addEventListener('load',postHeight); });
-      postHeight(); setTimeout(postHeight,300); setTimeout(postHeight,1200); setTimeout(postHeight,2500);
+      postHeight(); setTimeout(postHeight,300); setTimeout(postHeight,2500);
     }
   })();
   </script>
