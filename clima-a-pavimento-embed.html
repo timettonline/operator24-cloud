@@ -592,13 +592,19 @@
 
     /* ---------- Iframe: auto-altezza (no doppio scroll) ---------- */
     var inIframe=false; try{ inIframe=(window.self!==window.top); }catch(e){ inIframe=true; }
-    function postHeight(){
-      if(!inIframe) return;
-      var h=Math.ceil(root.getBoundingClientRect().height)+
+    function currentHeight(){
+      return Math.ceil(root.getBoundingClientRect().height)+
             (parseInt(getComputedStyle(root).marginTop)||0)+
             (parseInt(getComputedStyle(root).marginBottom)||0);
-      try{ window.parent.postMessage({type:'fc-clima-height',id:'fc-clima',height:h},'*'); }catch(e){}
     }
+    function postHeight(){
+      if(!inIframe) return;
+      try{ window.parent.postMessage({type:'fc-clima-height',id:'fc-clima',height:currentHeight()},'*'); }catch(e){}
+    }
+    // Il genitore (es. Wix/Velo) può chiedere l'altezza in qualsiasi momento
+    window.addEventListener('message',function(e){
+      var d=e&&e.data; if(d&&(d.type==='fc-clima-getheight'||d==='fc-clima-getheight')) postHeight();
+    });
     function goTo(el){
       if(!inIframe){ if(el) el.scrollIntoView({behavior:'smooth',block:'start'}); return; }
       postHeight();
