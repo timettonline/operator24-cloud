@@ -22,8 +22,8 @@
   #fc-app .pz.ct img{object-fit:contain;background:#fff}
   #fc-app .pz::after{content:"";position:absolute;inset:0;z-index:2}
 
-  /* ogni vista riempie lo stesso box */
-  #fc-app .view{position:absolute;inset:0;display:none;flex-direction:column;padding:clamp(12px,2vw,20px);gap:10px}
+  /* ogni vista riempie lo stesso box, contenuto centrato con larghezza massima */
+  #fc-app .view{position:absolute;top:0;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:1200px;display:none;flex-direction:column;padding:clamp(12px,2vw,22px);gap:10px}
   #fc-app .view.on{display:flex;animation:fd .25s ease}
   @keyframes fd{from{opacity:0}to{opacity:1}}
 
@@ -56,7 +56,7 @@
   #fc-app .tab{background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;font:inherit;color:var(--muto);font-weight:700;font-size:.8rem;padding:7px 10px;margin-bottom:-1px}
   #fc-app .tab.on{color:var(--blu);border-bottom-color:var(--accent)}
   #fc-app .stage{flex:1;min-height:0;position:relative}
-  #fc-app .pane{position:absolute;inset:0;display:none}
+  #fc-app .pane{position:absolute;inset:0;display:none;overflow:auto;-webkit-overflow-scrolling:touch}
   #fc-app .pane.on{display:block}
 
   /* pane Panoramica: galleria + info, tutto dentro l'altezza */
@@ -68,33 +68,39 @@
   #fc-app .gal .thumbs .t{height:42px;border:2px solid transparent;border-radius:7px;overflow:hidden;cursor:pointer;padding:0;background:none}
   #fc-app .gal .thumbs .t.on{border-color:var(--accent)}
   #fc-app .gal .thumbs .t .pz,#fc-app .gal .thumbs .t img{height:100%;border-radius:0}
-  #fc-app .side{min-height:0;display:flex;flex-direction:column;overflow:hidden}
-  #fc-app .side .intro{font-size:.8rem;color:var(--testo);margin-bottom:7px}
-  #fc-app .spec{list-style:none;display:grid;gap:4px;margin-bottom:8px}
-  #fc-app .spec li{display:flex;gap:7px;align-items:flex-start;font-size:.79rem}
-  #fc-app .spec li svg{flex:0 0 14px;margin-top:2px;color:var(--accent)}
-  #fc-app .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:auto}
+  #fc-app .side{min-height:0;display:flex;flex-direction:column;justify-content:center;overflow:hidden}
+  #fc-app .side .intro{font-size:.85rem;color:var(--testo);margin-bottom:12px}
+  #fc-app .side h4{font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muto);margin-bottom:8px}
+  #fc-app .spec{list-style:none;display:grid;gap:7px;margin-bottom:14px}
+  #fc-app .spec li{display:flex;gap:8px;align-items:flex-start;font-size:.86rem}
+  #fc-app .spec li svg{flex:0 0 15px;margin-top:2px;color:var(--accent)}
+  #fc-app .chips{display:flex;flex-wrap:wrap;gap:7px}
   #fc-app .chip{display:inline-flex;align-items:center;gap:5px;background:var(--grigio);border:1px solid var(--bordo);color:var(--blu);border-radius:999px;padding:4px 9px;font-size:.68rem;font-weight:600}
   #fc-app .chip svg{color:var(--accent)}
 
   /* pane Dettagli: griglia di feature che riempie l'area */
-  #fc-app .feats{height:100%;display:grid;grid-template-columns:1fr 1fr;grid-auto-rows:1fr;gap:10px}
-  @media(max-width:640px){#fc-app .feats{grid-template-columns:1fr;grid-auto-rows:auto;overflow-y:auto}}
-  #fc-app .fcard{min-height:0;border:1px solid var(--bordo);border-radius:11px;background:#fff;box-shadow:0 6px 16px rgba(10,61,98,.08);padding:12px 14px;overflow:hidden}
+  #fc-app .feats{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  @media(max-width:640px){#fc-app .feats{grid-template-columns:1fr}}
+  #fc-app .fcard{border:1px solid var(--bordo);border-radius:11px;background:#fff;box-shadow:0 6px 16px rgba(10,61,98,.08);padding:12px 14px}
   #fc-app .fcard h5{font-size:.86rem;color:var(--blu);margin-bottom:4px;display:flex;gap:6px;align-items:center}
   #fc-app .fcard h5 svg{color:var(--accent);flex:0 0 auto}
   #fc-app .fcard p{font-size:.76rem;color:var(--muto);line-height:1.4}
 
-  /* pane Tecnica */
-  #fc-app .tec{height:100%;display:flex;flex-direction:column;gap:10px;overflow:hidden}
-  #fc-app .tec .tbox{background:linear-gradient(135deg,var(--blu),var(--blu2));color:#fff;border-radius:10px;padding:12px 14px;font-size:.8rem;line-height:1.5;flex:0 0 auto}
+  /* pane Tecnica (scorre dentro la tab se lungo) */
+  #fc-app .tec{display:flex;flex-direction:column;gap:10px}
+  #fc-app .tec .tbox{background:linear-gradient(135deg,var(--blu),var(--blu2));color:#fff;border-radius:10px;padding:12px 14px;font-size:.8rem;line-height:1.5}
   #fc-app .tec .tbox b{color:#bfe9ff}
-  #fc-app .tec .twrap{flex:1;min-height:0;overflow:auto;border:1px solid var(--bordo);border-radius:10px;background:#fff}
-  #fc-app table.tt{border-collapse:collapse;width:100%;font-size:.72rem}
-  #fc-app table.tt th,#fc-app table.tt td{border:1px solid var(--bordo);padding:5px 7px;text-align:center}
-  #fc-app table.tt thead th{background:var(--blu);color:#fff;position:sticky;top:0}
+  #fc-app .tec .twrap{overflow:auto;border:1px solid var(--bordo);border-radius:10px;background:#fff}
+  #fc-app table.tt{border-collapse:collapse;width:100%;font-size:.74rem}
+  #fc-app table.tt th,#fc-app table.tt td{border:1px solid var(--bordo);padding:6px 8px;text-align:center}
+  #fc-app table.tt thead th{background:var(--blu);color:#fff}
   #fc-app table.tt tbody th{background:var(--grigio);color:var(--blu);text-align:left;white-space:nowrap}
-  #fc-app .tec .note{flex:0 0 auto;font-size:.7rem;color:var(--muto)}
+  #fc-app .tec .timg{border:1px solid var(--bordo);border-radius:10px;background:#fff;overflow:hidden;position:relative}
+  #fc-app .tec .timg img{width:100%;height:auto;object-fit:contain;pointer-events:none;-webkit-user-drag:none}
+  #fc-app .tec .timg::after{content:"";position:absolute;inset:0}
+  #fc-app .tec .tmulti{font-size:.82rem;color:var(--testo)}
+  #fc-app .tec .tmulti b{color:var(--blu)}
+  #fc-app .tec .note{font-size:.7rem;color:var(--muto)}
   </style>
 
   <!-- HOME -->
@@ -146,14 +152,21 @@
         spec:['Alta efficienza energetica stagionale','Portata d’aria regolabile (DC Inverter)','Doppia aspirazione dell’aria','Dimensioni super compatte','Gas refrigerante R32','Wi-Fi MELCloud opzionale'],
         chips:['A pavimento','Controllo remoto','Gas R32','Silenziosità'],
         feats:[
-          {i:P.floor,t:'Dimensioni compatte',p:'Le ridotte dimensioni rendono idonea l’installazione anche in incassi particolarmente ristretti.'},
-          {i:P.wind,t:'Installazione flessibile',p:'Ingresso aria dal basso o dalla parete anteriore, cambiando pannello, griglia e filtro.'},
-          {i:P.therm,t:'Alta efficienza',p:'Classe energetica fino ad A++ in raffreddamento e A+ in riscaldamento.'},
-          {i:P.wind,t:'Portata d’aria regolabile',p:'Ventilatore DC Inverter: 4 pressioni statiche (0-25-40-60 Pa), da canalizzazioni lunghe a scarico diretto.'},
-          {i:P.vol,t:'Comfort acustico',p:'Emissioni sonore ridotte al minimo grazie alla cura costruttiva Mitsubishi Electric.'},
-          {i:P.leaf,t:'Gas refrigerante R32',p:'Più efficiente, minor quantità di gas, ridotto impatto ambientale, bassa infiammabilità.'}
+          {i:P.floor,t:'Dimensioni compatte',p:'Le ridotte dimensioni della linea SFZ-M rendono idonea l’installazione anche in strutture ad incasso particolarmente ristrette.'},
+          {i:P.wind,t:'Installazione flessibile',p:'La direzione di ingresso dell’aria dal basso o dalla parete anteriore può essere selezionata cambiando il pannello, la griglia e il filtro.'},
+          {i:P.therm,t:'Alta efficienza energetica',p:'Le unità interne ad alta efficienza della serie SFZ raggiungono la classe energetica A++ in raffreddamento e A+ in riscaldamento.'},
+          {i:P.wind,t:'Portata d’aria regolabile',p:'Ventilatore pilotato da DC Inverter: 4 pressioni statiche selezionabili (0-25-40-60 Pa) consentono installazioni con canalizzazioni lunghe o a scarico diretto, bilanciando portata e silenziosità.'},
+          {i:P.vol,t:'Elevato comfort acustico',p:'I climatizzatori Mitsubishi Electric mantengono il massimo comfort acustico riducendo al minimo le emissioni sonore, grazie alla cura nella progettazione e nei dettagli costruttivi.'},
+          {i:P.leaf,t:'Gas refrigerante R32',p:'GWP inferiore all’R410A, non danneggia l’ozono: maggiore efficienza, minor quantità di gas, ridotto impatto ambientale, facilmente caricabile/recuperabile, bassa tossicità e infiammabilità.'},
+          {i:P.wind,t:'Filtrazione e qualità dell’aria',p:'I sistemi Mitsubishi Electric sono progettati per migliorare la qualità dell’aria degli ambienti in cui vivi, con una distribuzione uniforme e una filtrazione efficace.'},
+          {i:P.remote,t:'MelCloud (Wi-Fi opzionale)',p:'Con l’interfaccia Wi-Fi opzionale controlli l’impianto da PC, tablet e smartphone, ovunque tu sia; compatibile con Amazon Alexa e Google Home.'}
         ],
         tecBox:'Sistema <b>monosplit</b> o <b>multisplit</b> (MXZ / MXZ Hyper Heating) · Gas <b>R32</b> · classe fino ad <b>A++</b> in raffreddamento e <b>A+</b> in riscaldamento.',
+        tecImgs:[
+          'https://climatizzazione.mitsubishielectric.it/sites/default/files/inline-images/Monosplit%20a%20pavimento.png',
+          'https://climatizzazione.mitsubishielectric.it/sites/default/files/inline-images/image_17.png'
+        ],
+        multi:['MXZ','MXZ HYPER HEATING'],
         table:null, note:'*Classi di efficienza energetica da A+++ a D'
       },
       mfz:{badge:'A pavimento',cls:'mfz',titolo:'A pavimento MFZ-KT',mod:'Serie M',
@@ -167,12 +180,15 @@
         spec:['Estetica moderna ed elegante','Filtro V Blocking in dotazione','Sistema Multi-flow vane','Elevata capacità di riscaldamento','Gas refrigerante R32','Elevata silenziosità'],
         chips:['A pavimento','Controllo remoto','Purificazione aria','Gas R32','Silenziosità'],
         feats:[
-          {i:P.wind,t:'Multi-flow vane',p:'Tre deflettori ottimizzano la distribuzione dell’aria in raffrescamento e riscaldamento.'},
-          {i:P.air,t:'Filtro V Blocking in dotazione',p:'Azione antivirale: inibisce fino al 99% di virus, batteri, muffe e allergeni.'},
-          {i:P.air,t:'Filtro standard in dotazione',p:'Rimuove polveri e impurità, con effetto antibatterico, antimuffa e cattura odori.'},
-          {i:P.floor,t:'Design a pavimento',p:'Linee semplici e superfici piatte che si abbinano ad ogni arredamento.'}
+          {i:P.wind,t:'Sistema Multi-flow vane',p:'Tre deflettori con profilo dedicato ottimizzano la distribuzione dell’aria in uscita, massimizzando il comfort sia in raffrescamento che in riscaldamento; la direzione del flusso è impostabile liberamente.'},
+          {i:P.air,t:'Filtro V Blocking in dotazione',p:'Nuovo filtro purificatore con azione antivirale: inibisce fino al 99% di virus, batteri, muffe e allergeni, migliorando il precedente sistema agli ioni d’argento.'},
+          {i:P.air,t:'Filtro standard in dotazione',p:'Rimuove dall’aria particelle inquinanti grossolane come polvere e impurità, con effetto antibatterico, antimuffa e cattura odori.'},
+          {i:P.floor,t:'Design a pavimento',p:'Linee semplici e superfici piatte che conferiscono eleganza e modernità e si abbinano ad ogni tipo di arredamento.'},
+          {i:P.wind,t:'Filtrazione e qualità dell’aria',p:'I sistemi Mitsubishi Electric sono progettati per migliorare la qualità dell’aria degli ambienti, creando le condizioni ottimali per un comfort impareggiabile.'},
+          {i:P.remote,t:'MelCloud (Wi-Fi opzionale)',p:'Con l’interfaccia Wi-Fi opzionale controlli l’impianto da PC, tablet e smartphone; compatibile con Amazon Alexa e Google Home.'}
         ],
         tecBox:'Potenze <b>2,5 – 5,0 kW</b> · Gas <b>R32</b> · mono e multisplit (MXZ / MXZ Hyper Heating / PUMY-SP).',
+        multi:['MXZ','MXZ HYPER HEATING','PUMY-SP'],
         table:'<table class="tt"><thead><tr><th>Unità interna</th><th>KT25</th><th>KT35</th><th>KT50</th></tr></thead><tbody>'
           +'<tr><th>Unità esterna</th><td>SUZ-M25VA</td><td>SUZ-M35VA</td><td>SUZ-M50VA</td></tr>'
           +'<tr><th>Raffr. Potenza (kW)</th><td>2,5</td><td>3,5</td><td>5,0</td></tr>'
@@ -192,14 +208,16 @@
       var spec=d.spec.map(function(s){return '<li>'+CK+'<span>'+esc(s)+'</span></li>';}).join('');
       var chips=d.chips.map(function(c){return '<span class="chip">'+ic(c)+esc(c)+'</span>';}).join('');
       var feats=d.feats.map(function(f){return '<div class="fcard"><h5>'+sv(f.i)+esc(f.t)+'</h5><p>'+esc(f.p)+'</p></div>';}).join('');
-      var tec='<div class="tbox">'+d.tecBox+'</div>'+(d.table?('<div class="twrap">'+d.table+'</div>'):'')+'<div class="note">'+esc(d.note)+'</div>';
+      var tImgs=d.tecImgs?d.tecImgs.map(function(u){return '<div class="timg"><img src="'+u+'" alt="Scheda tecnica" loading="lazy"></div>';}).join(''):'';
+      var tMulti=d.multi?('<div class="tmulti"><b>Sistema multisplit:</b> '+d.multi.map(esc).join(' · ')+'</div>'):'';
+      var tec='<div class="tbox">'+d.tecBox+'</div>'+(d.table?('<div class="twrap">'+d.table+'</div>'):'')+tImgs+tMulti+'<div class="note">'+esc(d.note)+'</div>';
       return '<div class="top"><button class="back" type="button" data-back><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg> Indietro</button>'
         +'<span class="badge '+d.cls+'">'+esc(d.badge)+'</span><h2>'+esc(d.titolo)+'</h2><span class="mod">'+esc(d.mod)+'</span></div>'
         +'<div class="tabs"><button class="tab on" data-tab="0">Panoramica</button><button class="tab" data-tab="1">Dettagli</button><button class="tab" data-tab="2">Scheda tecnica</button></div>'
         +'<div class="stage">'
           +'<div class="pane on" data-pane="0"><div class="pano">'
             +'<div class="gal"><div class="main pz ct"><img id="m-'+k+'" src="'+d.gallery[0].s+'" alt="'+esc(d.gallery[0].c)+'"></div><div class="thumbs" data-th="'+k+'">'+thumbs+'</div></div>'
-            +'<div class="side"><div class="intro">'+esc(d.intro)+'</div><ul class="spec">'+spec+'</ul><div class="chips">'+chips+'</div></div>'
+            +'<div class="side"><div class="intro">'+esc(d.intro)+'</div><h4>Caratteristiche principali</h4><ul class="spec">'+spec+'</ul><div class="chips">'+chips+'</div></div>'
           +'</div></div>'
           +'<div class="pane" data-pane="1"><div class="feats">'+feats+'</div></div>'
           +'<div class="pane" data-pane="2"><div class="tec">'+tec+'</div></div>'
