@@ -1,0 +1,197 @@
+<!-- =====================================================================
+     Frigo Control Ticino — Banchi tradizionali Murali (Pastorfrigor) — APP FISSA
+     - App-shell: riempie l'elemento e NON cresce mai
+     - Home: 7 serie (Genova / Venezia / Torino / Verona / Milano / Retrobanco / Semimurali)
+     - Ogni serie: selettore modelli + foto reale + descrizione completa
+     - Su Wix: Incorpora HTML -> larghezza e altezza (consigliato ~680px)
+     ===================================================================== -->
+<div id="fc-app">
+  <style>
+  html,body{height:100%;margin:0;padding:0;overflow:hidden}
+  #fc-app *{box-sizing:border-box;margin:0;padding:0}
+  #fc-app{
+    --blu:#0a3d62;--blu2:#1e6091;--accent:#00a8e8;--grigio:#f4f6f8;--bordo:#e3e9ef;--testo:#22303a;--muto:#6b7b88;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    color:var(--testo);position:relative;height:100%;width:100%;overflow:hidden;
+    background:linear-gradient(180deg,#ffffff 0%,#eef4f8 100%);-webkit-tap-highlight-color:transparent;
+  }
+  #fc-app img{max-width:100%;display:block}
+  #fc-app h1,#fc-app h2,#fc-app h3,#fc-app h4,#fc-app h5,#fc-app h6{color:var(--blu);line-height:1.15}
+  #fc-app .pz{position:relative;overflow:hidden;border-radius:10px;background:#eef2f5}
+  #fc-app .pz img{width:100%;height:100%;object-fit:cover;-webkit-user-drag:none;user-select:none;pointer-events:none}
+  #fc-app .pz.ct img{object-fit:contain;background:#fff}
+  #fc-app .pz::after{content:"";position:absolute;inset:0;z-index:2}
+
+  #fc-app .view{position:absolute;top:0;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:1200px;display:none;flex-direction:column;padding:clamp(12px,2vw,22px);gap:10px}
+  #fc-app .view.on{display:flex;animation:fd .25s ease}
+  @keyframes fd{from{opacity:0}to{opacity:1}}
+
+  #fc-app .kick{letter-spacing:.12em;text-transform:uppercase;font-size:.6rem;font-weight:800;color:var(--accent);text-align:center;flex:0 0 auto}
+  #fc-app .home h1{font-size:clamp(1rem,2.2vw,1.5rem);font-weight:800;text-align:center;flex:0 0 auto}
+  #fc-app .home .sub{text-align:center;color:var(--muto);font-size:.82rem;max-width:760px;margin:0 auto;flex:0 0 auto}
+  #fc-app .cards{flex:1;min-height:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;align-content:center;overflow-y:auto}
+  #fc-app .card{display:flex;flex-direction:column;border:1px solid var(--bordo);border-radius:14px;overflow:hidden;background:#fff;box-shadow:0 8px 22px rgba(10,61,98,.10);cursor:pointer;text-align:left;font:inherit;color:inherit;padding:0}
+  #fc-app .card:hover{box-shadow:0 14px 30px rgba(10,61,98,.18)}
+  #fc-app .card .ph{aspect-ratio:4/3;flex:0 0 auto}
+  #fc-app .card .ph .pz{height:100%}
+  #fc-app .card .bd{flex:0 0 auto;padding:10px 13px 12px}
+  #fc-app .badge{display:inline-block;font-size:.56rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;padding:3px 8px;border-radius:999px;color:#fff;background:linear-gradient(135deg,#0a3d62,#1e6091)}
+  #fc-app .card h3{font-size:.9rem;margin:6px 0 2px}
+  #fc-app .card p{font-size:.73rem;color:var(--muto)}
+  #fc-app .card .go{margin-top:5px;font-weight:700;color:var(--accent);font-size:.74rem}
+  #fc-app .foot{flex:0 0 auto;text-align:center;color:var(--muto);font-size:.7rem}
+
+  #fc-app .top{flex:0 0 auto;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  #fc-app .back{background:none;border:none;cursor:pointer;color:var(--blu);font-weight:700;font-size:.82rem;display:inline-flex;align-items:center;gap:6px;font-family:inherit;padding:2px 4px}
+  #fc-app .back:hover{color:var(--accent)}
+  #fc-app .top h2{font-size:clamp(.98rem,1.8vw,1.25rem)}
+  #fc-app .fdesc{flex:0 0 auto;font-size:.8rem;color:var(--muto);line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  #fc-app .modelbar{flex:0 0 auto;display:flex;gap:6px;overflow-x:auto;padding-bottom:3px;-webkit-overflow-scrolling:touch}
+  #fc-app .mchip{white-space:nowrap;border:1px solid var(--bordo);background:#fff;border-radius:999px;padding:6px 12px;font-size:.74rem;font-weight:700;color:var(--muto);cursor:pointer;font-family:inherit}
+  #fc-app .mchip.on{background:linear-gradient(135deg,var(--blu),var(--blu2));color:#fff;border-color:transparent}
+  #fc-app .fbody{flex:1;min-height:0;display:grid;grid-template-columns:1.05fr .95fr;gap:16px}
+  @media(max-width:640px){#fc-app .fbody{grid-template-columns:1fr;grid-template-rows:minmax(150px,42%) 1fr;overflow:hidden}}
+  #fc-app .gal{min-height:0;display:flex;flex-direction:column;gap:8px}
+  #fc-app .gal .main{flex:1;min-height:0}
+  #fc-app .fspec{min-height:0;display:flex;flex-direction:column;overflow:auto}
+  @media(min-width:641px){#fc-app .fspec{justify-content:center}}
+  #fc-app .fspec h5{font-size:1.05rem;margin-bottom:8px}
+  #fc-app .mtext{font-size:.85rem;line-height:1.55;color:var(--testo)}
+  #fc-app .tags{margin-top:12px;display:flex;flex-wrap:wrap;gap:6px}
+  #fc-app .tag{font-size:.68rem;font-weight:700;color:var(--blu2);background:#eaf4fb;border:1px solid #d5e8f5;border-radius:999px;padding:4px 10px}
+  </style>
+
+  <div class="view home on" data-view="home">
+    <div class="kick">Frigo Control Ticino · Pastorfrigor</div>
+    <h1>Banchi tradizionali Murali</h1>
+    <div class="sub">Espositori murali refrigerati Pastorfrigor per supermercati, negozi di prossimità e punti vendita: linee Overview a basso consumo, con porte o aperti, per prodotti freschi e surgelati.</div>
+    <div class="cards" id="cards"></div>
+    <div class="foot">Pastorfrigor · Plug-in e remoto · Refrigeranti R290 / A2L / CO2 · Sopralluogo e assistenza in Ticino</div>
+  </div>
+
+  <div class="view" data-view="genova" id="v-genova"></div>
+  <div class="view" data-view="venezia" id="v-venezia"></div>
+  <div class="view" data-view="torino" id="v-torino"></div>
+  <div class="view" data-view="verona" id="v-verona"></div>
+  <div class="view" data-view="milano" id="v-milano"></div>
+  <div class="view" data-view="retrobanco" id="v-retrobanco"></div>
+  <div class="view" data-view="semimurali" id="v-semimurali"></div>
+
+  <script>
+  (function(){
+    var root=document.getElementById('fc-app');
+    if(root.dataset.init) return; root.dataset.init='1';
+    var U='https://frigocontrolch.10web.me/wp-content/uploads/2025/10/';
+    function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+    function M(name,img,text,tags){return {name:name,img:U+img,text:text,tags:tags||[]};}
+
+    var FAM={
+      genova:{name:'Genova Overview',card:U+'banco-murale-refrigerato-3-porte-ticino-M3.webp.webp',tag:'5 modelli',
+        desc:'Il murale ultra low front best-seller della linea plug-in Pastorfrigor, nelle versioni BT (surgelati), TN (freschi) e con porte: consumi e prestazioni ottimizzati con ampio volume espositivo.',
+        models:[
+          M('Overview Doors','banco-murale-refrigerato-3-porte-ticino-M3.webp.webp','Il Genova Overview con porte è dotato di un nuovo sistema di refrigerazione e ventilazione che permette un risparmio energetico del 60% in meno rispetto ad altri modelli di murali standard con porte.',['Con porte','Risparmio -60%']),
+          M('OV Doors H165','banco-murale-refrigerato-4-porte-ticino-M4.webp.webp','Canale Genova Overview Doors h 165 disponibile con porte, modulabile in configurazione isola promozionale con testate. In tutta la linea Genova Overview plug-in la manutenzione del condensatore è facilitata dai pannelli frontali estraibili senza attrezzi; decori nei colori più adatti all’ambiente.',['H 165','Isola promozionale']),
+          M('Overview BT','banco-murale-refrigerato-largo-5-porte-ticino-M10.webp.webp','La linea Overview si completa con il nuovo Genova BT per prodotti surgelati con profondità 90 cm, canalizzabile con tutte le altre versioni Overview tramite un divisorio intermedio. Profilo superiore alto solo 34 mm.',['Surgelati BT','Prof. 90 cm']),
+          M('OV Doors H150','banco-murale-refrigerato-porte-vetro-ticino-M2.webp.webp','Il Genova Basso Overview è disponibile sia con porte che senza e modulabile in configurazione isola promozionale con testate. Altezze 150 e 165 cm pensate per i negozi di prossimità; manutenzione del condensatore da pannelli frontali estraibili senza attrezzi.',['H 150 / 165','Prossimità']),
+          M('Overview Open','banco-murale-refrigerato-aperto-ticino-M1.webp.webp','Il murale ultra low front Genova con gruppo incorporato, nelle sue numerose versioni, è stato il best-seller della linea plug-in. La nuova linea Overview - BT per surgelati e TN per freschi e carne impacchettata - migliora consumi, volume espositivo e finiture grazie ai numerosi test in camera climatica.',['Aperto','Plug-in'])
+        ]},
+
+      venezia:{name:'Venezia Overview',card:U+'banco-murale-refrigerato-completo-vetro-ticino-M7.webp.webp',tag:'8 modelli',
+        desc:'Il tradizionale murale Venezia, moderno e sostenibile: superficie espositiva ampliata, porte a tutta altezza con doppi vetri senza cornice e illuminazione LED curata. Disponibile con refrigeranti A2L e CO2.',
+        models:[
+          M('Overview Doors','banco-murale-refrigerato-completo-vetro-ticino-M7.webp.webp','Il murale Venezia continua ad essere moderno e sostenibile. Superficie di esposizione aumentata grazie all’ottimizzazione dei canali interni del flusso d’aria, porte a tutta altezza con doppi vetri senza cornice e perimetro serigrafato. LED curati; componenti certificati per refrigeranti A2L e CO2.',['Con porte','A2L · CO2']),
+          M('Overview H150','banco-murale-refrigerato-medio-latticini-bevande-ticino-M17.webp.webp','Semimurale dalle linee squadrate che accompagna il semi verticale freezer Torino H150 nel completamento dell’esposizione centrale e promozionale, ideale dove c’è poco spazio. È un chiller per prodotti freschi: salumi, latticini e carne confezionata.',['H 150','Chiller freschi']),
+          M('Overview Open','banco-murale-refrigerato-medio-latticini-bevande-ticino-M19.webp.webp','La linea supermercato Overview porta funzionalità e innovazione: murali freschi chiusi con porte o aperti a frontale medio (Venezia Overview), oltre alle versioni Roll-in senza frontale o con frontale ribaltabile.',['Aperto','Frontale medio']),
+          M('Overview H150 Open','banco-murale-refrigerato-medio-latticini-succhi-ticino-M14.webp.webp','Semimurale Venezia H150 dalle linee squadrate, pensato per l’esposizione centrale e promozionale nei supermercati con poco spazio. Chiller per prodotti freschi: salumi, latticini e carne confezionata.',['H 150','Aperto']),
+          M('OV Basso Doors','banco-murale-refrigerato-basso-latticini-yogurt-ticino-M18.webp.webp','Il tradizionale Venezia Basso rivisto con le caratteristiche della linea Overview: ripiani a profondità decrescente, disponibile in altezza 130 o 160 cm. Per freschi, salumi, formaggi, latticini e carne pre-confezionata; la versione Doors ha il telaio per porte scorrevoli.',['H 130 / 160','Porte scorrevoli']),
+          M('Overview Basso','banco-murale-refrigerato-sportelli-vetro-ticino-M21.webp.webp','Espositore verticale remoto per temperatura positiva. Flessibile, elegante e funzionale, il Venezia si distingue per solidità strutturale e ricchezza di versioni, con ampia disponibilità di accessori.',['Remoto','TN positiva']),
+          M('Overview Roll-in','banco-murale-refrigerato-lungo-alimentari-freschi-ticino-M20.webp.webp','Espositore murale remoto roll-in per temperatura positiva. Si caratterizza per solidità strutturale e funzionalità, con varie versioni per l’utilizzo di diversi tipi di pallet.',['Roll-in','Remoto']),
+          M('Venezia Sushi','banco-murale-refrigerato-salumi-carne-ticino-M13.webp.webp','Semi murale plug-in concepito principalmente per l’esposizione di sushi. Eleganza data dai fianchi trasparenti incorporati nella lunghezza del mobile e dai ripiani in vetro, esaltati dalla delicata illuminazione a LED.',['Sushi','Plug-in'])
+        ]},
+
+      torino:{name:'Torino Overview',card:U+'banco-murale-grande-bibite-coca-cola-ticino-M30.webp.webp',tag:'2 modelli',
+        desc:'Espositori freezer da supermercato: murale con porte tutto vetro remoto a bassa temperatura e semi-verticale H150 per isole promozionali eleganti anche negli spazi ridotti.',
+        models:[
+          M('Torino Overview','banco-murale-grande-bibite-coca-cola-ticino-M30.webp.webp','Nella versione Overview, murale con porte tutto vetro, remoto e a bassa temperatura, mantiene la robustezza della struttura con un’area espositiva delle porte ampliata di 70 mm grazie all’innalzamento e all’eliminazione del profilo di alluminio perimetrale.',['Freezer BT','Tutto vetro']),
+          M('Torino Overview H150','banco-refrigerato-verticale-snack-bar-ticino-M31.webp.webp','Freezer semi verticale che, combinato al mobile di testa, forma un’isola promozionale elegante e funzionale. Permette un nuovo tipo di esposizione del reparto surgelati, sostituendo la tradizionale isola a doppia vasca: ampiezza di soli 1700 mm.',['H 150','Isola 1700 mm'])
+        ]},
+
+      verona:{name:'Verona Overview',card:U+'banco-frigo-murale-porte-vetro-latticini-ticino-M12.webp.webp',tag:'2 modelli',
+        desc:'Murale con nuovo profilo superiore minimal alto 34 mm che aumenta panoramicità e visibilità del prodotto, con porte o aperto. Batti carrello integrato al frontale e nuovo portaprezzo.',
+        models:[
+          M('Verona Overview Doors','banco-frigo-murale-porte-vetro-latticini-ticino-M12.webp.webp','Prodotto con un nuovo profilo superiore dalle linee minimal e dolcemente squadrate, alto 34 mm, che apporta panoramicità e visibilità al prodotto, presente sia con porte che senza. Novità strutturali come il batti carrello integrato al frontale e il nuovo portaprezzo con aggancio diverso.',['Con porte','Top 34 mm']),
+          M('Verona Overview Open','banco-murale-refrigerato-aperto-6-ripiani-ticino-M8.webp.webp','Stessa struttura Verona Overview nella versione aperta a frontale ultrabasso: nuovo profilo superiore minimal alto 34 mm, batti carrello integrato al frontale e nuovo sistema di aggancio del portaprezzo.',['Aperto','Frontale ultrabasso'])
+        ]},
+
+      milano:{name:'Milano Overview',card:U+'banco-combinato-frigo-congelatore-refrigerato-ticino-M26.webp.webp',tag:'1 modello',
+        desc:'Espositore remoto combinato a bassa temperatura, versione ultra-panoramica del modello Milano.',
+        models:[
+          M('Milano Overview','banco-combinato-frigo-congelatore-refrigerato-ticino-M26.webp.webp','Versione ultra-panoramica dell’espositore remoto combinato a bassa temperatura Milano. Mantiene la nota flessibilità di esercizio e presenta un ampliamento di 40 mm dell’area espositiva delle porte grazie all’innalzamento e all’eliminazione del profilo di alluminio perimetrale.',['Combinato BT','Remoto'])
+        ]},
+
+      retrobanco:{name:'Retrobanco & Filip',card:U+'banco-refrigerato-da-banco-salumi-formaggi-ticino-M9.webp.webp',tag:'5 modelli',
+        desc:'Murali retrobanco versatili a gruppo incorporato o remoto, disponibili in molte profondità e finiture per adattarsi a ogni forma di vendita al dettaglio.',
+        models:[
+          M('Roma','banco-refrigerato-da-banco-salumi-formaggi-ticino-M9.webp.webp','Retro banco murale a refrigerazione ventilata con gruppo remoto. Disponibile nella versione con frontale chiuso, con vano a giorno con scorrevoli o con cellette refrigerate. Flessibilità e versatilità per il tuo punto vendita.',['Retrobanco','Remoto']),
+          M('Up','banco-refrigerato-compatto-succhi-bevande-ticino-M22.webp.webp','Retrobanco per applicazione pensile o rialzata. La vetrinetta murale Up è disponibile in due altezze, 90 o 118 cm, con uno o due ripiani in aggiunta alla base espositiva. Espositore remoto semi-statico per salumi e carne, studiato per la classe 3M1 con l’umidità di un banco statico.',['Pensile','Remoto']),
+          M('Filip','banco-refrigerato-da-banco-salumi-formagg-ticino-M16.webp.webp','Espositore murale versatile a gruppo incorporato. Disponibile in un’ampia scelta di profondità e finiture che lo rendono estremamente adattabile alle più svariate forme di vendita al dettaglio.',['Gruppo incorporato']),
+          M('Filip RB','banco-refrigerato-bar-snack-bibite-ticino-M29.webp.webp','Murale retrobanco versatile a gruppo incorporato o a distanza. Disponibile in un’ampia scelta di profondità e finiture che lo rendono estremamente adattabile alle più svariate forme di vendita al dettaglio.',['Retrobanco']),
+          M('Filip RBLO','banco-refrigerato-carrellato-espositore-su-ruote-ticino-M28.webp.webp','Espositore murale versatile a gruppo incorporato. Disponibile in un’ampia scelta di profondità e finiture che lo rendono estremamente adattabile alle più svariate forme di vendita al dettaglio.',['Gruppo incorporato'])
+        ]},
+
+      semimurali:{name:'Semimurali & compatti',card:U+'banco-refrigerato-a-isola-espositore-prodotti-ticino-M25.webp.webp',tag:'8 modelli',
+        desc:'Semimurali, muralini e compatti a gruppo incorporato o remoto: soluzioni flessibili per piccoli spazi, Grab&Go, vendite d’impulso ed esposizioni promozionali.',
+        models:[
+          M('Lem','banco-refrigerato-a-isola-espositore-prodotti-ticino-M25.webp.webp','Murale per salumi, latticini e quarta gamma pensato per i piccoli spazi. Prodotto con refrigerante R290, R452a e R455a; sfrutta tutte le innovazioni della linea Overview. Moduli 625, 937, 1250, 1875 e 2500 mm; anche nella versione remota a valvola come retro-banco o murale 4ª gamma.',['4ª gamma','R290 · R452a · R455a']),
+          M('Lem H150','banco-refrigerato-alto-latte-yogurt-ticino-M23.webp.webp','Semimurale flessibile, nato principalmente per il Grab&Go: bibite, snack, sandwich, frutta confezionata e salumi. Gruppo incorporato a gas R290, lunghezze 625, 937, 1250, 1875 e 2500 mm; anche in versione remota a valvola per centrale, con refrigeranti comuni e CO2.',['Grab&Go','R290']),
+          M('Pangea','banco-nero-refrigerato-bevande-design-moderno-ticino-M27.webp.webp','Semimurale con gruppo R290, disponibile in 2 moduli da 967 e 1280 mm spalle incluse. Un espositore smart che offre una visione completa dei prodotti e trova posto ovunque nel negozio.',['R290','2 moduli']),
+          M('Maui','banco-refrigerato-da-banco-salumi-formaggi-ticino-M9.webp.webp','Espositore verticale basso remoto “ad isola” con doppia o singola testata sferica, ideale per salumi, latticini e bevande. La profondità di vasca e ripiani consente un’ampia esposizione dei prodotti.',['Ad isola','Remoto']),
+          M('Kalifornia D with Doors','banco-murale-refrigerato-2-porte-ticino-M5.webp.webp','Versione con porte dell’espositore murale di profondità ridotta. Modello particolarmente adatto a piccoli punti vendita per le sue dimensioni, pur consentendo un’ampia capacità espositiva della merce.',['Con porte','Profondità ridotta']),
+          M('Kalifornia Q','banco-murale-refrigerato-compatto-alimenti-freschi-ticino-M15.webp.webp','Espositore murale di profondità ridotta. Adatto a punti vendita con limiti di spazio per le sue dimensioni, pur consentendo un’ampia capacità espositiva della merce al suo interno.',['Profondità ridotta']),
+          M('Saraq','banco-compatto-refrigerato-succhi-piccolo-ticino-M24.webp.webp','Muralino basso con gruppo incorporato. L’altezza ridotta e le linee accattivanti lo rendono la scelta ottimale per le vendite d’impulso.',['Muralino basso','Vendita d’impulso']),
+          M('Sofia','banco-murale-refrigerato-garnde-latticini-bevande-ticino-M11.webp.webp','Murale basso con gruppo incorporato, disponibile per composizione ad isola con moduli angolari non refrigerati. Motore a gas R290 con componenti sicuri per il propano. Altezza 130 cm con due ripiani o 150 cm con tre ripiani.',['R290','H 130 / 150'])
+        ]}
+    };
+    var ORDER=['genova','venezia','torino','verona','milano','retrobanco','semimurali'];
+
+    document.getElementById('cards').innerHTML=ORDER.map(function(k){var f=FAM[k];
+      return '<button class="card" type="button" data-open="'+k+'"><div class="ph"><div class="pz"><img src="'+f.card+'" alt="'+esc(f.name)+'" loading="lazy"></div></div>'
+        +'<div class="bd"><span class="badge">Pastorfrigor</span><h3>'+esc(f.name)+'</h3><p>'+esc(f.tag)+'</p><div class="go">Scopri →</div></div></button>';
+    }).join('');
+
+    function renderFam(k){
+      var f=FAM[k];
+      var chips=f.models.map(function(m,i){return '<button class="mchip'+(i===0?' on':'')+'" type="button" data-i="'+i+'">'+esc(m.name)+'</button>';}).join('');
+      return '<div class="top"><button class="back" type="button" data-back><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg> Indietro</button><span class="badge">Pastorfrigor</span><h2>'+esc(f.name)+'</h2></div>'
+        +'<div class="fdesc">'+esc(f.desc)+'</div>'
+        +'<div class="modelbar" data-fam="'+k+'">'+chips+'</div>'
+        +'<div class="fbody">'
+          +'<div class="gal"><div class="main pz"><img id="gm-'+k+'"></div></div>'
+          +'<div class="fspec"><h5 id="mn-'+k+'"></h5><p class="mtext" id="fs-'+k+'"></p><div class="tags" id="tg-'+k+'"></div></div>'
+        +'</div>';
+    }
+    ORDER.forEach(function(k){ document.getElementById('v-'+k).innerHTML=renderFam(k); });
+
+    function setModel(k,i){
+      var f=FAM[k],m=f.models[i];
+      document.getElementById('mn-'+k).textContent=m.name;
+      document.getElementById('fs-'+k).textContent=m.text;
+      document.getElementById('tg-'+k).innerHTML=m.tags.map(function(t){return '<span class="tag">'+esc(t)+'</span>';}).join('');
+      var gm=document.getElementById('gm-'+k); gm.src=m.img; gm.alt=m.name;
+      var bar=document.querySelector('.modelbar[data-fam="'+k+'"]');
+      if(bar) bar.querySelectorAll('.mchip').forEach(function(c,ci){c.classList.toggle('on',ci===i);});
+      var fs=document.querySelector('#v-'+k+' .fspec'); if(fs) fs.scrollTop=0;
+    }
+    ORDER.forEach(function(k){ setModel(k,0); });
+
+    function show(v){ root.querySelectorAll('.view').forEach(function(el){el.classList.toggle('on', el.getAttribute('data-view')===v);}); }
+    root.addEventListener('click',function(e){
+      var op=e.target.closest('[data-open]'); if(op){ var v=op.getAttribute('data-open'); show(v); setModel(v,0); return; }
+      if(e.target.closest('[data-back]')){ show('home'); return; }
+      var mc=e.target.closest('.mchip'); if(mc){ var k=mc.closest('.modelbar').getAttribute('data-fam'); setModel(k,+mc.getAttribute('data-i')); return; }
+    });
+    root.addEventListener('contextmenu',function(e){ if(e.target.closest('.pz,img')) e.preventDefault(); });
+    root.addEventListener('dragstart',function(e){ if(e.target.tagName==='IMG') e.preventDefault(); });
+  })();
+  </script>
+</div>
