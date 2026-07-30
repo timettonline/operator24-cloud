@@ -1,0 +1,203 @@
+<!-- =====================================================================
+     Frigo Control Ticino — Vetrine frigo (Pastorfrigor) — APP FISSA
+     - App-shell: riempie l'elemento e NON cresce mai
+     - Home: 8 linee (Excelsior / Excellence / Admiral / Eskimo / Compatti / Panarea / Isole BT / Isole TN)
+     - Ogni linea: selettore modelli + foto reale + descrizione completa + tag
+     - Su Wix: Incorpora HTML -> larghezza e altezza (consigliato ~680px)
+     ===================================================================== -->
+<div id="fc-app">
+  <style>
+  html,body{height:100%;margin:0;padding:0;overflow:hidden}
+  #fc-app *{box-sizing:border-box;margin:0;padding:0}
+  #fc-app{
+    --blu:#0a3d62;--blu2:#1e6091;--accent:#00a8e8;--grigio:#f4f6f8;--bordo:#e3e9ef;--testo:#22303a;--muto:#6b7b88;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    color:var(--testo);position:relative;height:100%;width:100%;overflow:hidden;
+    background:linear-gradient(180deg,#ffffff 0%,#eef4f8 100%);-webkit-tap-highlight-color:transparent;
+  }
+  #fc-app img{max-width:100%;display:block}
+  #fc-app h1,#fc-app h2,#fc-app h3,#fc-app h4,#fc-app h5,#fc-app h6{color:var(--blu);line-height:1.15}
+  #fc-app .pz{position:relative;overflow:hidden;border-radius:10px;background:#eef2f5}
+  #fc-app .pz img{width:100%;height:100%;object-fit:cover;-webkit-user-drag:none;user-select:none;pointer-events:none}
+  #fc-app .pz.ct img{object-fit:contain;background:#fff}
+  #fc-app .pz::after{content:"";position:absolute;inset:0;z-index:2}
+
+  #fc-app .view{position:absolute;top:0;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:1200px;display:none;flex-direction:column;padding:clamp(12px,2vw,22px);gap:10px}
+  #fc-app .view.on{display:flex;animation:fd .25s ease}
+  @keyframes fd{from{opacity:0}to{opacity:1}}
+
+  #fc-app .kick{letter-spacing:.12em;text-transform:uppercase;font-size:.6rem;font-weight:800;color:var(--accent);text-align:center;flex:0 0 auto}
+  #fc-app .home h1{font-size:clamp(1rem,2.2vw,1.5rem);font-weight:800;text-align:center;flex:0 0 auto}
+  #fc-app .home .sub{text-align:center;color:var(--muto);font-size:.82rem;max-width:760px;margin:0 auto;flex:0 0 auto}
+  #fc-app .cards{flex:1;min-height:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;align-content:center;overflow-y:auto}
+  #fc-app .card{display:flex;flex-direction:column;border:1px solid var(--bordo);border-radius:14px;overflow:hidden;background:#fff;box-shadow:0 8px 22px rgba(10,61,98,.10);cursor:pointer;text-align:left;font:inherit;color:inherit;padding:0}
+  #fc-app .card:hover{box-shadow:0 14px 30px rgba(10,61,98,.18)}
+  #fc-app .card .ph{aspect-ratio:4/3;flex:0 0 auto}
+  #fc-app .card .ph .pz{height:100%}
+  #fc-app .card .bd{flex:0 0 auto;padding:10px 13px 12px}
+  #fc-app .badge{display:inline-block;font-size:.56rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;padding:3px 8px;border-radius:999px;color:#fff;background:linear-gradient(135deg,#0a3d62,#1e6091)}
+  #fc-app .card h3{font-size:.9rem;margin:6px 0 2px}
+  #fc-app .card p{font-size:.73rem;color:var(--muto)}
+  #fc-app .card .go{margin-top:5px;font-weight:700;color:var(--accent);font-size:.74rem}
+  #fc-app .foot{flex:0 0 auto;text-align:center;color:var(--muto);font-size:.7rem}
+
+  #fc-app .top{flex:0 0 auto;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  #fc-app .back{background:none;border:none;cursor:pointer;color:var(--blu);font-weight:700;font-size:.82rem;display:inline-flex;align-items:center;gap:6px;font-family:inherit;padding:2px 4px}
+  #fc-app .back:hover{color:var(--accent)}
+  #fc-app .top h2{font-size:clamp(.98rem,1.8vw,1.25rem)}
+  #fc-app .fdesc{flex:0 0 auto;font-size:.8rem;color:var(--muto);line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  #fc-app .modelbar{flex:0 0 auto;display:flex;gap:6px;overflow-x:auto;padding-bottom:3px;-webkit-overflow-scrolling:touch}
+  #fc-app .mchip{white-space:nowrap;border:1px solid var(--bordo);background:#fff;border-radius:999px;padding:6px 12px;font-size:.74rem;font-weight:700;color:var(--muto);cursor:pointer;font-family:inherit}
+  #fc-app .mchip.on{background:linear-gradient(135deg,var(--blu),var(--blu2));color:#fff;border-color:transparent}
+  #fc-app .fbody{flex:1;min-height:0;display:grid;grid-template-columns:1.05fr .95fr;gap:16px}
+  @media(max-width:640px){#fc-app .fbody{grid-template-columns:1fr;grid-template-rows:minmax(150px,42%) 1fr;overflow:hidden}}
+  #fc-app .gal{min-height:0;display:flex;flex-direction:column;gap:8px}
+  #fc-app .gal .main{flex:1;min-height:0}
+  #fc-app .fspec{min-height:0;display:flex;flex-direction:column;overflow:auto}
+  @media(min-width:641px){#fc-app .fspec{justify-content:center}}
+  #fc-app .fspec h5{font-size:1.05rem;margin-bottom:8px}
+  #fc-app .mtext{font-size:.85rem;line-height:1.55;color:var(--testo)}
+  #fc-app .tags{margin-top:12px;display:flex;flex-wrap:wrap;gap:6px}
+  #fc-app .tag{font-size:.68rem;font-weight:700;color:var(--blu2);background:#eaf4fb;border:1px solid #d5e8f5;border-radius:999px;padding:4px 10px}
+  </style>
+
+  <div class="view home on" data-view="home">
+    <div class="kick">Frigo Control Ticino · Pastorfrigor</div>
+    <h1>Vetrine frigo</h1>
+    <div class="sub">Banchi a servizio e isole refrigerate Pastorfrigor per macellerie, gastronomie, pasticcerie e supermercati: linee eleganti, ampio volume espositivo e sistemi plug-in o remoti a basso consumo.</div>
+    <div class="cards" id="cards"></div>
+    <div class="foot">Pastorfrigor · Banchi a servizio e isole · Plug-in e remoto · Sopralluogo e assistenza in Ticino</div>
+  </div>
+
+  <div class="view" data-view="excelsior" id="v-excelsior"></div>
+  <div class="view" data-view="excellence" id="v-excellence"></div>
+  <div class="view" data-view="admiral" id="v-admiral"></div>
+  <div class="view" data-view="eskimo" id="v-eskimo"></div>
+  <div class="view" data-view="compatti" id="v-compatti"></div>
+  <div class="view" data-view="panarea" id="v-panarea"></div>
+  <div class="view" data-view="isolebt" id="v-isolebt"></div>
+  <div class="view" data-view="isoletn" id="v-isoletn"></div>
+
+  <script>
+  (function(){
+    var root=document.getElementById('fc-app');
+    if(root.dataset.init) return; root.dataset.init='1';
+    var U='https://frigocontrolch.10web.me/wp-content/uploads/2025/08/';
+    function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+    function M(name,img,text,tags){return {name:name,img:U+img,text:text,tags:tags||[]};}
+
+    var FAM={
+      excelsior:{name:'Excelsior',card:U+'banco-frigo-verticale-carne-gastronomia-ticino.webp',tag:'3 modelli · Banchi a servizio',
+        desc:'Nuova linea Pastorfrigor di banchi tradizionali a servizio remoti per carne fresca e preconfezionata: ampio volume espositivo, finiture interne in inox e linee eleganti.',
+        models:[
+          M('Excelsior','banco-frigo-verticale-carne-gastronomia-ticino.webp','Banchi tradizionali a servizio remoti per la migliore esposizione di carne fresca e preconfezionata, con ampio volume espositivo e finiture interne in inox. Disponibile con refrigerazione ventilata o doppio statico per gruppo a distanza, con refrigerante CO2 e glicole, e nella configurazione doppio statica semi plug-in con doppia refrigerazione CO2 e R290 per le migliori prestazioni e il massimo risparmio energetico.',['Servizio remoto','Ventilato / doppio statico','CO2 · R290','TOWER 180 cm']),
+          M('Excelsior Spin','banco-angolare-refrigerato-carne-formaggi-ticino.webp','Modello Excelsior con piatto espositivo rotante: le nuove linee di disegno e le forme eleganti - sia nella zona espositiva sia esternamente sui fianchi e nel decoro - valorizzano ogni prodotto, con l’accesso facilitato garantito dal piatto rotante.',['Piatto rotante','Servizio remoto','Carne']),
+          M('Excelsior Tower','banco-frigo-tradizionale-fasce-acciaio-ticino.webp','Espositore alto 180 cm della linea Excelsior, composto da 2 ripiani in vetro più piano di fondo e con porte battenti posteriori, canalizzabile con tutti gli altri moduli della linea.',['TOWER 180 cm','2 ripiani vetro','Porte posteriori'])
+        ]},
+
+      excellence:{name:'Excellence',card:U+'banco-vetrina-carne-formaggi-integrato-ticino.webp',tag:'2 modelli · Plug-in',
+        desc:'Vetrina refrigerata a servizio plug-in con vetri dritti, disponibile in 6 lunghezze modulari e canalizzabili, con angoli esterni e interni. Nuovo castello vetri con pinze e punti luce di nuova generazione.',
+        models:[
+          M('Excellence','banco-vetrina-carne-formaggi-integrato-ticino.webp','Vetrina a servizio plug-in con vetri dritti dallo stile nuovo e dalle linee importanti, disponibile in 6 lunghezze modulari e canalizzabili, angoli esterni e interni. Castello vetri con pinze per reggere i vetri e punti luce di nuova generazione; fianco e frontale eleganti nella tradizione delle vetrine a servizio.',['Plug-in','Vetri dritti','6 lunghezze']),
+          M('Excellence Tower','banco-frigo-isola-nera-carne-ticino.webp','Configurazione TOWER della vetrina Excellence per l’esposizione di carne e salumi nei piccoli punti vendita ma anche nei supermercati, con lo stesso nuovo castello vetri e i punti luce di nuova generazione.',['TOWER','Carne e salumi','Plug-in'])
+        ]},
+
+      admiral:{name:'Admiral',card:U+'banco-refrigerato-compatto-carne-formaggi-ticino.webp',tag:'3 modelli · Banco carni',
+        desc:'Linea di banchi a servizio panoramici, il banco carni per antonomasia: ampio volume espositivo, finiture inox e nuova plafoniera d’illuminazione dalle dimensioni ridottissime per la piena presentazione del prodotto.',
+        models:[
+          M('Admiral','banco-refrigerato-compatto-carne-formaggi-ticino.webp','La panoramicità è il leit motiv: ampio volume espositivo e finiture interne in inox fanno dell’Admiral il banco carni per antonomasia. Nuova plafoniera dell’illuminazione interna dalle dimensioni ridottissime per la piena presentazione del prodotto. Disponibile con refrigerazione ventilata o doppio statico e gruppo a distanza, anche con refrigerante CO2.',['Ventilato / doppio statico','Gruppo a distanza','CO2']),
+          M('Admiral Sphera','banco-frigo-vetro-curvo-tradizionale-ticino.webp','Il modello Admiral Sphera è inseribile all’interno di un lineare Admiral e dona maggiore enfasi ai prodotti esposti. Il piatto rotante permette di accedere anche ai prodotti più lontani: soluzione innovativa per massimizzare le vendite.',['Piatto rotante','Inseribile nel lineare']),
+          M('Admiral Tower','banco-frigo-modulare-grigio-carne-formaggi-ticino.webp','Espositore alto 180 cm, TOWER, composto da 2 ripiani in vetro più piano di fondo e con porte battenti posteriori, canalizzabile con tutti gli altri moduli. Frontale decoro LX che copre tutta la parte anteriore lasciando a vista solo lo zoccolo.',['TOWER 180 cm','Decoro LX','Porte posteriori'])
+        ]},
+
+      eskimo:{name:'Eskimo',card:U+'banco-frigo-vetrina-formaggi-salumi-ticino.webp',tag:'3 modelli · Plug-in',
+        desc:'Vetrina refrigerata plug-in a servizio con vetri dritti o curvi, in 6 lunghezze modulari e canalizzabili, con angoli esterni e interni.',
+        models:[
+          M('Eskimo VC','banco-frigo-vetrina-formaggi-salumi-ticino.webp','Vetrina della gamma plug-in dei banchi a servizio con vetri dritti oppure curvi, disponibile in 6 lunghezze modulari e canalizzabili, angoli esterni e interni, come già in uso nella gamma dei banchi a servizio Pastorfrigor.',['Plug-in','Vetri dritti / curvi','6 lunghezze']),
+          M('Eskimo Tower','banco-frigo-nera-angolare-salumi-formaggi-ticino.webp','Vetrina Eskimo con vetri dritti in 6 lunghezze modulari e canalizzabili, angoli esterni e interni. Novità assoluta la vetrina TOWER, che valorizza l’esposizione della carne nei piccoli punti vendita ma anche nei supermercati.',['TOWER','Carne','Plug-in']),
+          M('Eskimo VDR','banco-vetrina-refrigerata-salumi-b14-ticino.webp','Vetrina della gamma plug-in dei banchi a servizio con vetri dritti, disponibile in 6 lunghezze modulari e canalizzabili, angoli esterni e interni, nello stile della gamma dei banchi a servizio Pastorfrigor.',['Plug-in','Vetri dritti','6 lunghezze'])
+        ]},
+
+      compatti:{name:'Banchi compatti & pasticceria',card:U+'banco-self-service-carni-confezionate-b13-ticino.webp',tag:'7 modelli',
+        desc:'Banchi a servizio versatili e compatti - a spina o remoti - per carne, salumi e pasticceria fresca, ideali per piccole superfici e per ampliamenti rapidi dello spazio espositivo.',
+        models:[
+          M('Prince VDR','banco-self-service-carni-confezionate-b13-ticino.webp','Banco a vetri dritti affidabile e di massima adattabilità. Performance ottimali, elevata capacità di carico e massimo sfruttamento degli spazi fanno della gamma Prince una sintesi perfetta di convenienza e versatilità, disponibile in versione sia a spina sia remota.',['A spina / remoto','Vetri dritti','Alta capacità']),
+          M('Ballydeck','banco-vetrina-refrigerata-alimenti-freschi-b12-ticino.webp','Efficace strumento di vendita: banco in acciaio inossidabile adatto a tutte le esigenze di vendita di prodotto fresco. Esempio della filosofia Pastorfrigor di venire incontro alle sempre più diverse esigenze della vendita al dettaglio.',['Acciaio inox','Prodotto fresco']),
+          M('Click','banco-tradizionale-refrigerato-carni-formaggi-b11-ticino.webp','Il primo banco piegabile esistente sul mercato. Il Click è la soluzione snella e versatile, perfetta per un rapido ed efficace ampliamento dello spazio espositivo all’interno e all’esterno del negozio.',['Piegabile','Interno / esterno']),
+          M('Kristina','vetrina-pasticceria-refrigerata-verticale-b18-ticino.webp','Banco compatto per piccole superfici. Pur nelle dimensioni ridotte, il Kristina presenta eccellenti caratteristiche di illuminazione, panoramicità e affidabilità.',['Compatto','Piccole superfici']),
+          M('Linda','banco-refrigerato-tradizionale-carne-b17-ticino.webp','Banco a vetri curvi flessibile per la pasticceria. Prestazioni e flessibilità ne fanno la soluzione perfetta per la vendita di pasticceria fresca.',['Vetri curvi','Pasticceria']),
+          M('Linda Q','vetrina-pasticceria-refrigerata-esposizione-b16-ticino.webp','Banco Linda Q con vetri dritti flessibile per la pasticceria. Prestazioni e flessibilità ne fanno la soluzione perfetta per la vendita di pasticceria fresca.',['Vetri dritti','Pasticceria']),
+          M('Zita mini','banco-tradizionale-refrigerato-carne-fresca-b15-ticino.webp','Banco a servizio conveniente dalla profondità ridotta, con molte opzioni disponibili. Configurabile per creare la maggior parte delle possibili varietà di esposizione: un fantastico espositore compatto.',['Profondità ridotta','Configurabile'])
+        ]},
+
+      panarea:{name:'Panarea',card:U+'isola-8-refrigerata-supermercato-frigo-control-ticino.webp',tag:'3 modelli · Isole TN',
+        desc:'Espositore isola a temperatura positiva con gruppo incorporato: vetri ultra-panoramici, design leggero, consumi elettrici ridotti e compressore di ultima generazione a carica gas ridotta.',
+        models:[
+          M('Panarea HD','isola-8-refrigerata-supermercato-frigo-control-ticino.webp','Espositore isola con gruppo incorporato a temperatura positiva. Performance termodinamiche elevate e visibilità del prodotto garantita da vetri ultra-panoramici. Design leggero come i consumi elettrici, con chiusure scorrevoli che mantengono bassi i consumi e alte le prestazioni; gruppo motore con compressore di ultima generazione a carica gas ridotta.',['TN positiva','Gruppo incorporato','Chiusure scorrevoli']),
+          M('Panarea HD BMM Sliding Doors','isola-9-refrigerata-orizzontale-frigo-control-ticino.webp','Versione con porte scorrevoli: ottime performance con consumi inferiori del 65% rispetto alla versione open. Componenti ad alta efficienza permettono ai modelli 937 e 1250 di rientrare nei parametri della classe “A”, con altissima visibilità del prodotto e inconfondibile Italian Style.',['Classe A','−65% consumi','Porte scorrevoli']),
+          M('Panarea HD BMM','isola-10-refrigerata-espositore-frigo-control-ticino.webp','Espositore isola con esposizione a ripiani e gruppo incorporato a temperatura positiva. Visibilità del prodotto incrementata e garantita da vetri ultra-panoramici; design leggero come i consumi, con gruppo motore di ultima generazione a carica gas ridotta.',['A ripiani','TN positiva','Vetri panoramici'])
+        ]},
+
+      isolebt:{name:'Sardegna & isole BT',card:U+'isola-11-refrigerata-compatta-frigo-control-ticino.webp',tag:'5 modelli · Bassa temperatura',
+        desc:'Isole remote e plug-in a bassa temperatura per surgelati e gelati: vetri ultra-panoramici, coperture basso-emissive opzionali e ampia flessibilità di canalizzazione.',
+        models:[
+          M('Sardegna Overview Doors','isola-11-refrigerata-compatta-frigo-control-ticino.webp','Isola doppia remota a bassa temperatura, flessibile grazie alla possibilità di canalizzare i moduli con o senza testata. Visibilità ottimale grazie ai vetri ultra-panoramici; le coperture in vetro basso-emissivo opzionali, scorrevoli o push&pull, offrono una significativa riduzione dei consumi.',['Isola doppia','Remoto BT','Coperture vetro']),
+          M('Sardegna Overview Open','isola-12-refrigerata-bassa-frigo-control-ticino.webp','Isola doppia remota a bassa temperatura e temperatura positiva, flessibile per la possibilità di canalizzare i moduli con o senza testata. Visibilità ottimale grazie ai vetri ultra-panoramici; coperture in vetro basso-emissivo opzionali scorrevoli per ridurre i consumi.',['Isola doppia','BT / TN','Coperture opz.']),
+          M('Capri','isola-13-refrigerata-chiusa-frigo-control-ticino.webp','Isola a muro remota per bassa temperatura. L’elevata capacità di carico e la flessibilità intrinseca consentono un utilizzo intelligente degli spazi lungo le superfici parietali.',['Isola a muro','Remoto BT']),
+          M('Sicilia','isola-1-refrigerata-compatta-prodotti-freschi-frigo-control-ticino.webp','Isola remota a bassa temperatura. Nella sua essenzialità estetica risulta assai versatile grazie alle due diverse profondità; il vetro che riveste l’intero perimetro offre una visibilità interna a 360°.',['Remoto BT','Vetro 360°','2 profondità']),
+          M('Lipari','isola-2-refrigerata-vetrina-inclinata-compatta-frigo-control-ticino.webp','Isola plug-in a bassa temperatura ideale per l’esposizione di gelati e surgelati. Si caratterizza per i bassi consumi, particolarmente nella versione a propano R290.',['Plug-in BT','Gelati e surgelati','R290'])
+        ]},
+
+      isoletn:{name:'Isole TN & multiuso',card:U+'isola-3-refrigerata-vetrina-inclinata-nera-frigo-control-ticino.webp',tag:'5 modelli',
+        desc:'Isole a temperatura positiva o doppia temperatura, plug-in o remote, per l’esposizione di prodotti freschi, latticini, salumi e bevande in ogni tipo di superficie di vendita.',
+        models:[
+          M('Vulcano','isola-3-refrigerata-vetrina-inclinata-nera-frigo-control-ticino.webp','Isola plug-in che con semplicità, minimo ingombro e ampia zona espositiva permette una visione completa dei prodotti. Il modulo si compone di due vasche espositive divise da un separatore intermedio trasparente che lascia campo visivo su entrambi i lati. Disponibile con gruppo incorporato R290: 1250, 1875 e testata.',['Plug-in','R290','Doppia vasca']),
+          M('Islanda','isola-4-refrigerata-vetrina-frontale-alimenti-freschi-frigo-control-ticino.webp','Espositore a temperatura positiva remoto in configurazione self-service, canalizzabile sia linearmente sia lateralmente con mobili di testa. Nuove linee e vetri dritti per rispondere alle norme energetiche, sempre all’insegna dell’Italian style.',['Remoto TN','Self-service','Vetri dritti']),
+          M('Conv','isola-5-refrigerata-grande-capienza-supermercato-frigo-control-ticino.webp','Isola a gruppo incorporato o a distanza dedicata all’esposizione di cibi refrigerati. Nata come soluzione ideale per punti vendita con esigenze molto diverse di tipologia di prodotto, dal cibo alle bevande.',['Incorporato / a distanza','Cibi e bevande']),
+          M('Felix Q','isola-6-refrigerata-compatta-accesso-facile-frigo-control-ticino.webp','Isola con gruppo incorporato a doppia temperatura, disponibile anche solo positiva o solo negativa. Si adatta a piccole, medie e grandi superfici. Disponibile anche aperta nella versione TN per salumi, formaggi e carne impacchettata.',['Doppia temperatura','TN / BT','Multi-superficie']),
+          M('Felix SG','isola-7-refrigerata-design-lineare-prodotti-freschi-frigo-control-ticino.webp','Isola con gruppo incorporato. Prodotto che si adatta egregiamente nelle piccole, nelle medie e nelle grandi superfici di vendita.',['Gruppo incorporato','Multi-superficie'])
+        ]}
+    };
+    var ORDER=['excelsior','excellence','admiral','eskimo','compatti','panarea','isolebt','isoletn'];
+
+    document.getElementById('cards').innerHTML=ORDER.map(function(k){var f=FAM[k];
+      return '<button class="card" type="button" data-open="'+k+'"><div class="ph"><div class="pz"><img src="'+f.card+'" alt="'+esc(f.name)+'" loading="lazy"></div></div>'
+        +'<div class="bd"><span class="badge">Pastorfrigor</span><h3>'+esc(f.name)+'</h3><p>'+esc(f.tag)+'</p><div class="go">Scopri →</div></div></button>';
+    }).join('');
+
+    function renderFam(k){
+      var f=FAM[k];
+      var chips=f.models.map(function(m,i){return '<button class="mchip'+(i===0?' on':'')+'" type="button" data-i="'+i+'">'+esc(m.name)+'</button>';}).join('');
+      return '<div class="top"><button class="back" type="button" data-back><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg> Indietro</button><span class="badge">Pastorfrigor</span><h2>'+esc(f.name)+'</h2></div>'
+        +'<div class="fdesc">'+esc(f.desc)+'</div>'
+        +'<div class="modelbar" data-fam="'+k+'">'+chips+'</div>'
+        +'<div class="fbody">'
+          +'<div class="gal"><div class="main pz"><img id="gm-'+k+'"></div></div>'
+          +'<div class="fspec"><h5 id="mn-'+k+'"></h5><p class="mtext" id="fs-'+k+'"></p><div class="tags" id="tg-'+k+'"></div></div>'
+        +'</div>';
+    }
+    ORDER.forEach(function(k){ document.getElementById('v-'+k).innerHTML=renderFam(k); });
+
+    function setModel(k,i){
+      var f=FAM[k],m=f.models[i];
+      document.getElementById('mn-'+k).textContent=m.name;
+      document.getElementById('fs-'+k).textContent=m.text;
+      document.getElementById('tg-'+k).innerHTML=m.tags.map(function(t){return '<span class="tag">'+esc(t)+'</span>';}).join('');
+      var gm=document.getElementById('gm-'+k); gm.src=m.img; gm.alt=m.name;
+      var bar=document.querySelector('.modelbar[data-fam="'+k+'"]');
+      if(bar) bar.querySelectorAll('.mchip').forEach(function(c,ci){c.classList.toggle('on',ci===i);});
+      var fs=document.querySelector('#v-'+k+' .fspec'); if(fs) fs.scrollTop=0;
+    }
+    ORDER.forEach(function(k){ setModel(k,0); });
+
+    function show(v){ root.querySelectorAll('.view').forEach(function(el){el.classList.toggle('on', el.getAttribute('data-view')===v);}); }
+    root.addEventListener('click',function(e){
+      var op=e.target.closest('[data-open]'); if(op){ var v=op.getAttribute('data-open'); show(v); setModel(v,0); return; }
+      if(e.target.closest('[data-back]')){ show('home'); return; }
+      var mc=e.target.closest('.mchip'); if(mc){ var k=mc.closest('.modelbar').getAttribute('data-fam'); setModel(k,+mc.getAttribute('data-i')); return; }
+    });
+    root.addEventListener('contextmenu',function(e){ if(e.target.closest('.pz,img')) e.preventDefault(); });
+    root.addEventListener('dragstart',function(e){ if(e.target.tagName==='IMG') e.preventDefault(); });
+  })();
+  </script>
+</div>
