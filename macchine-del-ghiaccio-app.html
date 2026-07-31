@@ -1,0 +1,211 @@
+<!-- =====================================================================
+     Frigo Control Ticino — Macchine del ghiaccio — APP FISSA
+     - App-shell: riempie l'elemento e NON cresce mai
+     - Home: 9 tipi di ghiaccio (pepite / scaglie / Maja / cono cavo / cubetti rotondi /
+       cubo quadrato / trapezoidale / tritato / micro-cubetti)
+     - Ogni tipo: selettore modelli + foto + descrizione + caratteristiche + vantaggi del ghiaccio
+     - Su Wix: Incorpora HTML -> larghezza e altezza (consigliato ~680px)
+     ===================================================================== -->
+<div id="fc-app">
+  <style>
+  html,body{height:100%;margin:0;padding:0;overflow:hidden}
+  #fc-app *{box-sizing:border-box;margin:0;padding:0}
+  #fc-app{
+    --blu:#0a3d62;--blu2:#1e6091;--accent:#00a8e8;--grigio:#f4f6f8;--bordo:#e3e9ef;--testo:#22303a;--muto:#6b7b88;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    color:var(--testo);position:relative;height:100%;width:100%;overflow:hidden;
+    background:linear-gradient(180deg,#ffffff 0%,#eef4f8 100%);-webkit-tap-highlight-color:transparent;
+  }
+  #fc-app img{max-width:100%;display:block}
+  #fc-app h1,#fc-app h2,#fc-app h3,#fc-app h4,#fc-app h5,#fc-app h6{color:var(--blu);line-height:1.15}
+  #fc-app .pz{position:relative;overflow:hidden;border-radius:10px;background:#eef2f5}
+  #fc-app .pz img{width:100%;height:100%;object-fit:cover;-webkit-user-drag:none;user-select:none;pointer-events:none}
+  #fc-app .pz.ct img{object-fit:contain;background:#fff}
+  #fc-app .pz::after{content:"";position:absolute;inset:0;z-index:2}
+
+  #fc-app .view{position:absolute;top:0;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:1200px;display:none;flex-direction:column;padding:clamp(12px,2vw,22px);gap:10px}
+  #fc-app .view.on{display:flex;animation:fd .25s ease}
+  @keyframes fd{from{opacity:0}to{opacity:1}}
+
+  #fc-app .kick{letter-spacing:.12em;text-transform:uppercase;font-size:.6rem;font-weight:800;color:var(--accent);text-align:center;flex:0 0 auto}
+  #fc-app .home h1{font-size:clamp(1rem,2.2vw,1.5rem);font-weight:800;text-align:center;flex:0 0 auto}
+  #fc-app .home .sub{text-align:center;color:var(--muto);font-size:.82rem;max-width:800px;margin:0 auto;flex:0 0 auto;line-height:1.45}
+  #fc-app .cards{flex:1;min-height:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(175px,1fr));gap:12px;align-content:center;overflow-y:auto}
+  #fc-app .card{display:flex;flex-direction:column;border:1px solid var(--bordo);border-radius:14px;overflow:hidden;background:#fff;box-shadow:0 8px 22px rgba(10,61,98,.10);cursor:pointer;text-align:left;font:inherit;color:inherit;padding:0}
+  #fc-app .card:hover{box-shadow:0 14px 30px rgba(10,61,98,.18)}
+  #fc-app .card .ph{aspect-ratio:4/3;flex:0 0 auto}
+  #fc-app .card .ph .pz{height:100%}
+  #fc-app .card .bd{flex:0 0 auto;padding:10px 13px 12px}
+  #fc-app .badge{display:inline-block;font-size:.56rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;padding:3px 8px;border-radius:999px;color:#fff;background:linear-gradient(135deg,#0a3d62,#1e6091)}
+  #fc-app .card h3{font-size:.9rem;margin:6px 0 2px}
+  #fc-app .card p{font-size:.73rem;color:var(--muto)}
+  #fc-app .card .go{margin-top:5px;font-weight:700;color:var(--accent);font-size:.74rem}
+  #fc-app .foot{flex:0 0 auto;text-align:center;color:var(--muto);font-size:.7rem}
+
+  #fc-app .top{flex:0 0 auto;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  #fc-app .back{background:none;border:none;cursor:pointer;color:var(--blu);font-weight:700;font-size:.82rem;display:inline-flex;align-items:center;gap:6px;font-family:inherit;padding:2px 4px}
+  #fc-app .back:hover{color:var(--accent)}
+  #fc-app .top h2{font-size:clamp(.98rem,1.8vw,1.25rem)}
+  #fc-app .fdesc{flex:0 0 auto;font-size:.8rem;color:var(--muto);line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  #fc-app .modelbar{flex:0 0 auto;display:flex;gap:6px;overflow-x:auto;padding-bottom:3px;-webkit-overflow-scrolling:touch}
+  #fc-app .mchip{white-space:nowrap;border:1px solid var(--bordo);background:#fff;border-radius:999px;padding:6px 12px;font-size:.74rem;font-weight:700;color:var(--muto);cursor:pointer;font-family:inherit}
+  #fc-app .mchip.on{background:linear-gradient(135deg,var(--blu),var(--blu2));color:#fff;border-color:transparent}
+  #fc-app .fbody{flex:1;min-height:0;display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:640px){#fc-app .fbody{grid-template-columns:1fr;grid-template-rows:minmax(150px,40%) 1fr;overflow:hidden}}
+  #fc-app .gal{min-height:0;display:flex;flex-direction:column;gap:8px}
+  #fc-app .gal .main{flex:1;min-height:0}
+  #fc-app .fspec{min-height:0;display:flex;flex-direction:column;overflow:auto}
+  #fc-app .fspec h5{font-size:1rem;margin-bottom:6px}
+  #fc-app .mtext{font-size:.83rem;line-height:1.5;color:var(--testo);margin-bottom:8px}
+  #fc-app h6.eyer{font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muto);margin:12px 0 6px}
+  #fc-app .blist{list-style:none;display:grid;gap:4px}
+  #fc-app .blist li{display:flex;gap:7px;font-size:.79rem;align-items:flex-start;line-height:1.35}
+  #fc-app .blist li svg{flex:0 0 13px;margin-top:3px;color:var(--accent)}
+  </style>
+
+  <div class="view home on" data-view="home">
+    <div class="kick">Frigo Control Ticino · Ghiaccio professionale</div>
+    <h1>Macchine del ghiaccio</h1>
+    <div class="sub">Ghiaccio fine, tritato, a pepite, in scaglie, a cubetti o trapezoidale: la macchina perfetta per ogni esigenza. Settore alberghiero, alimentare, laboratori e sanitario hanno bisogni molto diversi — noi abbiamo la soluzione giusta per ciascuno.</div>
+    <div class="cards" id="cards"></div>
+    <div class="foot">Kibernetik · Wessamat · Maja · NTF · Soluzioni di stoccaggio · Sopralluogo e assistenza in Ticino</div>
+  </div>
+
+  <div class="view" data-view="pepite" id="v-pepite"></div>
+  <div class="view" data-view="scaglie" id="v-scaglie"></div>
+  <div class="view" data-view="maja" id="v-maja"></div>
+  <div class="view" data-view="conocavo" id="v-conocavo"></div>
+  <div class="view" data-view="rotondi" id="v-rotondi"></div>
+  <div class="view" data-view="quadrati" id="v-quadrati"></div>
+  <div class="view" data-view="trapez" id="v-trapez"></div>
+  <div class="view" data-view="tritato" id="v-tritato"></div>
+  <div class="view" data-view="micro" id="v-micro"></div>
+
+  <script>
+  (function(){
+    var root=document.getElementById('fc-app');
+    if(root.dataset.init) return; root.dataset.init='1';
+    var U='https://frigocontrolch.10web.me/wp-content/uploads/2025/10/';
+    var CK='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>';
+    function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+    function M(name,img,text,feats){return {name:name,img:U+img,text:text||'',feats:feats||[]};}
+
+    var FAM={
+      pepite:{name:'Ghiaccio a pepite',card:U+'macc.-del-ghiaccio-Mask-Group-2-1.webp',tag:'NTF · fino a 345 kg/g',
+        desc:'Ghiaccio fine NTF a pepite: piccoli cubetti trapezoidali pressati in consistenza granulare e compatta che aderisce agli alimenti, accelera il raffreddamento e previene le bruciature da congelamento.',
+        vant:['Non forma grumi anche se mescolato con acqua','Ottima durata','Facile da dosare','Previene le ustioni da congelamento'],
+        models:[
+          M('Serie NTF MGT','macc.-del-ghiaccio-Mask-Group-2-1.webp','La “sorella maggiore” della serie SLT: ideale per capacità leggermente superiori, estremamente robusta e compatta.',['Produzione da 128 a 345 kg al giorno','Combinabile con diverse soluzioni di stoccaggio','Robusta cassa in acciaio inossidabile','Design salvaspazio'])
+        ]},
+
+      scaglie:{name:'Ghiaccio in scaglie',card:U+'Mask-Group-3-1.webp',tag:'Wessamat · NTF · fino a 1.000 kg/g',
+        desc:'Ghiaccio secco in scaglie, composto da cristalli spessi, a temperatura costante tra 0°C e −1°C. Utilizzato soprattutto nel settore sanitario e alimentare; si spalma facilmente e non si congela nemmeno negli strati inferiori.',
+        vant:['Ghiaccio secco a temperatura costante 0°C / −1°C','Ideale per ristoranti, panetterie, macellerie e pescherie','Particolarmente adatto a laboratori e ospedali','Facile da spalmare, non si congela in blocco'],
+        models:[
+          M('Linea Wessamat Flake','Mask-Group-3-1.webp','Ghiaccio in scaglie di alta qualità a prezzi convenienti, con produzione continua che riempie completamente il serbatoio.',['Produzione da 40 a 240 kg al giorno','Produzione continua di ghiaccio','Riempie completamente il serbatoio','Robusta cassa in acciaio inossidabile · design accattivante']),
+          M('Serie NTF SLF','kibernetik_eismaschinen_ntf_slf.webp','Unità compatte con design salvaspazio, ideali per chi necessita di piccole quantità di ghiaccio.',['Portata da 60 a 155 kg','Deposito di ghiaccio integrato','Robusta cassa in acciaio inossidabile','Piccola e compatta']),
+          M('Serie NTF GM','kibernetik_eismaschinen_ntf_gm.webp','La “sorella maggiore” della serie SLF: ideale per produzioni più elevate.',['Produzione da 160 a 1.000 kg al giorno','Combinabile con diverse soluzioni di stoccaggio','Robusta cassa in acciaio inossidabile','Design salvaspazio'])
+        ]},
+
+      maja:{name:'Scaglie Maja HY-GEN',card:U+'Mask-Group-4.webp',tag:'Maja · fino a 6.000 kg/g',
+        desc:'Ghiaccio in scaglie Maja composto da lastre spesse 1-2 mm dalla forma irregolare, a temperatura costante tra −6°C e −8°C: ghiaccio completamente asciutto. Macchine con marchio Maja “HY-GEN protected” per una produzione particolarmente igienica e refrigerante ecologico.',
+        vant:['Temperatura costante da −6°C a −8°C','Ghiaccio completamente asciutto','Ottima frantumabilità anche dopo conservazione prolungata','Produzione igienica marchio Maja HY-GEN'],
+        models:[
+          M('Serie Maja SAH / RVH','Mask-Group-4.webp','Design compatto, disponibili con o senza gruppo frigorifero integrato. Telaio e carrozzeria in acciaio inox le rendono robuste e resistenti.',['Produzione da 85 a 6.000 kg al giorno','Produzione igienica grazie al marchio Maja HY-GEN','Facile da pulire (manualmente o completamente automatica)','Diverse soluzioni di stoccaggio · uso con o senza funzione time'])
+        ]},
+
+      conocavo:{name:'Ghiaccio a cono cavo',card:U+'Mask-Group-5.webp',tag:'Wessamat · NTF · fino a 240 kg/g',
+        desc:'Cubetti a forma di cilindro con foro centrale: la cavità offre una superficie maggiore e raffredda le bevande più velocemente. Ghiaccio cristallino, dalla consistenza solida, che non si attacca.',
+        vant:['Ghiaccio cristallino','Non si attacca insieme','Consistenza solida','Ideale per rinfrescare le bevande'],
+        models:[
+          M('Wessamat','Mask-Group-5.webp','Macchine compatte installabili come apparecchio da tavolo indipendente o integrate nei piani di lavoro, con contenitore di stoccaggio integrato. Versioni raffreddate ad aria e ad acqua.',['Produzione da 22 a 240 kg al giorno','Soluzione di stoccaggio integrata','Cubetti cristallini e igienici','Da tavolo indipendente o integrata nel bancone']),
+          M('Serie NTF IFT','kibernetik_eismaschinen_hohlkegel_ntf.webp','Produce coni cavi dalla forma perfetta e igienicamente impeccabili.',['Produzione da 25 a 75 kg al giorno','Sistema raffreddato ad aria o ad acqua','Soluzione di stoccaggio integrata','Interruttore on/off · filtro protettivo esterno rimovibile'])
+        ]},
+
+      rotondi:{name:'Cubetti rotondi pieni',card:U+'Mask-Group-5-1.webp',tag:'Wessamat · NTF · fino a 300 kg/g',
+        desc:'Cubetti dalla forma solida, trasparente e simmetrica, con elevata durezza e azione refrigerante di lunga durata. Ideali per i cocktail perché non diluiscono le bevande.',
+        vant:['Forma chiara e simmetrica','Elevata durezza del ghiaccio','Prestazioni di raffreddamento prolungate','Ideale per i cocktail, non diluisce le bevande'],
+        models:[
+          M('Wessamat Smart-Line','Mask-Group-5-1.webp','Cubetti prodotti con processo a iniezione: l’acqua viene convogliata in un evaporatore a griglia dove si congela in cubetti quadrati e compatti.',['Produzione da 18 a 58 kg al giorno','Bassi costi grazie al ridotto consumo d’acqua','Design compatto e salvaspazio','Custodia in plastica di facile manutenzione']),
+          M('Serie NTF SL','Mask-Group-6.webp','Soluzione di stoccaggio integrata in tutte le macchine della serie. Design compatto e superficie arrotondata per una pulizia facile, ideale per l’installazione sul bancone.',['Produzione da 22 a 150 kg al giorno','Facile da usare con interruttore on/off','Facile da pulire','Design compatto, integrabile nei banconi']),
+          M('Serie NTF CM','Mask-Group-7.webp','Ampia gamma di modelli per le esigenze di produzione più elevate. Visivamente discreti, con raffreddamento ad aria o ad acqua.',['Produzione da 155 a 300 kg al giorno','Diverse soluzioni di stoccaggio','Unità impilabile','Filtro dell’aria rimovibile e facile da pulire'])
+        ]},
+
+      quadrati:{name:'Cubo quadrato pieno',card:U+'cube_line@2x.webp',tag:'Wessamat · NTF · fino a 150 kg/g',
+        desc:'Il classico cubetto di ghiaccio quadrato: forma quadrata e massa maggiore rilasciano l’acqua di fusione più lentamente, per un effetto rinfrescante duraturo che non diluisce le bevande. Standard igienici elevatissimi.',
+        vant:['Si scioglie molto lentamente','Raffreddamento prolungato delle bevande','Forma visivamente bella','Struttura solida e cristallina'],
+        models:[
+          M('Wessamat Cube-Line','cube_line@2x.webp','Cubetti prodotti con evaporatore a iniezione a griglia, dove l’acqua si congela in cubetti quadrati e compatti.',['Produzione da 18 a 58 kg al giorno','Basso consumo d’acqua per bassi costi','Design compatto e salvaspazio','Custodia in plastica di facile manutenzione']),
+          M('Macchine NTF','Eismaschine_NTF_sl50-1-1.webp','Alternativa ideale ed economica: la tecnologia a spruzzo produce cubetti cristallini con bordi precisi e puliti, che si sciolgono lentamente. Ideali per hotel, ristoranti, bar e discoteche.',['Produzione giornaliera da 30 a 150 kg','Capacità di stoccaggio da 6 a 65 kg','Facili da manutenere e poco ingombranti','Semplicità d’uso e affidabilità'])
+        ]},
+
+      trapez:{name:'Ghiaccio trapezoidale',card:U+'kibernetik_eismaschinen_trapez@2x.webp',tag:'NTF · fino a 770 kg/g',
+        desc:'Ghiaccio a forma di piramide tronca dall’aspetto originale ed elevata durezza, ideale per raffreddare rapidamente e a lungo cibi e bevande.',
+        vant:['Elevato grado di durezza','Raffreddamento rapido e duraturo','Cattura l’attenzione ottica','Ottima conservabilità dei cubetti'],
+        models:[
+          M('Serie NTF CV / CVC','kibernetik_eismaschinen_trapez@2x.webp','Prodotti durevoli e di alta qualità, apprezzati in ristorazione, hotel e fast food. Produzione elevata e costante, capace di resistere ai picchi di utilizzo.',['Produzione da 105 a 770 kg al giorno','Design compatto in diverse versioni (anche con piedini regolabili inox)','Diversi tipi di stoccaggio','Filtro anticalcare e filtro protettivo esterno facili da pulire'])
+        ]},
+
+      tritato:{name:'Ghiaccio tritato',card:U+'kibernetik_eismaschinen_crusher@2x-1.13.10.webp',tag:'Wessamat · 3-5 kg/min',
+        desc:'Ghiaccio tritato indispensabile in bar, ristoranti e buffet: rinfresca succhi, carne e latticini, insalate e frutti di mare e dà quel tocco in più ai drink più esotici.',
+        vant:['Ideale per preparare drink e cocktail','Presentazione estetica e igienica di cibi e bevande','Macchine salvaspazio','Facile da usare'],
+        models:[
+          M('Tritaghiaccio Wessamat','kibernetik_eismaschinen_crusher@2x-1.13.10.webp','Basta riempirlo di cubetti dall’alto: con la semplice pressione di un pulsante trasforma qualsiasi tipo di cubetto in ghiaccio tritato perfetto in pochi secondi, raccolto nella vaschetta.',['Volume in uscita 3 o 5 kg al minuto','Capacità di stoccaggio 1 o 5 kg','Produce ghiaccio tritato da tutti i tipi di ghiaccio','Salvaspazio, facile da usare e conveniente'])
+        ]},
+
+      micro:{name:'Micro-cubetti fine',card:U+'eismaschine_micro_cube-300x300-1.webp',tag:'Micro-Cube · unità e stoccaggio',
+        desc:'Il ghiaccio fine Micro-Cube, best-seller dal 1965, è sempre a 0°C: non si attacca, resta morbido e spalmabile, aderisce al cibo refrigerato accelerando il raffreddamento e mantenendo la forma a lungo senza formare grumi.',
+        vant:['Misura sempre esattamente 0°C','Non si attacca','Rimane morbido e spalmabile','Facile da dosare'],
+        models:[
+          M('Unità di produzione','eismaschine_micro_cube-300x300-1.webp','Il cuore della tua gelatiera Micro-Cube: struttura in acciaio inox estremamente robusta.',['Produzione da 120 a 800 kg al giorno','Raffreddamento ad aria, ad acqua o centralizzato','Refrigerante standard (R404/R449) o naturale (propano / CO2)','Cassa in acciaio inossidabile']),
+          M('Deposito in acciaio inox','kibernetik_eismaschinen_edelstahlspeicher-300x300-1.13.10.webp','Abbina l’unità di produzione a un’unità di stoccaggio in acciaio inox per una macchina compatta, stabile e dall’efficienza ottimale.',['Volumi da 70 a 250 kg al giorno','Deposito di ghiaccio integrato','Deposito in acciaio inossidabile']),
+          M('Deposito mobile','kibernetik_eismaschinen_fahrbarerspeicher-300x300-1.webp','Massima libertà e flessibilità: un sensore rileva se il carrello è pronto e se è vuoto o pieno.',['Volumi da 60 a 325 kg al giorno','Telaio in acciaio inox o supporto a parete','Carrello mobile per il trasporto','Carrello disponibile isolato o non isolato']),
+          M('Sistema di trasporto','kibernetik_eismaschinen_eistransportsystem-300x300-1.webp','Sistema di trasporto del ghiaccio per essere equipaggiati al meglio.',['Volumi fino a 1.500 kg al giorno','Serbatoio di stoccaggio in acciaio inox isolato','Spintore manuale per carrello di trasporto'])
+        ]}
+    };
+    var ORDER=['pepite','scaglie','maja','conocavo','rotondi','quadrati','trapez','tritato','micro'];
+
+    document.getElementById('cards').innerHTML=ORDER.map(function(k){var f=FAM[k];
+      return '<button class="card" type="button" data-open="'+k+'"><div class="ph"><div class="pz ct"><img src="'+f.card+'" alt="'+esc(f.name)+'" loading="lazy"></div></div>'
+        +'<div class="bd"><span class="badge">Ghiaccio</span><h3>'+esc(f.name)+'</h3><p>'+esc(f.tag)+'</p><div class="go">Scopri →</div></div></button>';
+    }).join('');
+
+    function renderFam(k){
+      var f=FAM[k];
+      var chips=f.models.map(function(m,i){return '<button class="mchip'+(i===0?' on':'')+'" type="button" data-i="'+i+'">'+esc(m.name)+'</button>';}).join('');
+      var vant='<h6 class="eyer">Vantaggi di questo ghiaccio</h6><ul class="blist">'+f.vant.map(function(x){return '<li>'+CK+'<span>'+esc(x)+'</span></li>';}).join('')+'</ul>';
+      return '<div class="top"><button class="back" type="button" data-back><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg> Indietro</button><span class="badge">Ghiaccio</span><h2>'+esc(f.name)+'</h2></div>'
+        +'<div class="fdesc">'+esc(f.desc)+'</div>'
+        +'<div class="modelbar" data-fam="'+k+'">'+chips+'</div>'
+        +'<div class="fbody">'
+          +'<div class="gal"><div class="main pz ct"><img id="gm-'+k+'"></div></div>'
+          +'<div class="fspec"><h5 id="mn-'+k+'"></h5><div id="fs-'+k+'"></div>'+vant+'</div>'
+        +'</div>';
+    }
+    ORDER.forEach(function(k){ document.getElementById('v-'+k).innerHTML=renderFam(k); });
+
+    function setModel(k,i){
+      var f=FAM[k],m=f.models[i];
+      document.getElementById('mn-'+k).textContent=m.name;
+      var html='';
+      if(m.text) html+='<p class="mtext">'+esc(m.text)+'</p>';
+      if(m.feats.length) html+='<h6 class="eyer">Caratteristiche</h6><ul class="blist">'+m.feats.map(function(x){return '<li>'+CK+'<span>'+esc(x)+'</span></li>';}).join('')+'</ul>';
+      document.getElementById('fs-'+k).innerHTML=html;
+      var gm=document.getElementById('gm-'+k); gm.src=m.img; gm.alt=m.name;
+      var bar=document.querySelector('.modelbar[data-fam="'+k+'"]');
+      if(bar) bar.querySelectorAll('.mchip').forEach(function(c,ci){c.classList.toggle('on',ci===i);});
+      var fs=document.querySelector('#v-'+k+' .fspec'); if(fs) fs.scrollTop=0;
+    }
+    ORDER.forEach(function(k){ setModel(k,0); });
+
+    function show(v){ root.querySelectorAll('.view').forEach(function(el){el.classList.toggle('on', el.getAttribute('data-view')===v);}); }
+    root.addEventListener('click',function(e){
+      var op=e.target.closest('[data-open]'); if(op){ var v=op.getAttribute('data-open'); show(v); setModel(v,0); return; }
+      if(e.target.closest('[data-back]')){ show('home'); return; }
+      var mc=e.target.closest('.mchip'); if(mc){ var k=mc.closest('.modelbar').getAttribute('data-fam'); setModel(k,+mc.getAttribute('data-i')); return; }
+    });
+    root.addEventListener('contextmenu',function(e){ if(e.target.closest('.pz,img')) e.preventDefault(); });
+    root.addEventListener('dragstart',function(e){ if(e.target.tagName==='IMG') e.preventDefault(); });
+  })();
+  </script>
+</div>
