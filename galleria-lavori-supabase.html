@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Galleria Lavori — Frigo Control</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ═════════════════════════════════════════════════
+   FRIGO CONTROL — GALLERIA LAVORI v3 (Supabase)
+   Griglia + filtri combinabili + lightbox + admin
+   + caricamento diretto immagini (Supabase Storage)
+   Il box riempie sempre il 100% dell'iframe Wix.
+   ═════════════════════════════════════════════════ */
+
+:root{
+  --blu:#0b4f8a;
+  --blu-chiaro:#1b8ad6;
+  --ghiaccio:#eef6fc;
+  --testo:#1c2733;
+  --grigio:#6b7c8d;
+  --bordo:#dbe7f2;
+  --radius:14px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden}
+body{font-family:'Poppins',system-ui,sans-serif;color:var(--testo);background:transparent}
+
+.app{height:100%;min-height:340px;display:flex;flex-direction:column;position:relative;padding:4px}
+
+/* ── BARRA FILTRI ─────────────────────────── */
+.barra{
+  flex:0 0 auto;
+  display:flex;align-items:center;gap:8px;
+  flex-wrap:wrap;
+  padding:2px 2px 10px;
+}
+.pill{position:relative;display:inline-flex;align-items:center}
+.pill select{
+  appearance:none;
+  font-family:inherit;font-size:.79rem;font-weight:600;
+  color:var(--grigio);
+  background:#fff;
+  border:1.5px solid var(--bordo);
+  border-radius:999px;
+  padding:8px 30px 8px 15px;
+  cursor:pointer;
+  transition:all .18s ease;
+  max-width:190px;
+  text-overflow:ellipsis;
+}
+.pill select:hover{border-color:var(--blu-chiaro);color:var(--blu)}
+.pill select:focus{outline:none;border-color:var(--blu-chiaro)}
+.pill.on select{background:var(--blu);border-color:var(--blu);color:#fff}
+.pill svg{
+  position:absolute;right:11px;width:12px;height:12px;
+  pointer-events:none;color:var(--grigio);
+}
+.pill.on svg{color:#fff}
+
+.conta{font-size:.76rem;font-weight:600;color:var(--grigio);margin-left:auto;white-space:nowrap}
+.conta b{color:var(--blu)}
+.azzera{
+  background:none;border:none;font-family:inherit;
+  font-size:.74rem;font-weight:600;color:var(--blu-chiaro);
+  cursor:pointer;text-decoration:underline;padding:4px;
+  display:none;
+}
+.azzera.on{display:inline}
+
+/* ── GRIGLIA ──────────────────────────────── */
+.griglia-wrap{
+  flex:1 1 auto;min-height:0;
+  overflow-y:auto;overflow-x:hidden;
+  border-radius:var(--radius);
+  padding:2px;
+}
+.griglia-wrap::-webkit-scrollbar{width:7px}
+.griglia-wrap::-webkit-scrollbar-thumb{background:var(--bordo);border-radius:8px}
+.griglia-wrap::-webkit-scrollbar-track{background:transparent}
+
+.griglia{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(160px,1fr));
+  gap:10px;
+}
+.cella{
+  position:relative;
+  aspect-ratio:1/1;
+  border-radius:12px;
+  overflow:hidden;
+  background:var(--ghiaccio);
+  cursor:pointer;
+  border:none;padding:0;
+  box-shadow:0 3px 10px rgba(11,79,138,.09);
+  transition:transform .22s ease,box-shadow .22s ease;
+}
+.cella img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .35s ease}
+.cella:hover{transform:translateY(-3px);box-shadow:0 10px 22px rgba(11,79,138,.2)}
+.cella:hover img{transform:scale(1.06)}
+.cella:focus-visible{outline:3px solid var(--blu-chiaro);outline-offset:2px}
+.cella .velo{
+  position:absolute;inset:0;
+  background:linear-gradient(to top,rgba(6,32,56,.8) 0%,rgba(6,32,56,0) 55%);
+  opacity:0;transition:opacity .22s ease;
+  display:flex;align-items:flex-end;
+  padding:10px;
+}
+.cella:hover .velo{opacity:1}
+.cella .velo span{
+  color:#fff;font-size:.76rem;font-weight:600;line-height:1.3;text-align:left;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+}
+
+.nessuno{
+  padding:40px 20px;text-align:center;color:var(--grigio);font-size:.88rem;
+}
+.nessuno b{display:block;color:var(--testo);margin-bottom:4px}
+
+/* ── LIGHTBOX ─────────────────────────────── */
+.lb{
+  position:absolute;inset:0;z-index:40;
+  background:rgba(8,28,48,.94);
+  display:none;align-items:center;justify-content:center;
+  border-radius:var(--radius);
+}
+.lb.on{display:flex}
+.lb img{max-width:calc(100% - 96px);max-height:calc(100% - 76px);object-fit:contain;border-radius:8px}
+.lb-chiudi{
+  position:absolute;top:10px;right:12px;
+  width:34px;height:34px;border:none;border-radius:50%;
+  background:rgba(255,255,255,.16);color:#fff;font-size:1.2rem;
+  cursor:pointer;line-height:1;
+}
+.lb-chiudi:hover{background:rgba(255,255,255,.3)}
+.lb-nav{
+  position:absolute;top:50%;transform:translateY(-50%);
+  width:42px;height:42px;border:none;border-radius:50%;
+  background:rgba(255,255,255,.92);color:var(--blu);
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+}
+.lb-nav:hover{background:#fff}
+.lb-nav svg{width:20px;height:20px}
+.lb-prev{left:12px}.lb-next{right:12px}
+.lb-info{
+  position:absolute;left:0;right:0;bottom:0;
+  padding:12px 60px;text-align:center;color:#fff;pointer-events:none;
+}
+.lb-info .t{font-size:.9rem;font-weight:600}
+.lb-info .m{font-size:.7rem;opacity:.75;text-transform:uppercase;letter-spacing:.08em;margin-top:3px}
+.lb-cont{
+  position:absolute;top:14px;left:14px;
+  color:#fff;font-size:.74rem;font-weight:600;opacity:.75;
+}
+
+/* ── INGRANAGGIO ──────────────────────────── */
+.ingranaggio{
+  position:absolute;left:6px;bottom:4px;z-index:20;
+  width:24px;height:24px;border:none;border-radius:50%;
+  background:rgba(255,255,255,.6);color:var(--grigio);
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  opacity:.28;transition:opacity .2s,transform .3s;
+}
+.ingranaggio:hover{opacity:1;transform:rotate(60deg)}
+.ingranaggio svg{width:14px;height:14px}
+
+/* ── PANNELLO ADMIN ───────────────────────── */
+.pannello{
+  position:absolute;inset:0;z-index:60;
+  background:#fff;border-radius:var(--radius);
+  display:none;flex-direction:column;
+  box-shadow:0 10px 40px rgba(6,32,56,.3);
+}
+.pannello.on{display:flex}
+.p-head{
+  flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;
+  gap:10px;padding:11px 15px;background:var(--blu);color:#fff;
+  border-radius:var(--radius) var(--radius) 0 0;
+}
+.p-head h2{font-size:.92rem;font-weight:600}
+.p-chiudi{background:rgba(255,255,255,.18);border:none;color:#fff;width:29px;height:29px;border-radius:8px;font-size:1.1rem;cursor:pointer;line-height:1}
+
+.tabs{flex:0 0 auto;display:flex;gap:2px;padding:0 12px;background:var(--ghiaccio);border-bottom:1px solid var(--bordo)}
+.tab{
+  background:none;border:none;font-family:inherit;font-size:.78rem;font-weight:600;
+  color:var(--grigio);padding:10px 14px;cursor:pointer;border-bottom:2.5px solid transparent;
+}
+.tab.on{color:var(--blu);border-bottom-color:var(--blu)}
+
+.p-body{flex:1 1 auto;min-height:0;overflow-y:auto;padding:15px}
+.p-body::-webkit-scrollbar{width:8px}
+.p-body::-webkit-scrollbar-thumb{background:var(--bordo);border-radius:8px}
+.vista{display:none}
+.vista.on{display:block}
+
+input,select,textarea{
+  font-family:inherit;font-size:.83rem;color:var(--testo);
+  border:1.5px solid var(--bordo);border-radius:9px;
+  padding:8px 10px;width:100%;background:#fff;
+}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--blu-chiaro)}
+textarea{resize:vertical;min-height:76px;line-height:1.45;font-size:.78rem}
+label{display:block;font-size:.69rem;font-weight:600;color:var(--grigio);margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em}
+.riga{display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap}
+.riga>div{flex:1 1 150px;min-width:0}
+
+.btn{
+  font-family:inherit;font-size:.8rem;font-weight:600;border:none;border-radius:9px;
+  padding:9px 15px;cursor:pointer;background:var(--blu);color:#fff;white-space:nowrap;
+}
+.btn:hover{filter:brightness(1.12)}
+.btn:disabled{opacity:.55;cursor:default}
+.btn.ghost{background:var(--ghiaccio);color:var(--blu)}
+.btn.rosso{background:#e0574d}
+.btn.mini{padding:6px 10px;font-size:.72rem}
+
+.dropzone{
+  border:2px dashed var(--bordo);border-radius:12px;background:#fbfdff;
+  padding:20px 14px;text-align:center;color:var(--grigio);cursor:pointer;
+  transition:border-color .18s,background .18s;
+}
+.dropzone:hover,.dropzone.drag{border-color:var(--blu-chiaro);background:var(--ghiaccio)}
+.dropzone svg{width:26px;height:26px;color:var(--blu-chiaro);margin-bottom:6px}
+.dropzone b{color:var(--blu);font-size:.84rem;display:block}
+.dropzone small{font-size:.72rem}
+.avanz{display:none;margin-top:10px;font-size:.78rem;font-weight:600;color:var(--blu)}
+.avanz.on{display:block}
+.barraprog{height:7px;border-radius:6px;background:var(--ghiaccio);overflow:hidden;margin-top:6px}
+.barraprog i{display:block;height:100%;width:0;background:var(--blu-chiaro);transition:width .2s}
+.divider{display:flex;align-items:center;gap:10px;color:var(--grigio);font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;margin:16px 0 10px}
+.divider::before,.divider::after{content:"";flex:1;height:1px;background:var(--bordo)}
+
+.card{border:1.5px solid var(--bordo);border-radius:12px;padding:12px;margin-bottom:11px;background:#fbfdff}
+.card h4{font-size:.85rem;font-weight:600;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.tagrow{display:flex;flex-wrap:wrap;gap:5px;margin:8px 0}
+.tag{
+  display:inline-flex;align-items:center;gap:5px;
+  background:var(--ghiaccio);color:var(--blu);
+  font-size:.72rem;font-weight:600;padding:5px 9px;border-radius:999px;
+}
+.tag button{background:none;border:none;color:var(--grigio);cursor:pointer;font-size:.85rem;line-height:1;padding:0}
+.tag button:hover{color:#e0574d}
+
+.iconbtn{
+  width:26px;height:26px;border:1.5px solid var(--bordo);background:#fff;
+  border-radius:7px;cursor:pointer;font-size:.75rem;color:var(--grigio);
+  display:flex;align-items:center;justify-content:center;padding:0;line-height:1;flex:0 0 auto;
+}
+.iconbtn:hover{border-color:var(--blu-chiaro);color:var(--blu)}
+.iconbtn.del:hover{border-color:#e0574d;color:#e0574d}
+
+.item{display:flex;align-items:center;gap:8px;padding:7px;border:1.5px solid var(--bordo);border-radius:10px;background:#fff;margin-bottom:6px}
+.item>img{width:44px;height:44px;object-fit:cover;border-radius:7px;flex:0 0 auto;background:var(--ghiaccio)}
+.item .info{flex:1 1 auto;min-width:0}
+.item .info b{display:block;font-size:.79rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.item .info span{font-size:.66rem;color:var(--grigio)}
+.item input[type=checkbox]{width:16px;height:16px;flex:0 0 auto;accent-color:var(--blu)}
+.editrow{padding:10px;border:1.5px solid var(--blu-chiaro);border-radius:10px;background:var(--ghiaccio);margin:-2px 0 8px}
+
+.bulk{
+  position:sticky;top:-15px;z-index:5;
+  background:var(--blu);color:#fff;border-radius:10px;padding:9px 11px;
+  display:none;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;
+}
+.bulk.on{display:flex}
+.bulk span{font-size:.76rem;font-weight:600}
+.bulk select{width:auto;min-width:120px;font-size:.76rem;padding:6px 9px}
+
+.stato{
+  flex:0 0 auto;padding:8px 15px;font-size:.7rem;color:var(--grigio);
+  border-top:1px solid var(--bordo);display:flex;align-items:center;justify-content:space-between;gap:10px;
+}
+.ok{color:#2e9e5b;font-weight:600}
+.warn{color:#d98324;font-weight:600}
+
+.login{flex:1 1 auto;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:11px;padding:22px}
+.login .lucchetto{width:44px;height:44px;border-radius:50%;background:var(--ghiaccio);color:var(--blu);display:flex;align-items:center;justify-content:center}
+.login p{font-size:.8rem;color:var(--grigio);text-align:center}
+.login input{max-width:240px;text-align:center}
+.err{color:#e0574d;font-size:.75rem;font-weight:600;min-height:15px}
+
+@media (max-width:640px){
+  .griglia{grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px}
+  .pill select{font-size:.73rem;padding:7px 26px 7px 12px;max-width:150px}
+  .lb img{max-width:calc(100% - 24px);max-height:calc(100% - 100px)}
+  .lb-nav{width:36px;height:36px}
+  .lb-info{padding:10px 16px}
+  .conta{width:100%;margin-left:0;text-align:right}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <div class="barra" id="barra"></div>
+
+  <div class="griglia-wrap" id="wrap">
+    <div class="griglia" id="griglia"></div>
+    <div class="nessuno" id="nessuno" style="display:none">
+      <b>Nessun lavoro con questi filtri</b>Prova a cambiare una selezione.
+    </div>
+  </div>
+
+  <!-- LIGHTBOX -->
+  <div class="lb" id="lb">
+    <div class="lb-cont" id="lbCont"></div>
+    <button class="lb-chiudi" id="lbChiudi" aria-label="Chiudi">×</button>
+    <button class="lb-nav lb-prev" id="lbPrev" aria-label="Precedente">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
+    <img id="lbImg" alt="">
+    <button class="lb-nav lb-next" id="lbNext" aria-label="Successivo">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+    </button>
+    <div class="lb-info"><div class="t" id="lbT"></div><div class="m" id="lbM"></div></div>
+  </div>
+
+  <button class="ingranaggio" id="apriAdmin" aria-label="Impostazioni">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6h.09A1.65 1.65 0 0 0 10.6 3V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+  </button>
+
+  <!-- ADMIN -->
+  <div class="pannello" id="pannello">
+    <div class="p-head">
+      <h2 id="pTitolo">Area riservata</h2>
+      <button class="p-chiudi" id="chiudiAdmin">×</button>
+    </div>
+
+    <div class="login" id="login">
+      <div class="lucchetto"><svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+      <p>Password per gestire filtri e immagini</p>
+      <input type="password" id="pwd" placeholder="Password" autocomplete="off">
+      <div class="err" id="err"></div>
+      <button class="btn" id="entra">Entra</button>
+    </div>
+
+    <div class="tabs" id="tabs" style="display:none">
+      <button class="tab on" data-v="vImg">Immagini</button>
+      <button class="tab" data-v="vAdd">Carica</button>
+      <button class="tab" data-v="vFil">Filtri</button>
+    </div>
+
+    <div class="p-body" id="pbody" style="display:none">
+
+      <!-- IMMAGINI -->
+      <div class="vista on" id="vImg">
+        <div class="bulk" id="bulk">
+          <span id="bulkN">0 selezionate</span>
+          <select id="bulkGruppo"></select>
+          <select id="bulkValore"></select>
+          <button class="btn mini ghost" id="bulkApplica">Applica</button>
+          <button class="btn mini rosso" id="bulkElimina">Elimina</button>
+          <button class="btn mini ghost" id="bulkAnnulla">Deseleziona</button>
+        </div>
+        <div class="riga" style="margin-bottom:10px">
+          <div><input id="cerca" placeholder="Cerca per titolo…"></div>
+          <button class="btn ghost mini" id="selTutte">Seleziona tutte</button>
+        </div>
+        <div id="listaImg"></div>
+      </div>
+
+      <!-- CARICA -->
+      <div class="vista" id="vAdd">
+        <label>Assegna i tag a tutte le immagini che carichi ora</label>
+        <div id="addTag" class="riga" style="margin-bottom:8px"></div>
+        <div style="margin-bottom:12px">
+          <label>Titolo base (facoltativo, viene numerato)</label>
+          <input id="nuovoTitolo" placeholder="Es. Impianto residenziale">
+        </div>
+
+        <!-- Carica dal computer -->
+        <div class="dropzone" id="dropzone">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          <b>Carica le foto dal computer</b>
+          <small>Trascina qui i file oppure clicca per selezionarli — anche 80 insieme</small>
+          <input type="file" id="fileInput" accept="image/*" multiple hidden>
+        </div>
+        <div class="avanz" id="avanz">
+          <span id="avanzTesto">Caricamento…</span>
+          <div class="barraprog"><i id="avanzBar"></i></div>
+        </div>
+
+        <div class="divider">oppure incolla degli URL</div>
+
+        <label>URL immagini — una per riga (es. foto già su Wix)</label>
+        <textarea id="nuoveUrl" placeholder="https://static.wixstatic.com/media/xxx.jpg&#10;https://static.wixstatic.com/media/yyy.jpg"></textarea>
+        <button class="btn" id="addImg" style="margin-top:10px">Aggiungi dagli URL</button>
+
+        <p style="font-size:.72rem;color:var(--grigio);margin-top:12px;line-height:1.5">
+          Le foto caricate dal computer vengono ottimizzate e salvate in automatico: non serve copiare nessun link. Puoi poi correggere titoli e tag dalla scheda Immagini.
+        </p>
+      </div>
+
+      <!-- FILTRI -->
+      <div class="vista" id="vFil">
+        <div id="listaGruppi"></div>
+        <div class="riga">
+          <div><input id="nuovoGruppo" placeholder="Nome nuovo gruppo (es. Anno)"></div>
+          <button class="btn" id="addGruppo">Crea gruppo</button>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="stato" id="stato" style="display:none">
+      <span id="statoTesto"></span>
+      <button class="btn mini ghost" id="esci">Esci</button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+/* ═════════════════════════════════════════════════
+   ⚙️  CONFIGURAZIONE
+   ─────────────────────────────────────────────────
+   Incolla qui i 2 valori del tuo progetto Supabase:
+   Project Settings → API → "Project URL" e "anon public".
+   Finché sono vuoti, il widget resta in modalità locale.
+   ═════════════════════════════════════════════════ */
+
+const ADMIN_PASSWORD = "frigo2026";
+const DOC_ID         = "frigocontrol";
+const BUCKET         = "galleria";
+
+const SUPABASE_URL   = "";   // es. https://abcd1234.supabase.co
+const SUPABASE_ANON  = "";   // es. eyJhbGciOi... (chiave "anon public")
+
+// Immagini dimostrative da Unsplash (usate SOLO in modalità locale, senza Supabase).
+const demo = (p, titolo, tipo, ambiente) => ({
+  id: "demo-" + p.slice(0, 8),
+  url: `https://images.unsplash.com/photo-${p}?w=700&h=700&fit=crop&auto=format&q=70`,
+  titolo, tag: { tipo, ambiente }
+});
+
+const SEED = {
+  gruppi: [
+    { id:"tipo",     nome:"Tipo di impianto", valori:["Climatizzazione","Refrigerazione","Pompa di calore","Ventilazione","Cella frigo"] },
+    { id:"ambiente", nome:"Ambiente",         valori:["Residenziale","Commerciale","Industriale","Uffici"] }
+  ],
+  immagini: [
+    demo("1718203862467-c33159fdc504", "Split a parete, appartamento privato",      "Climatizzazione", "Residenziale"),
+    demo("1726614846573-c1ac2e6161d1", "Unità interna in soggiorno",                "Climatizzazione", "Residenziale"),
+    demo("1757219525975-03b5984bc6e8", "Climatizzazione uffici open space",         "Climatizzazione", "Uffici"),
+    demo("1679303777007-c6c4522beb02", "Impianto per esercizio pubblico",           "Climatizzazione", "Commerciale"),
+    demo("1566917064245-1c6bff30dbf1", "Pompa di calore aria-acqua",                "Pompa di calore", "Residenziale"),
+    demo("1635604866833-70844856de75", "Canalizzazioni e distribuzione aria",       "Ventilazione",    "Industriale"),
+    demo("1601599967100-f16100982063", "Banco refrigerato per gastronomia",         "Refrigerazione",  "Commerciale"),
+    demo("1601599561213-832382fd07ba", "Cella frigo per magazzino",                 "Cella frigo",     "Industriale")
+  ]
+};
+
+/* ═════════════════════════════════════════════════ */
+
+const $ = id => document.getElementById(id);
+const uid = () => Math.random().toString(36).slice(2,9);
+const esc = s => String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+let dati = structuredClone(SEED);
+let filtri = {};              // {gruppoId: valore}
+let cloud = null, admin = false;
+let lbIdx = 0, selez = new Set(), editId = null;
+
+/* ── PERSISTENZA ──────────────────────────── */
+const locLeggi = () => { try{ const r=localStorage.getItem("gal_"+DOC_ID); return r?JSON.parse(r):null }catch{ return null } };
+const locScrivi = d => { try{ localStorage.setItem("gal_"+DOC_ID, JSON.stringify(d)) }catch{} };
+
+async function avvia(){
+  if(SUPABASE_URL && SUPABASE_ANON){
+    try{
+      const { createClient } = await import("https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm");
+      const sb = createClient(SUPABASE_URL, SUPABASE_ANON);
+      cloud = { sb };
+
+      // Caricamento iniziale
+      const { data, error } = await sb.from("galleria").select("dati").eq("id", DOC_ID).maybeSingle();
+      if(error) throw error;
+      if(data && data.dati){
+        dati = { gruppi:data.dati.gruppi||[], immagini:data.dati.immagini||[] };
+        rendi();
+      } else {
+        await salva();   // crea la riga se non esiste
+      }
+
+      // Realtime: ogni modifica arriva a tutti
+      sb.channel("galleria-"+DOC_ID)
+        .on("postgres_changes",
+            { event:"*", schema:"public", table:"galleria", filter:"id=eq."+DOC_ID },
+            payload=>{
+              const d = payload.new && payload.new.dati;
+              if(d){ dati = { gruppi:d.gruppi||[], immagini:d.immagini||[] }; rendi(); }
+            })
+        .subscribe();
+
+      msg('<span class="ok">● Supabase connesso</span> — le modifiche le vedono tutti.');
+      return;
+    }catch(e){ console.error(e); }
+  }
+  const l=locLeggi(); if(l) dati=l;
+  msg('<span class="warn">● Modalità locale</span> — modifiche visibili solo su questo browser.');
+  rendi();
+}
+
+async function salva(){
+  locScrivi(dati);
+  if(cloud){
+    try{
+      const { error } = await cloud.sb.from("galleria").upsert({ id: DOC_ID, dati });
+      if(error) throw error;
+    }catch(e){ console.error(e); alert("Salvataggio non riuscito. Controlla la connessione o le policy di Supabase."); }
+  }
+  rendi();
+}
+const msg = h => $("statoTesto").innerHTML = h;
+
+/* ── FRONT-END ────────────────────────────── */
+const visibili = () => dati.immagini.filter(img =>
+  dati.gruppi.every(g => !filtri[g.id] || (img.tag||{})[g.id] === filtri[g.id])
+);
+
+function rendiBarra(){
+  const b = $("barra"); b.innerHTML = "";
+  dati.gruppi.forEach(g=>{
+    if(!g.valori.length) return;
+    const p = document.createElement("div");
+    p.className = "pill" + (filtri[g.id] ? " on" : "");
+    p.innerHTML = `<select data-g="${esc(g.id)}">
+        <option value="">${esc(g.nome)}: tutti</option>
+        ${g.valori.map(v=>`<option value="${esc(v)}"${filtri[g.id]===v?" selected":""}>${esc(v)}</option>`).join("")}
+      </select>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>`;
+    p.querySelector("select").onchange = e => {
+      const v = e.target.value;
+      if(v) filtri[g.id]=v; else delete filtri[g.id];
+      rendi();
+    };
+    b.appendChild(p);
+  });
+  const n = visibili().length;
+  const c = document.createElement("div");
+  c.className="conta";
+  c.innerHTML = `<b>${n}</b> ${n===1?"lavoro":"lavori"}`;
+  b.appendChild(c);
+  const az = document.createElement("button");
+  az.className = "azzera" + (Object.keys(filtri).length ? " on" : "");
+  az.textContent = "azzera";
+  az.onclick = ()=>{ filtri={}; rendi(); };
+  b.appendChild(az);
+}
+
+function rendiGriglia(){
+  const g = $("griglia"); g.innerHTML="";
+  const lista = visibili();
+  $("nessuno").style.display = lista.length ? "none" : "block";
+  lista.forEach((img,i)=>{
+    const c = document.createElement("button");
+    c.className="cella";
+    c.innerHTML = `<img src="${esc(img.url)}" alt="${esc(img.titolo||'Lavoro Frigo Control')}" loading="lazy">
+                   <div class="velo"><span>${esc(img.titolo||"")}</span></div>`;
+    c.onclick = ()=> apriLb(i);
+    g.appendChild(c);
+  });
+}
+
+function rendi(){ rendiBarra(); rendiGriglia(); if(admin) rendiAdmin(); }
+
+/* ── LIGHTBOX ─────────────────────────────── */
+function apriLb(i){
+  lbIdx = i;
+  $("lb").classList.add("on");
+  mostraLb();
+}
+function mostraLb(){
+  const l = visibili();
+  if(!l.length){ chiudiLb(); return; }
+  lbIdx = (lbIdx + l.length) % l.length;
+  const img = l[lbIdx];
+  $("lbImg").src = img.url;
+  $("lbImg").alt = img.titolo || "";
+  $("lbT").textContent = img.titolo || "";
+  $("lbM").textContent = dati.gruppi.map(g=>(img.tag||{})[g.id]).filter(Boolean).join(" · ");
+  $("lbCont").textContent = `${lbIdx+1} / ${l.length}`;
+}
+const chiudiLb = ()=> $("lb").classList.remove("on");
+$("lbChiudi").onclick = chiudiLb;
+$("lbPrev").onclick = ()=>{ lbIdx--; mostraLb(); };
+$("lbNext").onclick = ()=>{ lbIdx++; mostraLb(); };
+$("lb").onclick = e => { if(e.target.id==="lb") chiudiLb(); };
+document.addEventListener("keydown", e=>{
+  if(!$("lb").classList.contains("on")) return;
+  if(e.key==="Escape") chiudiLb();
+  if(e.key==="ArrowLeft"){ lbIdx--; mostraLb(); }
+  if(e.key==="ArrowRight"){ lbIdx++; mostraLb(); }
+});
+let x0=null;
+$("lb").addEventListener("touchstart",e=>x0=e.touches[0].clientX,{passive:true});
+$("lb").addEventListener("touchend",e=>{
+  if(x0===null) return;
+  const dx=e.changedTouches[0].clientX-x0;
+  if(Math.abs(dx)>45){ lbIdx += dx<0?1:-1; mostraLb(); }
+  x0=null;
+},{passive:true});
+
+/* ── ADMIN ────────────────────────────────── */
+$("apriAdmin").onclick = ()=>{ $("pannello").classList.add("on"); if(!admin){ $("pwd").value=""; $("err").textContent=""; setTimeout(()=>$("pwd").focus(),60); } };
+$("chiudiAdmin").onclick = ()=> $("pannello").classList.remove("on");
+$("entra").onclick = login;
+$("pwd").addEventListener("keydown", e=>{ if(e.key==="Enter") login(); });
+
+function login(){
+  if($("pwd").value !== ADMIN_PASSWORD){ $("err").textContent="Password errata"; $("pwd").value=""; return; }
+  admin = true;
+  $("login").style.display="none";
+  $("tabs").style.display="flex";
+  $("pbody").style.display="block";
+  $("stato").style.display="flex";
+  $("pTitolo").textContent="Gestione galleria";
+  rendiAdmin();
+}
+$("esci").onclick = ()=>{
+  admin=false; selez.clear(); editId=null;
+  $("login").style.display="flex";
+  $("tabs").style.display="none";
+  $("pbody").style.display="none";
+  $("stato").style.display="none";
+  $("pTitolo").textContent="Area riservata";
+  $("pannello").classList.remove("on");
+};
+$("tabs").onclick = e=>{
+  const t = e.target.closest(".tab"); if(!t) return;
+  [...$("tabs").children].forEach(x=>x.classList.remove("on"));
+  t.classList.add("on");
+  document.querySelectorAll(".vista").forEach(v=>v.classList.remove("on"));
+  $(t.dataset.v).classList.add("on");
+};
+
+function selectGruppo(gid, valore, cls=""){
+  const g = dati.gruppi.find(x=>x.id===gid);
+  return `<select class="${cls}" data-g="${esc(gid)}">
+    <option value="">— ${esc(g.nome)} —</option>
+    ${g.valori.map(v=>`<option value="${esc(v)}"${valore===v?" selected":""}>${esc(v)}</option>`).join("")}
+  </select>`;
+}
+
+function rendiAdmin(){
+  // ── tab CARICA: select per gruppo
+  $("addTag").innerHTML = dati.gruppi.map(g=>`<div>${selectGruppo(g.id,"","addsel")}</div>`).join("");
+
+  // ── tab FILTRI
+  const lg = $("listaGruppi"); lg.innerHTML="";
+  dati.gruppi.forEach((g,gi)=>{
+    const card = document.createElement("div");
+    card.className="card";
+    card.innerHTML = `
+      <h4><span>${esc(g.nome)}</span>
+        <span style="display:flex;gap:4px">
+          <button class="iconbtn" data-a="su">↑</button>
+          <button class="iconbtn" data-a="giu">↓</button>
+          <button class="iconbtn" data-a="ren">✎</button>
+          <button class="iconbtn del" data-a="del">🗑</button>
+        </span>
+      </h4>
+      <div class="tagrow">
+        ${g.valori.map((v,vi)=>`<span class="tag">${esc(v)}<button data-a="delval" data-vi="${vi}">×</button></span>`).join("") || '<span style="font-size:.74rem;color:var(--grigio)">Nessuna voce</span>'}
+      </div>
+      <div class="riga">
+        <div><input placeholder="Nuova voce" data-in="val"></div>
+        <button class="btn mini" data-a="addval">Aggiungi voce</button>
+      </div>`;
+    card.onclick = e=>{
+      const b = e.target.closest("[data-a]"); if(!b) return;
+      const a = b.dataset.a;
+      if(a==="su" && gi>0){ [dati.gruppi[gi-1],dati.gruppi[gi]]=[dati.gruppi[gi],dati.gruppi[gi-1]]; salva(); }
+      if(a==="giu" && gi<dati.gruppi.length-1){ [dati.gruppi[gi+1],dati.gruppi[gi]]=[dati.gruppi[gi],dati.gruppi[gi+1]]; salva(); }
+      if(a==="ren"){ const n=prompt("Nome gruppo:",g.nome); if(n&&n.trim()){ g.nome=n.trim(); salva(); } }
+      if(a==="del"){ if(confirm(`Eliminare il gruppo "${g.nome}"? I tag relativi verranno rimossi dalle immagini.`)){
+        dati.immagini.forEach(i=>{ if(i.tag) delete i.tag[g.id] });
+        delete filtri[g.id];
+        dati.gruppi.splice(gi,1); salva(); } }
+      if(a==="delval"){
+        const v = g.valori[+b.dataset.vi];
+        if(confirm(`Eliminare la voce "${v}"?`)){
+          dati.immagini.forEach(i=>{ if(i.tag && i.tag[g.id]===v) delete i.tag[g.id] });
+          if(filtri[g.id]===v) delete filtri[g.id];
+          g.valori.splice(+b.dataset.vi,1); salva();
+        }
+      }
+      if(a==="addval"){
+        const inp = card.querySelector('[data-in="val"]');
+        const v = inp.value.trim();
+        if(!v) return;
+        if(g.valori.includes(v)){ alert("Voce già presente."); return; }
+        g.valori.push(v); inp.value=""; salva();
+      }
+    };
+    lg.appendChild(card);
+  });
+
+  // ── bulk selects
+  $("bulkGruppo").innerHTML = dati.gruppi.map(g=>`<option value="${esc(g.id)}">${esc(g.nome)}</option>`).join("");
+  aggiornaBulkValori();
+
+  rendiLista();
+}
+
+function aggiornaBulkValori(){
+  const g = dati.gruppi.find(x=>x.id===$("bulkGruppo").value);
+  $("bulkValore").innerHTML = g ? `<option value="">— rimuovi —</option>` + g.valori.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join("") : "";
+}
+$("bulkGruppo").onchange = aggiornaBulkValori;
+
+function rendiLista(){
+  const q = $("cerca").value.trim().toLowerCase();
+  const box = $("listaImg"); box.innerHTML="";
+  const lista = dati.immagini.filter(i=>!q || (i.titolo||"").toLowerCase().includes(q));
+  if(!lista.length){ box.innerHTML='<p style="font-size:.8rem;color:var(--grigio);padding:14px 0">Nessuna immagine.</p>'; }
+
+  lista.forEach(img=>{
+    const i = dati.immagini.indexOf(img);
+    const row = document.createElement("div");
+    row.className="item";
+    const tags = dati.gruppi.map(g=>(img.tag||{})[g.id]).filter(Boolean).join(" · ") || "senza tag";
+    row.innerHTML = `
+      <input type="checkbox" ${selez.has(img.id)?"checked":""}>
+      <img src="${esc(img.url)}" alt="" loading="lazy">
+      <div class="info"><b>${esc(img.titolo||"(senza titolo)")}</b><span>${esc(tags)}</span></div>
+      <button class="iconbtn" data-a="su">↑</button>
+      <button class="iconbtn" data-a="giu">↓</button>
+      <button class="iconbtn" data-a="mod">✎</button>
+      <button class="iconbtn del" data-a="del">🗑</button>`;
+    row.querySelector("input").onchange = e=>{
+      e.target.checked ? selez.add(img.id) : selez.delete(img.id);
+      aggiornaBulk();
+    };
+    row.onclick = e=>{
+      const b = e.target.closest("[data-a]"); if(!b) return;
+      const a = b.dataset.a;
+      if(a==="su" && i>0){ [dati.immagini[i-1],dati.immagini[i]]=[dati.immagini[i],dati.immagini[i-1]]; salva(); }
+      if(a==="giu" && i<dati.immagini.length-1){ [dati.immagini[i+1],dati.immagini[i]]=[dati.immagini[i],dati.immagini[i+1]]; salva(); }
+      if(a==="del"){ if(confirm("Eliminare questa immagine?")){ rimuoviFile(img); selez.delete(img.id); dati.immagini.splice(i,1); salva(); } }
+      if(a==="mod"){ editId = editId===img.id ? null : img.id; rendiLista(); }
+    };
+    box.appendChild(row);
+
+    if(editId===img.id){
+      const ed = document.createElement("div");
+      ed.className="editrow";
+      ed.innerHTML = `
+        <label>Titolo</label>
+        <input data-in="tit" value="${esc(img.titolo||"")}" style="margin-bottom:8px">
+        <label>Tag</label>
+        <div class="riga" style="margin-bottom:9px">${dati.gruppi.map(g=>`<div>${selectGruppo(g.id,(img.tag||{})[g.id],"edsel")}</div>`).join("")}</div>
+        <div style="display:flex;gap:6px">
+          <button class="btn mini" data-a="ok">Salva</button>
+          <button class="btn mini ghost" data-a="no">Annulla</button>
+        </div>`;
+      ed.onclick = e=>{
+        const b=e.target.closest("[data-a]"); if(!b) return;
+        if(b.dataset.a==="no"){ editId=null; rendiLista(); return; }
+        img.titolo = ed.querySelector('[data-in="tit"]').value.trim();
+        img.tag = img.tag||{};
+        ed.querySelectorAll(".edsel").forEach(s=>{
+          if(s.value) img.tag[s.dataset.g]=s.value; else delete img.tag[s.dataset.g];
+        });
+        editId=null; salva();
+      };
+      box.appendChild(ed);
+    }
+  });
+  aggiornaBulk();
+}
+
+function aggiornaBulk(){
+  $("bulkN").textContent = `${selez.size} selezionate`;
+  $("bulk").classList.toggle("on", selez.size>0);
+}
+$("cerca").oninput = rendiLista;
+$("selTutte").onclick = ()=>{
+  const q=$("cerca").value.trim().toLowerCase();
+  dati.immagini.filter(i=>!q||(i.titolo||"").toLowerCase().includes(q)).forEach(i=>selez.add(i.id));
+  rendiLista();
+};
+$("bulkAnnulla").onclick = ()=>{ selez.clear(); rendiLista(); };
+$("bulkApplica").onclick = ()=>{
+  const gid=$("bulkGruppo").value, v=$("bulkValore").value;
+  dati.immagini.forEach(i=>{
+    if(!selez.has(i.id)) return;
+    i.tag = i.tag||{};
+    if(v) i.tag[gid]=v; else delete i.tag[gid];
+  });
+  salva();
+};
+$("bulkElimina").onclick = ()=>{
+  if(!confirm(`Eliminare ${selez.size} immagini?`)) return;
+  dati.immagini.filter(i=>selez.has(i.id)).forEach(rimuoviFile);
+  dati.immagini = dati.immagini.filter(i=>!selez.has(i.id));
+  selez.clear(); salva();
+};
+
+$("addGruppo").onclick = ()=>{
+  const n = $("nuovoGruppo").value.trim();
+  if(!n) return;
+  dati.gruppi.push({ id:uid(), nome:n, valori:[] });
+  $("nuovoGruppo").value="";
+  salva();
+};
+
+/* ── AGGIUNTA DA URL ──────────────────────── */
+$("addImg").onclick = ()=>{
+  const urls = $("nuoveUrl").value.split("\n").map(u=>u.trim()).filter(Boolean);
+  if(!urls.length){ alert("Incolla almeno un URL."); return; }
+  const t = $("nuovoTitolo").value.trim();
+  const tag = {};
+  document.querySelectorAll(".addsel").forEach(s=>{ if(s.value) tag[s.dataset.g]=s.value; });
+  urls.forEach((u,k)=> dati.immagini.push({
+    id: uid(), url: u,
+    titolo: t ? (urls.length>1 ? `${t} ${k+1}` : t) : "",
+    tag: {...tag}
+  }));
+  $("nuoveUrl").value="";
+  alert(`${urls.length} immagini aggiunte.`);
+  salva();
+};
+
+/* ── CARICAMENTO DIRETTO (Supabase Storage) ── */
+const dz = $("dropzone"), fileInput = $("fileInput");
+dz.onclick = ()=> fileInput.click();
+dz.addEventListener("dragover", e=>{ e.preventDefault(); dz.classList.add("drag"); });
+dz.addEventListener("dragleave", ()=> dz.classList.remove("drag"));
+dz.addEventListener("drop", e=>{ e.preventDefault(); dz.classList.remove("drag"); if(e.dataTransfer.files.length) caricaFile(e.dataTransfer.files); });
+fileInput.onchange = ()=>{ if(fileInput.files.length) caricaFile(fileInput.files); fileInput.value=""; };
+
+// Ridimensiona ogni foto (max 1000px) e la converte in WebP: file piccoli, zero costi.
+function ottimizza(file, max=1000, q=0.82){
+  return new Promise((res,rej)=>{
+    const img = new Image();
+    img.onload = ()=>{
+      let {width:w, height:h} = img;
+      if(w>max || h>max){ const r=Math.min(max/w, max/h); w=Math.round(w*r); h=Math.round(h*r); }
+      const c = document.createElement("canvas"); c.width=w; c.height=h;
+      c.getContext("2d").drawImage(img,0,0,w,h);
+      URL.revokeObjectURL(img.src);
+      c.toBlob(b=> b ? res(b) : rej(new Error("conversione fallita")), "image/webp", q);
+    };
+    img.onerror = ()=>{ URL.revokeObjectURL(img.src); rej(new Error("immagine non valida")); };
+    img.src = URL.createObjectURL(file);
+  });
+}
+
+async function caricaFile(fileList){
+  if(!cloud){ alert("Il caricamento diretto funziona solo con Supabase collegato. Per ora puoi incollare gli URL qui sotto."); return; }
+  const files = [...fileList].filter(f=> f.type.startsWith("image/"));
+  if(!files.length) return;
+
+  const base = $("nuovoTitolo").value.trim();
+  const tag = {};
+  document.querySelectorAll(".addsel").forEach(s=>{ if(s.value) tag[s.dataset.g]=s.value; });
+
+  const av = $("avanz"); av.classList.add("on");
+  fileInput.disabled = true;
+  let ok = 0;
+  for(let k=0; k<files.length; k++){
+    $("avanzTesto").textContent = `Caricamento ${k+1} di ${files.length}…`;
+    $("avanzBar").style.width = Math.round((k/files.length)*100) + "%";
+    try{
+      const blob = await ottimizza(files[k]);
+      const path = DOC_ID + "/" + uid() + ".webp";
+      const { error } = await cloud.sb.storage.from(BUCKET).upload(path, blob, { contentType:"image/webp", cacheControl:"31536000", upsert:false });
+      if(error) throw error;
+      const { data } = cloud.sb.storage.from(BUCKET).getPublicUrl(path);
+      dati.immagini.push({
+        id: uid(), url: data.publicUrl, path,
+        titolo: base ? (files.length>1 ? `${base} ${ok+1}` : base) : "",
+        tag: {...tag}
+      });
+      ok++;
+    }catch(e){ console.error("Upload fallito:", e); }
+  }
+  $("avanzBar").style.width = "100%";
+  $("avanzTesto").textContent = `${ok} immagini caricate.`;
+  fileInput.disabled = false;
+  if(ok) await salva();
+  setTimeout(()=> av.classList.remove("on"), 2500);
+}
+
+// Cancella il file da Storage quando l'immagine viene eliminata (best-effort).
+function rimuoviFile(img){
+  if(cloud && img && img.path){
+    cloud.sb.storage.from(BUCKET).remove([img.path]).catch(e=>console.warn("File non rimosso:", e));
+  }
+}
+
+avvia();
+</script>
+</body>
+</html>
