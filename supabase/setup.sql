@@ -70,6 +70,8 @@ alter table public.accesso_admin     enable row level security;
 
 -- Lettura pubblica dei contenuti (nessuna policy di scrittura: si scrive solo
 -- tramite salva_contenuto). Storico e password non hanno policy → invisibili.
+grant usage on schema public to anon, authenticated;
+grant select on public.contenuti to anon, authenticated;
 drop policy if exists "lettura pubblica" on public.contenuti;
 create policy "lettura pubblica" on public.contenuti
   for select to anon, authenticated using (true);
