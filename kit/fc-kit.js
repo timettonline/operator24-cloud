@@ -176,7 +176,7 @@
     ".fck-it.fck-on>.fck-ih .fck-car{transform:rotate(90deg)}",
     ".fck-ih .fck-it-t{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600}",
     ".fck-ih .fck-it-t small{color:var(--fm);font-weight:500;margin-right:6px}",
-    ".fck-ih img{width:30px;height:30px;object-fit:cover;border-radius:5px;background:var(--fg);flex:0 0 auto}",
+    ".fck-ih img{width:30px;height:30px;object-fit:contain;border-radius:5px;background:#fff;border:1px solid var(--fl);flex:0 0 auto}",
     ".fck-ib{display:none;padding:4px 10px 2px;border-top:1px solid var(--fl)}",
     ".fck-it.fck-on>.fck-ib{display:block}",
     ".fck-ic{width:28px;height:28px;flex:0 0 auto;border:1.5px solid var(--fl);border-radius:7px;background:#fff;color:var(--fm);cursor:pointer;font-size:13px;line-height:1;padding:0}",

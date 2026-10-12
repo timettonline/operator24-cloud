@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background: #000000;
+      color: #ffffff;
+      font-family: Helvetica, Arial, sans-serif;
+    }
+
+    .fc-soluzioni {
+      width: 100%;
+      background: #000000;
+      padding: 65px 30px 70px;
+    }
+
+    .fc-soluzioni-inner {
+      width: 100%;
+      max-width: 1150px;
+      margin: 0 auto;
+    }
+
+    .fc-soluzioni h2 {
+      margin: 0 0 18px;
+      font-family: Helvetica, Arial, sans-serif;
+      font-size: 27px;
+      line-height: 1.2;
+      font-weight: 600;
+      color: #ffffff;
+      text-align: left;
+    }
+
+    .fc-soluzioni-intro {
+      max-width: 850px;
+      margin: 0 0 50px;
+      font-family: Helvetica, Arial, sans-serif;
+      font-size: 15px;
+      line-height: 1.55;
+      font-weight: 400;
+      color: #eeeeee;
+      text-align: left;
+    }
+
+    .fc-soluzioni-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 50px;
+    }
+
+    .fc-soluzioni-card {
+      text-align: left;
+    }
+
+    .fc-soluzioni-card h3 {
+      margin: 0 0 10px;
+      font-family: Helvetica, Arial, sans-serif;
+      font-size: 16px;
+      line-height: 1.3;
+      font-weight: 600;
+      color: #ffffff;
+      text-transform: uppercase;
+      letter-spacing: 0.2px;
+    }
+
+    .fc-soluzioni-card p {
+      max-width: 290px;
+      margin: 0;
+      font-family: Helvetica, Arial, sans-serif;
+      font-size: 15px;
+      line-height: 1.5;
+      font-weight: 400;
+      color: #dddddd;
+    }
+
+    @media (max-width: 900px) {
+      .fc-soluzioni {
+        padding: 55px 25px 60px;
+      }
+
+      .fc-soluzioni-grid {
+        grid-template-columns: 1fr;
+        gap: 32px;
+      }
+
+      .fc-soluzioni-intro {
+        margin-bottom: 38px;
+      }
+
+      .fc-soluzioni-card p {
+        max-width: 500px;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .fc-soluzioni {
+        padding: 50px 20px 55px;
+      }
+
+      .fc-soluzioni h2 {
+        font-size: 24px;
+      }
+
+      .fc-soluzioni-intro {
+        font-size: 15px;
+      }
+
+      .fc-soluzioni-card h3 {
+        font-size: 16px;
+      }
+
+      .fc-soluzioni-card p {
+        font-size: 15px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<section class="fc-soluzioni">
+  <div class="fc-soluzioni-inner" id="fc-root"></div>
+</section>
+
+<!--FC-KIT-->
+<script>
+(function () {
+  var E = FCKit.esc;
+  var DATI = {
+    titolo: "Soluzioni per ogni ambiente",
+    intro: "Lavoriamo con privati, attività commerciali e aziende, progettando ogni impianto in base alle reali esigenze del cliente.",
+    schede: [
+      { titolo: "Privati", testo: "Comfort e benessere per la tua casa, con soluzioni progettate sulle tue esigenze." },
+      { titolo: "Attività commerciali", testo: "Soluzioni pensate per negozi, locali e spazi aperti al pubblico." },
+      { titolo: "Aziende", testo: "Impianti studiati per garantire efficienza, comfort e continuità operativa." }
+    ]
+  };
+  var SCHEMA = [
+    { t: "testo", k: "titolo", l: "Titolo" },
+    { t: "area", k: "intro", l: "Testo introduttivo" },
+    { t: "lista", k: "schede", l: "Colonne", agg: "Aggiungi una colonna", titolo: "titolo",
+      voce: { t: "gruppo", campi: [ { t: "testo", k: "titolo", l: "Titolo (in maiuscolo sul sito)" }, { t: "area", k: "testo", l: "Testo" } ] } }
+  ];
+  function render(d) {
+    document.getElementById("fc-root").innerHTML =
+      "<h2>" + E(d.titolo) + "</h2>" +
+      '<p class="fc-soluzioni-intro">' + E(d.intro) + "</p>" +
+      '<div class="fc-soluzioni-grid">' + (d.schede || []).map(function (s) {
+        return '<div class="fc-soluzioni-card"><h3>' + E(s.titolo) + "</h3><p>" + E(s.testo) + "</p></div>";
+      }).join("") + "</div>";
+  }
+  FCKit.avvia({ id: "clima-soluzioni", nome: "Climatizzazione · Soluzioni per ogni ambiente", dati: DATI, schema: SCHEMA,
+                render: render, ingranaggio: { pos: "br", tono: "scuro" } });
+})();
+</script>
+
+</body>
+</html>
