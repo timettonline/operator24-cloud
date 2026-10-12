@@ -1,0 +1,1116 @@
+<!-- =====================================================================
+     Frigo Control Ticino — Climatizzatori canalizzati — APP A SCHERMATA FISSA
+     - App-shell: riempie l'elemento (larghezza x altezza) e NON cresce mai
+     - Prodotto unico (SEZ-M): scheda diretta con TAB (Panoramica/Dettagli/Scheda tecnica)
+     - Ogni tab occupa lo STESSO box fisso, niente scroll di pagina
+     - Su Wix: Incorpora HTML -> imposta larghezza e altezza (consigliato ~680px)
+     ===================================================================== -->
+<div id="fc-app">
+  <style>
+  html,body{height:100%;margin:0;padding:0;overflow:hidden}
+  #fc-app *{box-sizing:border-box;margin:0;padding:0}
+  #fc-app{
+    --blu:#0a3d62;--blu2:#1e6091;--accent:#00a8e8;--grigio:#f4f6f8;--bordo:#e3e9ef;--testo:#22303a;--muto:#6b7b88;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    color:var(--testo);position:relative;height:100%;width:100%;overflow:hidden;
+    background:linear-gradient(180deg,#ffffff 0%,#eef4f8 100%);-webkit-tap-highlight-color:transparent;
+  }
+  #fc-app img{max-width:100%;display:block}
+  #fc-app h1,#fc-app h2,#fc-app h3,#fc-app h4{color:var(--blu);line-height:1.15}
+  #fc-app .pz{position:relative;overflow:hidden;border-radius:10px;background:#eef2f5}
+  #fc-app .pz img{width:100%;height:100%;object-fit:cover;-webkit-user-drag:none;user-select:none;pointer-events:none}
+  #fc-app .pz.ct img{object-fit:contain;background:#fff}
+  #fc-app .pz::after{content:"";position:absolute;inset:0;z-index:2}
+
+  #fc-app .shell{position:absolute;top:0;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:1200px;display:flex;flex-direction:column;padding:clamp(12px,2vw,22px);gap:10px}
+
+  #fc-app .top{flex:0 0 auto;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+  #fc-app .top .kick{width:100%;letter-spacing:.12em;text-transform:uppercase;font-size:.6rem;font-weight:800;color:var(--accent)}
+  #fc-app .badge{display:inline-block;font-size:.58rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;padding:4px 9px;border-radius:999px;color:#fff;background:linear-gradient(135deg,#0a3d62,#1e6091);align-self:center}
+  #fc-app .top h2{font-size:clamp(1rem,2vw,1.4rem)}
+  #fc-app .top .mod{color:var(--muto);font-weight:600;font-size:.78rem}
+  #fc-app .tabs{flex:0 0 auto;display:flex;gap:6px;border-bottom:1px solid var(--bordo)}
+  #fc-app .tab{background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;font:inherit;color:var(--muto);font-weight:700;font-size:.8rem;padding:7px 10px;margin-bottom:-1px}
+  #fc-app .tab.on{color:var(--blu);border-bottom-color:var(--accent)}
+  #fc-app .stage{flex:1;min-height:0;position:relative}
+  #fc-app .pane{position:absolute;inset:0;display:none;overflow:auto;-webkit-overflow-scrolling:touch}
+  #fc-app .pane.on{display:block}
+
+  #fc-app .pano{height:100%;display:grid;grid-template-columns:1.05fr .95fr;gap:16px}
+  @media(max-width:640px){#fc-app .pano{grid-template-columns:1fr;grid-template-rows:1fr auto}}
+  #fc-app .gal{min-height:0;display:flex;flex-direction:column;gap:8px}
+  #fc-app .gal .main{flex:1;min-height:0}
+  #fc-app .gal .thumbs{flex:0 0 auto;display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
+  #fc-app .gal .thumbs .t{height:42px;border:2px solid transparent;border-radius:7px;overflow:hidden;cursor:pointer;padding:0;background:none}
+  #fc-app .gal .thumbs .t.on{border-color:var(--accent)}
+  #fc-app .gal .thumbs .t .pz,#fc-app .gal .thumbs .t img{height:100%;border-radius:0}
+  #fc-app .side{min-height:0;display:flex;flex-direction:column;justify-content:center;overflow:hidden}
+  #fc-app .side .intro{font-size:.85rem;color:var(--testo);margin-bottom:12px}
+  #fc-app .side h4{font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muto);margin-bottom:8px}
+  #fc-app .spec{list-style:none;display:grid;gap:7px;margin-bottom:14px}
+  #fc-app .spec li{display:flex;gap:8px;align-items:flex-start;font-size:.86rem}
+  #fc-app .spec li svg{flex:0 0 15px;margin-top:2px;color:var(--accent)}
+  #fc-app .chips{display:flex;flex-wrap:wrap;gap:7px}
+  #fc-app .chip{display:inline-flex;align-items:center;gap:5px;background:var(--grigio);border:1px solid var(--bordo);color:var(--blu);border-radius:999px;padding:4px 9px;font-size:.68rem;font-weight:600}
+  #fc-app .chip svg{color:var(--accent)}
+
+  #fc-app .feats{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  @media(max-width:640px){#fc-app .feats{grid-template-columns:1fr}}
+  #fc-app .fcard{border:1px solid var(--bordo);border-radius:11px;background:#fff;box-shadow:0 6px 16px rgba(10,61,98,.08);padding:12px 14px}
+  #fc-app .fcard h5{font-size:.86rem;color:var(--blu);margin-bottom:4px;display:flex;gap:6px;align-items:center}
+  #fc-app .fcard h5 svg{color:var(--accent);flex:0 0 auto}
+  #fc-app .fcard p{font-size:.76rem;color:var(--muto);line-height:1.4}
+
+  #fc-app .tec{display:flex;flex-direction:column;gap:10px}
+  #fc-app .tec .tbox{background:linear-gradient(135deg,var(--blu),var(--blu2));color:#fff;border-radius:10px;padding:12px 14px;font-size:.8rem;line-height:1.5}
+  #fc-app .tec .tbox b{color:#bfe9ff}
+  #fc-app .tec .twrap{overflow:auto;border:1px solid var(--bordo);border-radius:10px;background:#fff}
+  #fc-app table.tt{border-collapse:collapse;width:100%;min-width:640px;font-size:.72rem}
+  #fc-app table.tt th,#fc-app table.tt td{border:1px solid var(--bordo);padding:6px 8px;text-align:center}
+  #fc-app table.tt thead th{background:var(--blu);color:#fff}
+  #fc-app table.tt tbody th{background:var(--grigio);color:var(--blu);text-align:left;white-space:nowrap}
+  #fc-app table.tt tr.grp th{background:var(--blu2);color:#fff;text-align:left}
+  #fc-app .tec .tmulti{font-size:.82rem;color:var(--testo)}
+  #fc-app .tec .tmulti b{color:var(--blu)}
+  #fc-app .tec .note{font-size:.7rem;color:var(--muto)}
+  </style>
+
+  <div class="shell">
+    <div class="top">
+      <div class="kick" id="fc-kick"></div>
+      <span class="badge" id="fc-badge"></span>
+      <h2 id="fc-titolo"></h2>
+      <span class="mod" id="fc-mod"></span>
+    </div>
+    <div class="tabs">
+      <button class="tab on" data-tab="0">Panoramica</button>
+      <button class="tab" data-tab="1">Dettagli</button>
+      <button class="tab" data-tab="2">Scheda tecnica</button>
+    </div>
+    <div class="stage" id="stage"></div>
+  </div>
+
+  <script>
+/* ═══════════════════════════════════════════════════════════════════════════
+   FC-KIT · menu impostazioni per gli embed Frigo Control
+   ───────────────────────────────────────────────────────────────────────────
+   - Legge i contenuti dell'embed da Supabase (tabella "contenuti", una riga
+     per embed). Se il database non risponde, mostra i contenuti predefiniti
+     scritti nel codice: il sito non resta mai vuoto.
+   - Ingranaggio discreto → password → modulo di modifica generato dallo
+     "schema" dell'embed (testi, foto, liste, tabelle).
+   - Salvataggio tramite salva_contenuto(): la password la controlla il DB.
+   - Foto: ottimizzate nel browser (WebP) e caricate nel bucket "media".
+   ═══════════════════════════════════════════════════════════════════════════ */
+(function () {
+  "use strict";
+  if (window.FCKit) return;
+
+  var CFG = { url: "", anon: "", hash: "3d4abbee0f60fb6cd5d6ec850a1007cd1b76b07b1ea68b1eef0b3b2afda76886" };
+  CFG.url = String(CFG.url).replace(/\/+$/, "");
+  var ATTIVO = /^(https:\/\/[^/]+|http:\/\/(localhost|127\.0\.0\.1)(:\d+)?)$/.test(CFG.url) && CFG.anon.length > 30;
+  var BUCKET = "media";
+  var MAXFOTO = 1600;
+
+  /* ── utilità ─────────────────────────────────────────────────────────── */
+  function esc(s) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+  /* testo con **grassetto** e a capo */
+  function ricco(s) {
+    return esc(s).replace(/\*\*([^*]+)\*\*/g, "<b>$1</b>").replace(/\n/g, "<br>");
+  }
+  function clona(o) { return o === undefined ? undefined : JSON.parse(JSON.stringify(o)); }
+  function uguale(a, b) { return JSON.stringify(a) === JSON.stringify(b); }
+  function ora(t) {
+    var d = t ? new Date(t) : new Date();
+    if (isNaN(d)) d = new Date();
+    return d.toLocaleString("it-CH", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" });
+  }
+  function completa(def, db) {
+    if (!db || typeof db !== "object" || Array.isArray(db)) return clona(def);
+    var o = clona(db);
+    for (var k in def) if (Object.prototype.hasOwnProperty.call(def, k) && !(k in o)) o[k] = clona(def[k]);
+    return o;
+  }
+  function pwdLeggi() { try { return sessionStorage.getItem("fck_pwd") || ""; } catch (e) { return ""; } }
+  function pwdScrivi(v) { try { v ? sessionStorage.setItem("fck_pwd", v) : sessionStorage.removeItem("fck_pwd"); } catch (e) {} }
+
+  /* ── rete (REST di Supabase, nessuna libreria) ───────────────────────── */
+  function intestazioni(extra) {
+    var h = { apikey: CFG.anon, Authorization: "Bearer " + CFG.anon };
+    for (var k in extra) h[k] = extra[k];
+    return h;
+  }
+  function leggi(id) {
+    return fetch(CFG.url + "/rest/v1/contenuti?select=dati,aggiornato_il&id=eq." + encodeURIComponent(id), {
+      headers: intestazioni({ Accept: "application/json" }), cache: "no-store"
+    }).then(function (r) {
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      return r.json();
+    }).then(function (a) { return a && a[0] ? a[0] : null; });
+  }
+  function rpc(nome, args) {
+    return fetch(CFG.url + "/rest/v1/rpc/" + nome, {
+      method: "POST",
+      headers: intestazioni({ "Content-Type": "application/json", Accept: "application/json" }),
+      body: JSON.stringify(args)
+    }).then(function (r) {
+      return r.text().then(function (t) {
+        var j = null; try { j = t ? JSON.parse(t) : null; } catch (e) {}
+        if (!r.ok) {
+          var er = new Error((j && (j.message || j.error)) || ("Errore " + r.status));
+          er.codice = j && j.code; throw er;
+        }
+        return j;
+      });
+    });
+  }
+  function caricaFile(blob, id, est, tipo) {
+    var nome = id + "/" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 8) + "." + est;
+    return fetch(CFG.url + "/storage/v1/object/" + BUCKET + "/" + nome, {
+      method: "POST",
+      headers: intestazioni({ "Content-Type": tipo, "x-upsert": "false", "cache-control": "max-age=31536000" }),
+      body: blob
+    }).then(function (r) {
+      if (!r.ok) return r.text().then(function () { throw new Error("caricamento rifiutato (" + r.status + ")"); });
+      return CFG.url + "/storage/v1/object/public/" + BUCKET + "/" + nome;
+    });
+  }
+  function sha256(s) {
+    if (!(window.crypto && crypto.subtle && window.TextEncoder)) return Promise.resolve("");
+    return crypto.subtle.digest("SHA-256", new TextEncoder().encode(s)).then(function (b) {
+      return Array.prototype.map.call(new Uint8Array(b), function (x) { return ("0" + x.toString(16)).slice(-2); }).join("");
+    });
+  }
+  function verifica(p) {
+    if (ATTIVO) return rpc("verifica_password", { p_password: p }).then(function (r) { return r === true; });
+    return sha256(p).then(function (h) { return h === CFG.hash; });
+  }
+
+  /* ── ottimizzazione foto nel browser ─────────────────────────────────── */
+  function ottimizza(file) {
+    return new Promise(function (ok, ko) {
+      if (/svg|gif/i.test(file.type)) return ok({ blob: file, est: /svg/i.test(file.type) ? "svg" : "gif", tipo: file.type });
+      var img = new Image(), u = URL.createObjectURL(file);
+      img.onload = function () {
+        var w = img.naturalWidth, h = img.naturalHeight, r = Math.min(1, MAXFOTO / Math.max(w, h));
+        w = Math.max(1, Math.round(w * r)); h = Math.max(1, Math.round(h * r));
+        var c = document.createElement("canvas"); c.width = w; c.height = h;
+        c.getContext("2d").drawImage(img, 0, 0, w, h);
+        URL.revokeObjectURL(u);
+        c.toBlob(function (b) {
+          if (b && b.type === "image/webp") return ok({ blob: b, est: "webp", tipo: "image/webp" });
+          c.toBlob(function (j) { j ? ok({ blob: j, est: "jpg", tipo: "image/jpeg" }) : ko(new Error("conversione non riuscita")); }, "image/jpeg", 0.86);
+        }, "image/webp", 0.85);
+      };
+      img.onerror = function () { URL.revokeObjectURL(u); ko(new Error("il file non è un'immagine valida")); };
+      img.src = u;
+    });
+  }
+
+  /* ── icone ───────────────────────────────────────────────────────────── */
+  var IC = {
+    gear: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>',
+    lock: '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>',
+    su: "↑", giu: "↓", dup: "⧉", del: "🗑", apri: "▸"
+  };
+
+  /* ── stile del menu (inserito nel documento che lo ospita) ───────────── */
+  var CSS = [
+    ".fck-gear{position:fixed;z-index:2147483000;width:26px;height:26px;padding:0;border-radius:50%;border:1px solid rgba(0,0,0,.08);cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:.22;transition:opacity .2s,transform .3s;box-shadow:0 2px 6px rgba(0,0,0,.12)}",
+    ".fck-gear:hover,.fck-gear:focus-visible{opacity:1;transform:rotate(45deg)}",
+    ".fck-gear svg{width:15px;height:15px}",
+    ".fck-gear.fck-chiaro{background:#fff;color:#4b5b6b}.fck-gear.fck-scuro{background:#141a3a;color:#d7defa;border-color:rgba(255,255,255,.18)}",
+    ".fck-tl{top:6px;left:6px}.fck-tr{top:6px;right:6px}.fck-bl{bottom:6px;left:6px}.fck-br{bottom:6px;right:6px}",
+    ".fck-ov{position:fixed;inset:0;z-index:2147483001;background:rgba(8,20,36,.55);display:flex;align-items:stretch;justify-content:center}",
+    "body.fck-pop{margin:0;background:#eef3f8}",
+    ".fck-pan,.fck-pan *{box-sizing:border-box}",
+    ".fck-pan{--fb:#0b4f8a;--fb2:#1b8ad6;--fg:#eef6fc;--ft:#1c2733;--fm:#6b7c8d;--fl:#dbe7f2;font:14px/1.45 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:var(--ft);background:#fff;width:100%;max-width:1000px;height:100%;display:flex;flex-direction:column;text-align:left;position:relative}",
+    "body.fck-pop .fck-pan{margin:0 auto;min-height:100vh;height:100vh;box-shadow:0 0 30px rgba(6,32,56,.12)}",
+    ".fck-head{flex:0 0 auto;display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 14px;background:var(--fb);color:#fff}",
+    ".fck-tit{flex:1 1 200px;min-width:0;display:flex;flex-direction:column;line-height:1.2}",
+    ".fck-tit b{font-size:15px}.fck-tit span{font-size:12px;opacity:.8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}",
+    ".fck-az{display:flex;gap:6px;flex-wrap:wrap}",
+    ".fck-b{font:600 13px/1 inherit;font-family:inherit;border:0;border-radius:8px;padding:9px 13px;cursor:pointer;background:var(--fg);color:var(--fb);white-space:nowrap}",
+    ".fck-b:hover{filter:brightness(.96)}.fck-b:disabled{opacity:.5;cursor:default}",
+    ".fck-head .fck-b{background:rgba(255,255,255,.16);color:#fff}.fck-head .fck-b.fck-prim{background:#fff;color:var(--fb)}",
+    ".fck-b.fck-prim{background:var(--fb);color:#fff}",
+    ".fck-b.fck-x{width:34px;height:34px;padding:0;font-size:20px;line-height:1}",
+    ".fck-b.fck-del{background:#fdecea;color:#c0392b}",
+    ".fck-pulse{box-shadow:0 0 0 0 rgba(255,255,255,.7);animation:fckp 1.6s infinite}",
+    "@keyframes fckp{70%{box-shadow:0 0 0 8px rgba(255,255,255,0)}100%{box-shadow:0 0 0 0 rgba(255,255,255,0)}}",
+    ".fck-corpo{flex:1 1 auto;min-height:0;overflow:auto;padding:14px;background:#f7fafd}",
+    ".fck-piede{flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 14px;border-top:1px solid var(--fl);font-size:12px;color:var(--fm);background:#fff}",
+    ".fck-ok{color:#2e9e5b}.fck-warn{color:#d98324}.fck-errc{color:#c0392b}",
+    ".fck-login{max-width:320px;margin:30px auto;display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center}",
+    ".fck-lucch{width:48px;height:48px;border-radius:50%;background:var(--fg);color:var(--fb);display:flex;align-items:center;justify-content:center}",
+    ".fck-login p{margin:0;color:var(--fm)}.fck-nota{font-size:12px;background:#fff7ec;border:1px solid #f6dfbf;color:#9a5b12!important;border-radius:8px;padding:8px 10px}",
+    ".fck-err{color:#c0392b;font-weight:600;min-height:18px;font-size:13px}",
+    ".fck-pan input,.fck-pan select,.fck-pan textarea{font:inherit;color:var(--ft);border:1.5px solid var(--fl);border-radius:8px;padding:7px 9px;width:100%;background:#fff}",
+    ".fck-pan input:focus,.fck-pan select:focus,.fck-pan textarea:focus{outline:none;border-color:var(--fb2)}",
+    ".fck-pan textarea{resize:vertical;min-height:60px}",
+    ".fck-login input{text-align:center}",
+    ".fck-f{display:block;margin:0 0 11px}",
+    ".fck-l{display:block;font-size:11.5px;font-weight:700;color:var(--fm);text-transform:uppercase;letter-spacing:.04em;margin:0 0 4px}",
+    ".fck-l em{display:block;font-style:normal;text-transform:none;letter-spacing:0;font-weight:400;font-size:12px;margin-top:1px}",
+    ".fck-gr{border:1.5px solid var(--fl);border-radius:12px;padding:12px 12px 2px;margin:0 0 14px;background:#fff}",
+    ".fck-gr>legend{font-weight:700;font-size:13px;color:var(--fb);padding:0 6px}",
+    ".fck-aiuto{margin:-2px 0 10px;font-size:12px;color:var(--fm)}",
+    ".fck-lista{margin:0 0 14px}",
+    ".fck-lh{display:flex;align-items:center;justify-content:space-between;font-weight:700;font-size:13px;color:var(--fb);margin:0 0 6px}",
+    ".fck-lh i{font-style:normal;font-weight:600;font-size:11px;background:var(--fg);border-radius:999px;padding:2px 8px;margin-left:6px}",
+    ".fck-it{border:1.5px solid var(--fl);border-radius:10px;background:#fff;margin:0 0 6px}",
+    ".fck-it.fck-on{border-color:var(--fb2)}",
+    ".fck-ih{display:flex;align-items:center;gap:6px;padding:6px 8px;cursor:pointer;user-select:none}",
+    ".fck-ih .fck-car{width:16px;color:var(--fm);transition:transform .15s;flex:0 0 auto}",
+    ".fck-it.fck-on>.fck-ih .fck-car{transform:rotate(90deg)}",
+    ".fck-ih .fck-it-t{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600}",
+    ".fck-ih .fck-it-t small{color:var(--fm);font-weight:500;margin-right:6px}",
+    ".fck-ih img{width:30px;height:30px;object-fit:contain;border-radius:5px;background:#fff;border:1px solid var(--fl);flex:0 0 auto}",
+    ".fck-ib{display:none;padding:4px 10px 2px;border-top:1px solid var(--fl)}",
+    ".fck-it.fck-on>.fck-ib{display:block}",
+    ".fck-ic{width:28px;height:28px;flex:0 0 auto;border:1.5px solid var(--fl);border-radius:7px;background:#fff;color:var(--fm);cursor:pointer;font-size:13px;line-height:1;padding:0}",
+    ".fck-ic:hover{border-color:var(--fb2);color:var(--fb)}.fck-ic.fck-icdel:hover{border-color:#c0392b;color:#c0392b}",
+    ".fck-ic:disabled{opacity:.35;cursor:default}",
+    ".fck-add{width:100%;border:1.5px dashed var(--fb2);background:#fff}",
+    ".fck-img{display:flex;gap:8px;align-items:flex-start;flex-wrap:wrap}",
+    ".fck-img .fck-th{width:74px;height:74px;border-radius:8px;border:1.5px solid var(--fl);background:var(--fg) center/contain no-repeat;flex:0 0 auto}",
+    ".fck-img .fck-iw{flex:1 1 220px;min-width:0;display:flex;flex-direction:column;gap:6px}",
+    ".fck-img .fck-ir{display:flex;gap:6px;flex-wrap:wrap}",
+    ".fck-tw{overflow:auto;border:1.5px solid var(--fl);border-radius:10px;background:#fff;margin:0 0 8px}",
+    ".fck-tab{border-collapse:collapse;min-width:100%}",
+    ".fck-tab td,.fck-tab th{border:1px solid var(--fl);padding:3px;vertical-align:middle}",
+    ".fck-tab input{min-width:92px;padding:5px 6px;border-radius:6px;font-size:13px}",
+    ".fck-tab th input{font-weight:700;background:var(--fg)}",
+    ".fck-tab tr.fck-tg input{font-weight:700;background:#e3eefa}",
+    ".fck-tab .fck-tc{white-space:nowrap;width:1%}",
+    ".fck-tab .fck-tc .fck-ic{width:24px;height:24px;font-size:12px;margin:0 1px}",
+    ".fck-trow{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 14px}",
+    ".fck-trow .fck-b{padding:7px 10px;font-size:12px}",
+    ".fck-dlg{position:absolute;inset:0;z-index:5;background:rgba(8,20,36,.45);display:flex;align-items:center;justify-content:center;padding:16px}",
+    ".fck-dlg>div{background:#fff;border-radius:12px;max-width:420px;width:100%;padding:18px;box-shadow:0 12px 40px rgba(0,0,0,.25)}",
+    ".fck-dlg p{margin:0 0 14px}.fck-dlg .fck-az{justify-content:flex-end}",
+    ".fck-ver{max-width:620px;margin:0 auto}",
+    ".fck-ver h3{margin:0 0 4px;font-size:16px;color:var(--fb)}.fck-ver>p{margin:0 0 12px;color:var(--fm);font-size:13px}",
+    ".fck-vi{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 12px;border:1.5px solid var(--fl);border-radius:10px;background:#fff;margin:0 0 6px}",
+    "@media (max-width:560px){.fck-head{padding:8px 10px}.fck-b{padding:8px 10px;font-size:12px}.fck-corpo{padding:10px}}"
+  ].join("\n");
+
+  function stile(doc) {
+    if (doc.getElementById("fck-stile")) return;
+    var s = doc.createElement("style"); s.id = "fck-stile"; s.textContent = CSS;
+    (doc.head || doc.documentElement).appendChild(s);
+  }
+
+  /* ── valore predefinito di una voce nuova ────────────────────────────── */
+  function vuoto(f) {
+    if (!f) return "";
+    if (f.nuovo !== undefined) return clona(typeof f.nuovo === "function" ? f.nuovo() : f.nuovo);
+    if (f.t === "gruppo") { var o = {}; (f.campi || []).forEach(function (c) { if (c.k) o[c.k] = vuoto(c); else if (c.t === "gruppo") { var x = vuoto(c); for (var z in x) o[z] = x[z]; } }); return o; }
+    if (f.t === "lista") return [];
+    if (f.t === "tabella") return { intestazioni: ["", ""], righe: [] };
+    if (f.t === "num") return 0;
+    if (f.t === "si") return false;
+    if (f.t === "sel") return f.opz && f.opz[0] ? f.opz[0][0] : "";
+    return "";
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════════
+     MODULO DI MODIFICA (costruito dentro il documento ospite: iframe o finestra)
+     ═══════════════════════════════════════════════════════════════════════ */
+  function Editor(st, doc, box, chiudi) {
+    var win = doc.defaultView || window;
+    function el(tag, cls, html) {
+      var e = doc.createElement(tag);
+      if (cls) e.className = cls;
+      if (html != null) e.innerHTML = html;
+      return e;
+    }
+    function btn(cls, html, titolo) {
+      var b = el("button", cls, html); b.type = "button"; if (titolo) b.title = titolo; return b;
+    }
+
+    box.innerHTML = "";
+    var pan = el("div", "fck-pan"); box.appendChild(pan);
+    var head = el("div", "fck-head"); pan.appendChild(head);
+    head.appendChild(el("div", "fck-tit", "<b>Modifica contenuti</b><span>" + esc(st.cfg.nome) + "</span>"));
+    var azioni = el("div", "fck-az"); head.appendChild(azioni);
+    var bx = btn("fck-b fck-x", "×", "Chiudi"); head.appendChild(bx);
+    var corpo = el("div", "fck-corpo"); pan.appendChild(corpo);
+    var piede = el("div", "fck-piede"); pan.appendChild(piede);
+    var msg = el("span", "fck-msg"); piede.appendChild(msg);
+    var bEsci = btn("fck-b", "Esci", "Esci dal menu impostazioni"); bEsci.style.display = "none"; piede.appendChild(bEsci);
+
+    var sporco = false;
+    function info(h) { msg.innerHTML = h || ""; }
+    function stato() {
+      return ATTIVO ? '<span class="fck-ok">●</span> Database collegato'
+                    : '<span class="fck-warn">●</span> Modalità locale: database non collegato, le modifiche restano un\'anteprima';
+    }
+
+    /* finestra di conferma interna (le finestre native possono essere bloccate da Wix) */
+    function chiedi(testo, si, no) {
+      return new Promise(function (ok) {
+        var d = el("div", "fck-dlg"), c = el("div");
+        c.appendChild(el("p", null, esc(testo)));
+        var az = el("div", "fck-az");
+        var bn = btn("fck-b", esc(no || "Annulla")), bs = btn("fck-b fck-prim", esc(si || "Conferma"));
+        az.appendChild(bn); az.appendChild(bs); c.appendChild(az); d.appendChild(c); pan.appendChild(d);
+        bn.onclick = function () { d.remove(); ok(false); };
+        bs.onclick = function () { d.remove(); ok(true); };
+        setTimeout(function () { bs.focus(); }, 30);
+      });
+    }
+
+    bx.onclick = function () {
+      if (!sporco) return chiudi();
+      chiedi("Ci sono modifiche non salvate. Chiudere senza salvare?", "Chiudi senza salvare", "Resta").then(function (s) { if (s) chiudi(); });
+    };
+    bEsci.onclick = function () {
+      function esci() { pwdScrivi(""); st.pwd = ""; sporco = false; vistaLogin(); }
+      if (!sporco) return esci();
+      chiedi("Ci sono modifiche non salvate. Uscire senza salvare?", "Esci", "Resta").then(function (s) { if (s) esci(); });
+    };
+
+    /* ── accesso ── */
+    function vistaLogin(errore) {
+      azioni.innerHTML = ""; corpo.innerHTML = ""; bEsci.style.display = "none";
+      var f = el("form", "fck-login");
+      f.innerHTML = '<div class="fck-lucch">' + IC.lock + "</div>" +
+        "<p>Inserisci la password per modificare questa sezione del sito.</p>" +
+        '<input type="password" autocomplete="current-password" placeholder="Password">' +
+        '<div class="fck-err">' + esc(errore || "") + "</div>" +
+        '<button class="fck-b fck-prim" type="submit">Entra</button>' +
+        (ATTIVO ? "" : '<p class="fck-nota">Il database non è ancora collegato: puoi provare le modifiche in anteprima, ma non verranno pubblicate per gli altri visitatori.</p>');
+      corpo.appendChild(f);
+      var inp = f.querySelector("input"), err = f.querySelector(".fck-err"), bt = f.querySelector("button");
+      setTimeout(function () { inp.focus(); }, 60);
+      f.onsubmit = function (e) {
+        e.preventDefault();
+        var p = inp.value; if (!p) return;
+        bt.disabled = true; err.textContent = ""; info("Verifica in corso…");
+        verifica(p).then(function (ok) {
+          bt.disabled = false;
+          if (ok) { pwdScrivi(p); st.pwd = p; vistaEditor(); }
+          else { err.textContent = "Password errata"; inp.value = ""; inp.focus(); info(stato()); }
+        }).catch(function (e2) { bt.disabled = false; err.textContent = "Connessione non riuscita (" + e2.message + ")"; info(stato()); });
+      };
+      info(stato());
+    }
+
+    /* ── editor ── */
+    var bozza;
+    function vistaEditor() {
+      bozza = clona(st.dati); sporco = false;
+      azioni.innerHTML = ""; bEsci.style.display = "";
+      var bVer = btn("fck-b", "Versioni", "Versioni precedenti e contenuto originale");
+      var bAnn = btn("fck-b", "Annulla modifiche", "Torna all'ultima versione pubblicata");
+      var bSal = btn("fck-b fck-prim", ATTIVO ? "Salva e pubblica" : "Applica anteprima");
+      azioni.appendChild(bVer); azioni.appendChild(bAnn); azioni.appendChild(bSal);
+
+      function segna() {
+        if (!sporco) { sporco = true; bSal.classList.add("fck-pulse"); }
+        info('<span class="fck-warn">●</span> Modifiche non ancora salvate');
+      }
+      function disegna() {
+        corpo.innerHTML = "";
+        var form = el("div", "fck-form"); corpo.appendChild(form);
+        campi(st.cfg.schema, bozza, form);
+      }
+      var ctx = { segna: segna };
+
+      /* — campi — */
+      function campi(lista, obj, cont) { lista.forEach(function (f) { campo(f, obj, cont); }); }
+      function campo(f, obj, cont) {
+        if (f.t === "gruppo") {
+          var tgt = obj;
+          if (f.k) { if (!obj[f.k] || typeof obj[f.k] !== "object") obj[f.k] = vuoto(f); tgt = obj[f.k]; }
+          var g = el("fieldset", "fck-gr");
+          if (f.l) g.appendChild(el("legend", null, esc(f.l)));
+          if (f.aiuto) g.appendChild(el("p", "fck-aiuto", esc(f.aiuto)));
+          campi(f.campi, tgt, g); cont.appendChild(g); return;
+        }
+        if (f.t === "lista") return lista(f, obj, cont);
+        if (f.t === "tabella") return tabella(f, obj, cont);
+        if (obj[f.k] === undefined) obj[f.k] = vuoto(f);
+        var w = el("div", "fck-f");
+        w.appendChild(el("span", "fck-l", esc(f.l) + (f.aiuto ? "<em>" + esc(f.aiuto) + "</em>" : "")));
+        w.appendChild(input(f, function () { return obj[f.k]; }, function (v) { obj[f.k] = v; }));
+        cont.appendChild(w);
+      }
+      function input(f, get, set) {
+        var i;
+        if (f.t === "img") return immagine(f, get, set);
+        if (f.t === "area") {
+          i = el("textarea"); i.rows = f.righe || 3; i.value = get() == null ? "" : get();
+          i.oninput = function () { set(i.value); ctx.segna(); };
+          return i;
+        }
+        if (f.t === "sel") {
+          i = el("select");
+          (f.opz || []).forEach(function (o) { var op = el("option", null, esc(o[1])); op.value = o[0]; i.appendChild(op); });
+          i.value = get(); if (i.value !== get() && f.opz && f.opz[0]) { i.value = f.opz[0][0]; }
+          i.onchange = function () { set(i.value); ctx.segna(); };
+          return i;
+        }
+        if (f.t === "si") {
+          var lab = el("label", null); i = el("input"); i.type = "checkbox"; i.style.width = "auto"; i.checked = !!get();
+          i.onchange = function () { set(i.checked); ctx.segna(); };
+          lab.appendChild(i); lab.appendChild(doc.createTextNode(" " + (f.testo || "Sì"))); return lab;
+        }
+        i = el("input"); i.type = f.t === "num" ? "number" : f.t === "link" ? "url" : "text";
+        if (f.ph) i.placeholder = f.ph;
+        i.value = get() == null ? "" : get();
+        i.oninput = function () { set(f.t === "num" ? (i.value === "" ? 0 : Number(i.value)) : i.value); ctx.segna(); };
+        return i;
+      }
+      function immagine(f, get, set) {
+        var w = el("div", "fck-img");
+        var th = el("div", "fck-th"); w.appendChild(th);
+        var iw = el("div", "fck-iw"); w.appendChild(iw);
+        var url = el("input"); url.type = "url";
+        function mostraUrl() {
+          var v = get() || "", dentro = /^data:/.test(v);
+          url.value = dentro ? "" : v;
+          url.placeholder = dentro ? "Foto incorporata nel codice — per cambiarla carica una foto o incolla un indirizzo"
+                                   : "Indirizzo dell'immagine (https://…)";
+        }
+        mostraUrl();
+        var ir = el("div", "fck-ir");
+        var bc = btn("fck-b", "Carica foto dal computer");
+        var fi = el("input"); fi.type = "file"; fi.accept = "image/*"; fi.style.display = "none";
+        ir.appendChild(bc); ir.appendChild(fi);
+        iw.appendChild(url); iw.appendChild(ir);
+        var nota = el("span", "fck-aiuto"); iw.appendChild(nota);
+        function anteprima() { var v = get(); th.style.backgroundImage = v ? 'url("' + String(v).replace(/"/g, "%22") + '")' : "none"; }
+        anteprima();
+        url.oninput = function () { if (!url.value.trim() && /^data:/.test(get() || "")) return; set(url.value.trim()); anteprima(); ctx.segna(); };
+        bc.onclick = function () { fi.click(); };
+        fi.onchange = function () {
+          var file = fi.files && fi.files[0]; fi.value = "";
+          if (!file) return;
+          if (!/^image\//.test(file.type)) { nota.innerHTML = '<span class="fck-errc">Il file scelto non è un\'immagine.</span>'; return; }
+          bc.disabled = true; nota.textContent = "Ottimizzazione e caricamento…";
+          ottimizza(file).then(function (o) {
+            if (!ATTIVO) {
+              return new Promise(function (ok) {
+                var r = new FileReader(); r.onload = function () { ok(r.result); }; r.readAsDataURL(o.blob);
+              }).then(function (du) { nota.innerHTML = '<span class="fck-warn">Anteprima locale: la foto verrà caricata davvero quando il database sarà collegato.</span>'; return du; });
+            }
+            return caricaFile(o.blob, st.cfg.id, o.est, o.tipo).then(function (u) { nota.innerHTML = '<span class="fck-ok">Foto caricata ✓</span> ricordati di premere <b>Salva e pubblica</b>.'; return u; });
+          }).then(function (u) {
+            set(u); mostraUrl(); anteprima(); ctx.segna(); bc.disabled = false;
+          }).catch(function (e) { bc.disabled = false; nota.innerHTML = '<span class="fck-errc">Errore: ' + esc(e.message) + "</span>"; });
+        };
+        return w;
+      }
+
+      /* — liste — */
+      function lista(f, obj, cont) {
+        if (!Array.isArray(obj[f.k])) obj[f.k] = [];
+        var arr = obj[f.k];
+        var box2 = el("div", "fck-lista");
+        var hd = el("div", "fck-lh", "<span>" + esc(f.l) + "<i></i></span>");
+        box2.appendChild(hd);
+        if (f.aiuto) box2.appendChild(el("p", "fck-aiuto", esc(f.aiuto)));
+        var items = el("div"); box2.appendChild(items);
+        var add = btn("fck-b fck-add", "+ " + esc(f.agg || "Aggiungi")); box2.appendChild(add);
+        var aperti = arr.map(function () { return false; });
+        var primitivo = !f.voce || f.voce.t !== "gruppo";
+
+        function etichetta(it, i) {
+          var t = "";
+          if (typeof f.titolo === "function") t = f.titolo(it, i);
+          else if (f.titolo && it && typeof it === "object") t = it[f.titolo];
+          else if (typeof it === "string" && (!f.voce || f.voce.t !== "img")) t = it;
+          t = String(t == null ? "" : t).replace(/\*\*/g, "").trim();
+          return t || "(senza titolo)";
+        }
+        function miniatura(it) {
+          var u = f.miniatura ? (typeof f.miniatura === "function" ? f.miniatura(it) : it && it[f.miniatura]) : (f.voce && f.voce.t === "img" ? it : "");
+          return u ? '<img alt="" src="' + esc(u) + '">' : "";
+        }
+        function disegna() {
+          items.innerHTML = "";
+          hd.querySelector("i").textContent = arr.length;
+          add.disabled = !!(f.max && arr.length >= f.max);
+          arr.forEach(function (it, i) {
+            var c = el("div", "fck-it" + (aperti[i] ? " fck-on" : ""));
+            var h = el("div", "fck-ih");
+            var t = el("span", "fck-it-t");
+            function titola() { t.innerHTML = "<small>" + (i + 1) + ".</small>" + esc(etichetta(arr[i], i)); }
+            titola();
+            h.appendChild(el("span", "fck-car", IC.apri));
+            var mi = miniatura(it); if (mi) h.insertAdjacentHTML("beforeend", mi);
+            h.appendChild(t);
+            var bs = btn("fck-ic", IC.su, "Sposta su"), bg = btn("fck-ic", IC.giu, "Sposta giù"),
+                bd = btn("fck-ic", IC.dup, "Duplica"), be = btn("fck-ic fck-icdel", IC.del, "Elimina");
+            bs.disabled = i === 0; bg.disabled = i === arr.length - 1;
+            if (f.max && arr.length >= f.max) bd.disabled = true;
+            if (f.min && arr.length <= f.min) be.disabled = true;
+            [bs, bg, bd, be].forEach(function (b) { h.appendChild(b); });
+            c.appendChild(h);
+            var b = el("div", "fck-ib");
+            if (primitivo) {
+              var w = el("div", "fck-f");
+              w.appendChild(input(f.voce || { t: "testo" }, function () { return arr[i]; }, function (v) { arr[i] = v; }));
+              b.appendChild(w);
+            } else {
+              campi(f.voce.campi, arr[i], b);
+            }
+            b.addEventListener("input", titola); b.addEventListener("change", titola);
+            c.appendChild(b);
+            h.onclick = function (e) {
+              if (e.target.closest("button")) return;
+              aperti[i] = !aperti[i]; c.classList.toggle("fck-on", aperti[i]);
+            };
+            function scambia(a, z) {
+              var x = arr[a]; arr[a] = arr[z]; arr[z] = x;
+              var y = aperti[a]; aperti[a] = aperti[z]; aperti[z] = y;
+              ctx.segna(); disegna();
+            }
+            bs.onclick = function () { scambia(i, i - 1); };
+            bg.onclick = function () { scambia(i, i + 1); };
+            bd.onclick = function () { arr.splice(i + 1, 0, clona(arr[i])); aperti.splice(i + 1, 0, true); ctx.segna(); disegna(); };
+            be.onclick = function () {
+              chiedi('Eliminare "' + etichetta(arr[i], i) + '"?', "Elimina").then(function (s) {
+                if (!s) return; arr.splice(i, 1); aperti.splice(i, 1); ctx.segna(); disegna();
+              });
+            };
+            items.appendChild(c);
+          });
+        }
+        add.onclick = function () {
+          arr.push(vuoto(f.voce ? (primitivo ? f.voce : f.voce) : { t: "testo" }));
+          if (f.nuovo !== undefined) arr[arr.length - 1] = clona(typeof f.nuovo === "function" ? f.nuovo() : f.nuovo);
+          aperti.push(true); ctx.segna(); disegna();
+        };
+        disegna();
+        cont.appendChild(box2);
+      }
+
+      /* — tabelle: {intestazioni:[…], righe:[{gruppo:"…"} | {celle:[…]}]} — */
+      function tabella(f, obj, cont) {
+        if (!obj[f.k] || typeof obj[f.k] !== "object") obj[f.k] = { intestazioni: ["", ""], righe: [] };
+        var tb = obj[f.k];
+        if (!Array.isArray(tb.intestazioni)) tb.intestazioni = [];
+        if (!Array.isArray(tb.righe)) tb.righe = [];
+        var wrap = el("div", "fck-lista");
+        wrap.appendChild(el("div", "fck-lh", "<span>" + esc(f.l) + "</span>"));
+        if (f.aiuto) wrap.appendChild(el("p", "fck-aiuto", esc(f.aiuto)));
+        var tw = el("div", "fck-tw"); wrap.appendChild(tw);
+        var bar = el("div", "fck-trow"); wrap.appendChild(bar);
+        var bR = btn("fck-b", "+ Riga"), bG = btn("fck-b", "+ Riga titolo"), bC = btn("fck-b", "+ Colonna"), bCm = btn("fck-b", "− Ultima colonna");
+        [bR, bG, bC, bCm].forEach(function (b) { bar.appendChild(b); });
+        function cella(get, set) {
+          var i = el("input"); i.type = "text"; i.value = get() == null ? "" : get();
+          i.oninput = function () { set(i.value); ctx.segna(); };
+          return i;
+        }
+        function disegna() {
+          var n = tb.intestazioni.length;
+          var t = el("table", "fck-tab");
+          var tr = el("tr");
+          tb.intestazioni.forEach(function (_, c) {
+            var th = el("th"); th.appendChild(cella(function () { return tb.intestazioni[c]; }, function (v) { tb.intestazioni[c] = v; })); tr.appendChild(th);
+          });
+          tr.appendChild(el("th", "fck-tc")); t.appendChild(tr);
+          tb.righe.forEach(function (r, ri) {
+            var row = el("tr", r.gruppo !== undefined ? "fck-tg" : "");
+            if (r.gruppo !== undefined) {
+              var td = el("td"); td.colSpan = n;
+              td.appendChild(cella(function () { return r.gruppo; }, function (v) { r.gruppo = v; }));
+              row.appendChild(td);
+            } else {
+              if (!Array.isArray(r.celle)) r.celle = [];
+              for (var c = 0; c < n; c++) (function (c) {
+                var td2 = el(c === 0 ? "th" : "td");
+                td2.appendChild(cella(function () { return r.celle[c]; }, function (v) { r.celle[c] = v; }));
+                row.appendChild(td2);
+              })(c);
+            }
+            var tc = el("td", "fck-tc");
+            var bs = btn("fck-ic", IC.su, "Sposta su"), bg = btn("fck-ic", IC.giu, "Sposta giù"), be = btn("fck-ic fck-icdel", IC.del, "Elimina riga");
+            bs.disabled = ri === 0; bg.disabled = ri === tb.righe.length - 1;
+            bs.onclick = function () { var x = tb.righe[ri]; tb.righe[ri] = tb.righe[ri - 1]; tb.righe[ri - 1] = x; ctx.segna(); disegna(); };
+            bg.onclick = function () { var x = tb.righe[ri]; tb.righe[ri] = tb.righe[ri + 1]; tb.righe[ri + 1] = x; ctx.segna(); disegna(); };
+            be.onclick = function () { chiedi("Eliminare questa riga della tabella?", "Elimina").then(function (s) { if (s) { tb.righe.splice(ri, 1); ctx.segna(); disegna(); } }); };
+            tc.appendChild(bs); tc.appendChild(bg); tc.appendChild(be); row.appendChild(tc);
+            t.appendChild(row);
+          });
+          tw.innerHTML = ""; tw.appendChild(t);
+          bCm.disabled = n <= 1;
+        }
+        bR.onclick = function () { tb.righe.push({ celle: tb.intestazioni.map(function () { return ""; }) }); ctx.segna(); disegna(); };
+        bG.onclick = function () { tb.righe.push({ gruppo: "Nuovo gruppo" }); ctx.segna(); disegna(); };
+        bC.onclick = function () { tb.intestazioni.push(""); tb.righe.forEach(function (r) { if (r.celle) r.celle.push(""); }); ctx.segna(); disegna(); };
+        bCm.onclick = function () {
+          chiedi("Eliminare l'ultima colonna della tabella?", "Elimina").then(function (s) {
+            if (!s) return; tb.intestazioni.pop(); tb.righe.forEach(function (r) { if (r.celle) r.celle.pop(); }); ctx.segna(); disegna();
+          });
+        };
+        disegna();
+        cont.appendChild(wrap);
+      }
+
+      /* — azioni — */
+      bAnn.onclick = function () {
+        if (!sporco) { info("Nessuna modifica da annullare"); return; }
+        chiedi("Annullare tutte le modifiche non salvate?", "Annulla le modifiche", "No").then(function (s) {
+          if (!s) return; bozza = clona(st.dati); sporco = false; bSal.classList.remove("fck-pulse"); disegna(); info(stato());
+        });
+      };
+      bSal.onclick = function () {
+        /* prova il nuovo contenuto sul widget prima di pubblicarlo */
+        try { st.cfg.render(clona(bozza)); }
+        catch (e) {
+          try { st.cfg.render(clona(st.dati)); } catch (e2) {}
+          info('<span class="fck-errc">● Il contenuto non è valido (' + esc(e.message) + "): non è stato salvato.</span>");
+          return;
+        }
+        if (!ATTIVO) {
+          st.dati = clona(bozza); sporco = false; bSal.classList.remove("fck-pulse");
+          info('<span class="fck-warn">●</span> Anteprima applicata solo su questo browser (database non collegato)');
+          return;
+        }
+        bSal.disabled = true; info("Pubblicazione in corso…");
+        rpc("salva_contenuto", { p_id: st.cfg.id, p_dati: bozza, p_password: st.pwd }).then(function (t) {
+          st.dati = clona(bozza); sporco = false; bSal.disabled = false; bSal.classList.remove("fck-pulse");
+          info('<span class="fck-ok">●</span> Pubblicato il ' + ora(t) + " — lo vedono tutti i visitatori");
+        }).catch(function (e) {
+          bSal.disabled = false;
+          try { st.cfg.render(clona(st.dati)); } catch (e2) {}
+          if (/password/i.test(e.message)) { pwdScrivi(""); st.pwd = ""; vistaLogin("Password non più valida: accedi di nuovo"); return; }
+          info('<span class="fck-errc">● Salvataggio non riuscito: ' + esc(e.message) + "</span>");
+        });
+      };
+      bVer.onclick = function () { vistaVersioni(); };
+
+      function vistaVersioni() {
+        corpo.innerHTML = "";
+        var v = el("div", "fck-ver"); corpo.appendChild(v);
+        v.appendChild(el("h3", null, "Versioni precedenti"));
+        v.appendChild(el("p", null, "Scegli una versione da riaprire. Viene caricata nel modulo: diventa visibile a tutti solo quando premi «Salva e pubblica»."));
+        var torna = btn("fck-b", "← Torna al modulo"); torna.style.marginBottom = "12px"; v.appendChild(torna);
+        torna.onclick = disegna;
+        function voce(testo, azione) {
+          var r = el("div", "fck-vi"); r.appendChild(el("span", null, testo));
+          var b = btn("fck-b", "Apri"); r.appendChild(b); b.onclick = azione; v.appendChild(r); return b;
+        }
+        voce("<b>Contenuto originale</b> (quello di partenza scritto nel codice)", function () {
+          bozza = clona(st.cfg.dati); segna(); disegna();
+          info('<span class="fck-warn">●</span> Caricato il contenuto originale: premi «Salva e pubblica» per rimetterlo online');
+        });
+        if (!ATTIVO) { v.appendChild(el("p", null, "Lo storico dei salvataggi sarà disponibile quando il database sarà collegato.")); return; }
+        var att = el("p", null, "Caricamento dello storico…"); v.appendChild(att);
+        rpc("versioni_contenuto", { p_id: st.cfg.id, p_password: st.pwd }).then(function (lista) {
+          att.remove();
+          if (!lista || !lista.length) { v.appendChild(el("p", null, "Non ci sono ancora salvataggi precedenti.")); return; }
+          lista.forEach(function (x) {
+            voce("Versione salvata prima del " + esc(ora(x.salvato_il)), function () {
+              rpc("leggi_versione", { p_n: x.n, p_password: st.pwd }).then(function (d) {
+                if (!d) return;
+                bozza = completa(st.cfg.dati, d); segna(); disegna();
+                info('<span class="fck-warn">●</span> Versione caricata: premi «Salva e pubblica» per rimetterla online');
+              }).catch(function (e) { info('<span class="fck-errc">● ' + esc(e.message) + "</span>"); });
+            });
+          });
+        }).catch(function (e) { att.innerHTML = '<span class="fck-errc">Storico non disponibile: ' + esc(e.message) + "</span>"; });
+      }
+
+      disegna();
+      info(stato());
+    }
+
+    /* accesso automatico se la password è già stata inserita in questa scheda */
+    var memo = pwdLeggi();
+    if (memo) {
+      info("Accesso in corso…");
+      verifica(memo).then(function (ok) {
+        if (ok) { st.pwd = memo; vistaEditor(); } else { pwdScrivi(""); vistaLogin(); }
+      }).catch(function () { vistaLogin(); });
+    } else vistaLogin();
+  }
+
+  /* ── apertura del menu: dentro l'embed se c'è spazio, altrimenti finestra ── */
+  function apri(st) {
+    if (st.finestra && !st.finestra.closed) { try { st.finestra.focus(); } catch (e) {} return; }
+    if (st.ov && st.ov.parentNode) return;
+    var stretto = window.innerHeight < 470 || window.innerWidth < 340;
+    if (stretto) {
+      var w = null;
+      try { w = window.open("", "fck_" + st.cfg.id, "width=1000,height=820,scrollbars=yes,resizable=yes"); } catch (e) {}
+      if (w) {
+        try {
+          /* se il browser non ci lascia scrivere nella finestra (iframe isolato), si ripiega sotto */
+          var d = w.document;
+          d.open();
+          d.write('<!doctype html><html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Modifica · ' + esc(st.cfg.nome) + '</title></head><body class="fck-pop"></body></html>');
+          d.close();
+          stile(d);
+          st.finestra = w;
+          Editor(st, d, d.body, function () { try { w.close(); } catch (e) {} st.finestra = null; });
+          return;
+        } catch (e) {
+          try { w.close(); } catch (e2) {}
+          st.finestra = null;
+        }
+      }
+    }
+    var ov = document.createElement("div"); ov.className = "fck-ov";
+    document.body.appendChild(ov); st.ov = ov;
+    Editor(st, document, ov, function () { ov.remove(); st.ov = null; });
+  }
+
+  function ingranaggio(st) {
+    var g = st.cfg.ingranaggio || {};
+    var b = document.createElement("button");
+    b.type = "button";
+    b.className = "fck-gear fck-" + (g.pos || "br") + " fck-" + (g.tono || "chiaro");
+    b.title = "Impostazioni contenuti";
+    b.setAttribute("aria-label", "Impostazioni contenuti");
+    b.innerHTML = IC.gear;
+    b.onclick = function (e) { e.preventDefault(); e.stopPropagation(); apri(st); };
+    document.body.appendChild(b);
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════════
+     AVVIO DI UN EMBED
+     cfg = { id, nome, dati (predefiniti), schema, render(dati), ingranaggio:{pos,tono}, attesa }
+     ═══════════════════════════════════════════════════════════════════════ */
+  function avvia(cfg) {
+    var st = { cfg: cfg, dati: null, mostrato: false, pwd: "" };
+    function mostra(d) {
+      try { cfg.render(d); st.dati = d; }
+      catch (e) {
+        console.error("[FC] contenuto non valido, uso quello predefinito", e);
+        st.dati = clona(cfg.dati); cfg.render(st.dati);
+      }
+      st.mostrato = true;
+    }
+    function parti() {
+      stile(document);
+      if (!ATTIVO) mostra(clona(cfg.dati));
+      else {
+        var timer = setTimeout(function () { if (!st.mostrato) mostra(clona(cfg.dati)); }, cfg.attesa || 1500);
+        leggi(cfg.id).then(function (r) {
+          clearTimeout(timer);
+          var d = r ? completa(cfg.dati, r.dati) : clona(cfg.dati);
+          if (!st.mostrato || !uguale(d, st.dati)) mostra(d);
+        }).catch(function (e) {
+          clearTimeout(timer);
+          console.warn("[FC] database non raggiungibile, uso i contenuti predefiniti", e);
+          if (!st.mostrato) mostra(clona(cfg.dati));
+        });
+      }
+      ingranaggio(st);
+    }
+    if (document.body) parti(); else document.addEventListener("DOMContentLoaded", parti);
+    return { dati: function () { return st.dati; } };
+  }
+
+  window.FCKit = {
+    avvia: avvia, esc: esc, ricco: ricco, clona: clona, attivo: ATTIVO,
+    /* funzioni di base per embed con un pannello proprio (es. galleria) */
+    rete: { leggi: leggi, rpc: rpc, caricaFile: caricaFile, verifica: verifica, ottimizza: ottimizza,
+            pwdLeggi: pwdLeggi, pwdScrivi: pwdScrivi }
+  };
+})();
+
+</script>
+  <script>
+  (function(){
+    var root=document.getElementById('fc-app');
+    if(root.dataset.init) return; root.dataset.init='1';
+    var CK='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>';
+    var P={leaf:'<path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6"/>',
+      remote:'<rect x="7" y="2" width="10" height="20" rx="3"/><circle cx="12" cy="12" r="1.5"/>',
+      air:'<path d="M17.7 7.7A2.5 2.5 0 1 1 19.5 12H2"/><path d="M9.6 4.6A2 2 0 1 1 11 8H2"/><path d="M12.6 19.4A2 2 0 1 0 14 16H2"/>',
+      vol:'<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>',
+      therm:'<path d="M14 4v10.54a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0Z"/>',
+      wind:'<path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"/>',
+      shield:'<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/>',
+      wifi:'<path d="M5 13a10 10 0 0 1 14 0"/><path d="M8.5 16.5a5 5 0 0 1 7 0"/><path d="M2 8.82a15 15 0 0 1 20 0"/><line x1="12" y1="20" x2="12.01" y2="20"/>',
+      grid:'<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/>',
+      ruler:'<rect x="2" y="7" width="20" height="10" rx="1"/><path d="M6 7v3M10 7v4M14 7v3M18 7v4"/>',
+      plug:'<path d="M9 2v6M15 2v6M7 8h10v3a5 5 0 0 1-10 0V8ZM12 16v6"/>'};
+    function sv(p){return '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+p+'</svg>';}
+    function ic(t){t=t.toLowerCase();
+      return sv(/r32|refriger/.test(t)?P.leaf:/wi-fi|wifi|melcloud/.test(t)?P.wifi:/remoto|controllo|remote/.test(t)?P.remote:/purific|aria|air|filtro|plasma/.test(t)?P.air:/raffresc|riscald/.test(t)?P.therm:/silenz/.test(t)?P.vol:P.leaf);}
+    function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+    function grassetto(s){return esc(s).replace(/\*\*([^*]+)\*\*/g,'<b>$1</b>');}
+
+    /* Contenuti predefiniti (quelli attualmente online) */
+    var DATI={
+ "kick": "Frigo Control Ticino · Mitsubishi Electric",
+ "badge": "Canalizzato",
+ "titolo": "Climatizzatore canalizzato SEZ-M",
+ "mod": "Serie SEZ-M",
+ "intro": "Impianto potente ma invisibile, nascosto nel controsoffitto: gestisce più locali da un’unica macchina, per il massimo comfort senza ingombri.",
+ "gallery": [
+  {
+   "s": "https://frigocontrolch.10web.me/wp-content/uploads/2025/08/climatizzatore-canalizzato-sez-m-soggiorno-moderno-frigo-control-ticino.webp",
+   "c": "In soggiorno moderno, discreto ed elegante"
+  },
+  {
+   "s": "https://frigocontrolch.10web.me/wp-content/uploads/2025/08/climatizzatore-canalizzato-sez-m-soffitto-moderno-frigo-control-ticino.webp",
+   "c": "Installazione a soffitto"
+  },
+  {
+   "s": "https://frigocontrolch.10web.me/wp-content/uploads/2025/08/climatizzatore-canalizzato-sez-m-griglie-soffitto-frigo-control-ticino.webp",
+   "c": "Griglie integrate a soffitto"
+  },
+  {
+   "s": "https://frigocontrolch.10web.me/wp-content/uploads/2025/08/climatizzatore-canalizzato-sez-m-unita-interna-frigo-control-ticino.webp",
+   "c": "Unità interna canalizzata"
+  }
+ ],
+ "spec": [
+  "Gas refrigerante R32 a basso impatto",
+  "Dimensioni super compatte",
+  "Buona efficienza energetica stagionale",
+  "Silenziosità e comfort",
+  "Connettibilità espansa",
+  "Portata d’aria regolabile",
+  "Filtro Plasma Quad Connect opzionale",
+  "Controllo Wi-Fi MELCloud opzionale"
+ ],
+ "chips": [
+  "Gas R32",
+  "Raffrescamento/Riscaldamento",
+  "Silenziosità"
+ ],
+ "feats": [
+  {
+   "i": "ruler",
+   "t": "Dimensioni super compatte",
+   "p": "Altezza 200 mm e profondità 700 mm per tutta la gamma: si installa anche in controsoffitti particolarmente angusti."
+  },
+  {
+   "i": "vol",
+   "t": "Silenziosità & comfort",
+   "p": "Emissioni sonore ridotte al minimo grazie alla cura nella progettazione e nei dettagli costruttivi, per il massimo comfort acustico."
+  },
+  {
+   "i": "therm",
+   "t": "Buona efficienza energetica",
+   "p": "Unità ad alta efficienza con DC inverter: classe “A+” o superiore con unità esterne PUZ, “A” o superiore con unità esterne SUZ."
+  },
+  {
+   "i": "plug",
+   "t": "Connettibilità espansa",
+   "p": "Ampia compatibilità con le unità esterne, per adattarsi a numerose configurazioni d’impianto."
+  },
+  {
+   "i": "wind",
+   "t": "Portata d’aria regolabile",
+   "p": "La portata d’aria è regolabile per adattarsi alle canalizzazioni e ottimizzare la diffusione nei diversi locali."
+  },
+  {
+   "i": "air",
+   "t": "Filtro Plasma Quad Connect (opzionale)",
+   "p": "Filtrazione attiva: inibisce fino al 99% di virus, batteri, muffe e PM2.5, fino al 98% di allergeni/pollini e 99,7% di acari/polveri. Richiede accessorio dedicato."
+  },
+  {
+   "i": "air",
+   "t": "Tecnologia Plasma Quad",
+   "p": "Filtrazione attiva Mitsubishi Electric: abbatte il 99% di virus/batteri/muffe, il 98% di allergeni, il 97% di acari/polveri e il 99% del PM2.5, catturando anche gli odori."
+  },
+  {
+   "i": "grid",
+   "t": "Applicazioni commerciali",
+   "p": "Configurazione dedicata per uffici, negozi e ambienti lavorativi: una soluzione ottimale e versatile per ogni esigenza."
+  }
+ ],
+ "tecBox": "Gas **R32** · unità DC inverter · portata d’aria regolabile · sistema **monosplit** o **multisplit**.",
+ "tabella": {
+  "intestazioni": [
+   "Unità interna",
+   "SEZ-M25",
+   "SEZ-M35",
+   "SEZ-M50",
+   "SEZ-M60",
+   "SEZ-M71"
+  ],
+  "righe": [
+   {
+    "celle": [
+     "Unità esterna",
+     "SUZ-M25VA",
+     "SUZ-M35VA",
+     "SUZ-M50VA",
+     "SUZ-M60VA",
+     "SUZ-M71VA"
+    ]
+   },
+   {
+    "gruppo": "Raffrescamento (EN14825)"
+   },
+   {
+    "celle": [
+     "Potenza (kW)",
+     "2,5",
+     "3,5",
+     "5,0",
+     "6,1",
+     "7,1"
+    ]
+   },
+   {
+    "celle": [
+     "SEER",
+     "5,3",
+     "5,9",
+     "6,0",
+     "5,5",
+     "5,5"
+    ]
+   },
+   {
+    "celle": [
+     "Efficienza*",
+     "A",
+     "A+",
+     "A+",
+     "A",
+     "A"
+    ]
+   },
+   {
+    "celle": [
+     "Pressione sonora (dB)",
+     "23-26-30",
+     "23-27-31",
+     "30-34-37",
+     "30-34-38",
+     "30-35-40"
+    ]
+   },
+   {
+    "gruppo": "Riscaldamento (EN14825)"
+   },
+   {
+    "celle": [
+     "Potenza (kW)",
+     "2,0",
+     "2,3",
+     "3,8",
+     "4,1",
+     "5,2"
+    ]
+   },
+   {
+    "celle": [
+     "SCOP",
+     "3,8",
+     "4,1",
+     "4,0",
+     "4,2",
+     "3,9"
+    ]
+   },
+   {
+    "celle": [
+     "Efficienza*",
+     "A",
+     "A+",
+     "A+",
+     "A+",
+     "A"
+    ]
+   },
+   {
+    "celle": [
+     "Pressione sonora (dB)",
+     "23-26-30",
+     "23-27-31",
+     "30-34-37",
+     "30-34-38",
+     "30-35-40"
+    ]
+   }
+  ]
+ },
+ "multi": [
+  "MXZ",
+  "MXZ HYPER HEATING",
+  "PUMY-SP"
+ ],
+ "nota": "*Classi di efficienza energetica da A+++ a D."
+};
+
+    var ICONE=[["leaf","Foglia (ecologia)"],["remote","Telecomando"],["air","Aria / filtrazione"],["vol","Silenziosità"],["therm","Temperatura"],["wind","Flusso d’aria"],["shield","Protezione"],["wifi","Wi-Fi"],["grid","Griglia / pannello"],["ruler","Dimensioni"],["plug","Alimentazione"]];
+    var SCHEMA=[
+      {t:'testo',k:'kick',l:'Scritta piccola in alto'},
+      {t:'testo',k:'badge',l:'Etichetta'},
+      {t:'testo',k:'titolo',l:'Titolo'},
+      {t:'testo',k:'mod',l:'Serie / modello'},
+      {t:'area',k:'intro',l:'Testo introduttivo (scheda Panoramica)'},
+      {t:'lista',k:'gallery',l:'Galleria foto',agg:'Aggiungi una foto',titolo:'c',miniatura:'s',min:1,nuovo:{s:'',c:''},
+        voce:{t:'gruppo',campi:[{t:'img',k:'s',l:'Foto'},{t:'testo',k:'c',l:'Didascalia'}]}},
+      {t:'lista',k:'spec',l:'Caratteristiche principali (elenco con ✓)',agg:'Aggiungi una caratteristica',voce:{t:'testo'}},
+      {t:'lista',k:'chips',l:'Etichette (pillole sotto l’elenco)',agg:'Aggiungi un’etichetta',voce:{t:'testo'},aiuto:'L’icona di ogni etichetta viene scelta in automatico in base al testo.'},
+      {t:'lista',k:'feats',l:'Dettagli (scheda Dettagli)',agg:'Aggiungi un dettaglio',titolo:'t',nuovo:{i:'leaf',t:'',p:''},
+        voce:{t:'gruppo',campi:[{t:'sel',k:'i',l:'Icona',opz:ICONE},{t:'testo',k:'t',l:'Titolo'},{t:'area',k:'p',l:'Testo'}]}},
+      {t:'gruppo',l:'Scheda tecnica',campi:[
+        {t:'area',k:'tecBox',l:'Riquadro blu',righe:2,aiuto:'Scrivi **testo** per il grassetto.'},
+        {t:'tabella',k:'tabella',l:'Tabella tecnica',aiuto:'Le righe titolo fanno da intestazione di gruppo; le celle con «—», «solo multi» o «Multisplit» appaiono in grigio.'},
+        {t:'lista',k:'multi',l:'Sistemi multisplit',agg:'Aggiungi un sistema',voce:{t:'testo'},aiuto:'Se la lista è vuota la riga non compare.'},
+        {t:'area',k:'nota',l:'Nota in fondo',righe:2}]}
+    ];
+
+    var GAL=[];
+    var GRIGIO=/^(—|-|solo multi|multisplit)$/i;
+    function tabellaHTML(tb){
+      var n=tb.intestazioni.length;
+      return '<table class="tt"><thead><tr>'+tb.intestazioni.map(function(c){return '<th>'+esc(c)+'</th>';}).join('')+'</tr></thead><tbody>'
+        +tb.righe.map(function(r){
+          if(r.gruppo!==undefined) return '<tr class="grp"><th colspan="'+n+'">'+esc(r.gruppo)+'</th></tr>';
+          var c=r.celle||[]; var s='<tr><th>'+esc(c[0]==null?'':c[0])+'</th>';
+          for(var i=1;i<n;i++){ var v=c[i]==null?'':String(c[i]); s+='<td'+(GRIGIO.test(v.trim())?' class="na"':'')+'>'+esc(v)+'</td>'; }
+          return s+'</tr>';
+        }).join('')+'</tbody></table>';
+    }
+    function render(D){
+      GAL=D.gallery;
+      document.getElementById('fc-kick').textContent=D.kick;
+      document.getElementById('fc-badge').textContent=D.badge;
+      document.getElementById('fc-titolo').textContent=D.titolo;
+      document.getElementById('fc-mod').textContent=D.mod;
+      var thumbs=D.gallery.map(function(g,i){return '<button type="button" class="t'+(i===0?' on':'')+'" data-i="'+i+'"><span class="pz"><img src="'+g.s+'" alt="'+esc(g.c)+'" loading="lazy"></span></button>';}).join('');
+      var spec=D.spec.map(function(s){return '<li>'+CK+'<span>'+esc(s)+'</span></li>';}).join('');
+      var chips=D.chips.map(function(c){return '<span class="chip">'+ic(c)+esc(c)+'</span>';}).join('');
+      var feats=D.feats.map(function(f){return '<div class="fcard"><h5>'+sv(P[f.i]||P.leaf)+esc(f.t)+'</h5><p>'+esc(f.p)+'</p></div>';}).join('');
+      var tb=D.tabella||{intestazioni:[],righe:[]}, mu=D.multi||[];
+      var tec='<div class="tbox">'+grassetto(D.tecBox)+'</div>'+(tb.righe&&tb.righe.length?('<div class="twrap">'+tabellaHTML(tb)+'</div>'):'')
+        +(mu.length?('<div class="tmulti"><b>Sistema multisplit:</b> '+mu.map(esc).join(' · ')+'</div>'):'')
+        +'<div class="note">'+esc(D.nota)+'</div>';
+      var g0=D.gallery[0]||{s:'',c:''};
+      document.getElementById('stage').innerHTML=''
+        +'<div class="pane on" data-pane="0"><div class="pano">'
+          +'<div class="gal"><div class="main pz ct"><img id="mainimg" src="'+g0.s+'" alt="'+esc(g0.c)+'"></div><div class="thumbs" id="thumbs">'+thumbs+'</div></div>'
+          +'<div class="side"><div class="intro">'+esc(D.intro)+'</div><h4>Caratteristiche principali</h4><ul class="spec">'+spec+'</ul><div class="chips">'+chips+'</div></div>'
+        +'</div></div>'
+        +'<div class="pane" data-pane="1"><div class="feats">'+feats+'</div></div>'
+        +'<div class="pane" data-pane="2"><div class="tec">'+tec+'</div></div>';
+      root.querySelectorAll('.tab').forEach(function(x,i){x.classList.toggle('on',i===0);});
+    }
+
+    root.addEventListener('click',function(e){
+      var tb=e.target.closest('.tab'); if(tb){ var i=tb.getAttribute('data-tab');
+        root.querySelectorAll('.tab').forEach(function(x){x.classList.toggle('on',x===tb);});
+        root.querySelectorAll('.pane').forEach(function(p){p.classList.toggle('on',p.getAttribute('data-pane')===i);}); return; }
+      var th=e.target.closest('.thumbs .t'); if(th){ var idx=+th.getAttribute('data-i'); var g=GAL[idx];
+        var m=document.getElementById('mainimg'); m.src=g.s; m.alt=g.c;
+        document.querySelectorAll('.thumbs .t').forEach(function(x){x.classList.remove('on');}); th.classList.add('on'); return; }
+    });
+    root.addEventListener('contextmenu',function(e){ if(e.target.closest('.pz,img')) e.preventDefault(); });
+    root.addEventListener('dragstart',function(e){ if(e.target.tagName==='IMG') e.preventDefault(); });
+
+    FCKit.avvia({id:'clima-canalizzato',nome:'Climatizzatore canalizzato',dati:DATI,schema:SCHEMA,render:render,ingranaggio:{pos:'br',tono:'chiaro'}});
+  })();
+  </script>
+</div>

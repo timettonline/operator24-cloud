@@ -1,0 +1,1433 @@
+<!-- =====================================================================
+     Frigo Control Ticino — Armadi refrigerati (Everlasting) — APP A SCHERMATA FISSA
+     - App-shell: riempie l'elemento (larghezza x altezza) e NON cresce mai
+     - Home: 5 famiglie (Basic / Master / Classic / Professional / Roll-in)
+     - Ogni famiglia: selettore modelli + foto + specifiche (TN/BT, refrigerante,
+       capacita, dimensioni)
+     - Su Wix: Incorpora HTML -> imposta larghezza e altezza (consigliato ~680px)
+     ===================================================================== -->
+<div id="fc-app">
+  <style>
+  html,body{height:100%;margin:0;padding:0;overflow:hidden}
+  #fc-app *{box-sizing:border-box;margin:0;padding:0}
+  #fc-app{
+    --blu:#0a3d62;--blu2:#1e6091;--accent:#00a8e8;--grigio:#f4f6f8;--bordo:#e3e9ef;--testo:#22303a;--muto:#6b7b88;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    color:var(--testo);position:relative;height:100%;width:100%;overflow:hidden;
+    background:linear-gradient(180deg,#ffffff 0%,#eef4f8 100%);-webkit-tap-highlight-color:transparent;
+  }
+  #fc-app img{max-width:100%;display:block}
+  #fc-app h1,#fc-app h2,#fc-app h3,#fc-app h4,#fc-app h5{color:var(--blu);line-height:1.15}
+  #fc-app .pz{position:relative;overflow:hidden;border-radius:10px;background:#eef2f5}
+  #fc-app .pz img{width:100%;height:100%;object-fit:cover;-webkit-user-drag:none;user-select:none;pointer-events:none}
+  #fc-app .pz.ct img{object-fit:contain;background:#fff}
+  #fc-app .pz::after{content:"";position:absolute;inset:0;z-index:2}
+
+  #fc-app .view{position:absolute;top:0;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:1200px;display:none;flex-direction:column;padding:clamp(12px,2vw,22px);gap:10px}
+  #fc-app .view.on{display:flex;animation:fd .25s ease}
+  @keyframes fd{from{opacity:0}to{opacity:1}}
+
+  /* HOME */
+  #fc-app .kick{letter-spacing:.12em;text-transform:uppercase;font-size:.6rem;font-weight:800;color:var(--accent);text-align:center;flex:0 0 auto}
+  #fc-app .home h1{font-size:clamp(1rem,2.2vw,1.5rem);font-weight:800;text-align:center;flex:0 0 auto}
+  #fc-app .home .sub{text-align:center;color:var(--muto);font-size:.82rem;max-width:680px;margin:0 auto;flex:0 0 auto}
+  #fc-app .cards{flex:1;min-height:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;align-content:center;overflow-y:auto}
+  #fc-app .card{display:flex;flex-direction:column;border:1px solid var(--bordo);border-radius:14px;overflow:hidden;background:#fff;box-shadow:0 8px 22px rgba(10,61,98,.10);cursor:pointer;text-align:left;font:inherit;color:inherit;padding:0}
+  #fc-app .card:hover{box-shadow:0 14px 30px rgba(10,61,98,.18)}
+  #fc-app .card .ph{aspect-ratio:16/10;flex:0 0 auto}
+  #fc-app .card .bd{flex:0 0 auto;padding:10px 13px 12px}
+  #fc-app .badge{display:inline-block;font-size:.56rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;padding:3px 8px;border-radius:999px;color:#fff;background:linear-gradient(135deg,#0a3d62,#1e6091)}
+  #fc-app .card h3{font-size:.92rem;margin:6px 0 2px}
+  #fc-app .card p{font-size:.74rem;color:var(--muto)}
+  #fc-app .card .go{margin-top:5px;font-weight:700;color:var(--accent);font-size:.74rem}
+  #fc-app .foot{flex:0 0 auto;text-align:center;color:var(--muto);font-size:.7rem}
+
+  /* FAMIGLIA */
+  #fc-app .top{flex:0 0 auto;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  #fc-app .back{background:none;border:none;cursor:pointer;color:var(--blu);font-weight:700;font-size:.82rem;display:inline-flex;align-items:center;gap:6px;font-family:inherit;padding:2px 4px}
+  #fc-app .back:hover{color:var(--accent)}
+  #fc-app .top h2{font-size:clamp(.98rem,1.8vw,1.25rem)}
+  #fc-app .fdesc{flex:0 0 auto;font-size:.8rem;color:var(--muto);line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  #fc-app .modelbar{flex:0 0 auto;display:flex;gap:6px;overflow-x:auto;padding-bottom:3px;-webkit-overflow-scrolling:touch}
+  #fc-app .mchip{white-space:nowrap;border:1px solid var(--bordo);background:#fff;border-radius:999px;padding:6px 12px;font-size:.74rem;font-weight:700;color:var(--muto);cursor:pointer;font-family:inherit}
+  #fc-app .mchip.on{background:linear-gradient(135deg,var(--blu),var(--blu2));color:#fff;border-color:transparent}
+  #fc-app .fbody{flex:1;min-height:0;display:grid;grid-template-columns:1.05fr .95fr;gap:16px}
+  @media(max-width:640px){#fc-app .fbody{grid-template-columns:1fr;grid-template-rows:1fr auto;overflow-y:auto}}
+  #fc-app .gal{min-height:0;display:flex;flex-direction:column;gap:8px}
+  #fc-app .gal .main{flex:1;min-height:0}
+  #fc-app .gal .thumbs{flex:0 0 auto;display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
+  #fc-app .gal .thumbs .t{height:46px;border:2px solid transparent;border-radius:7px;overflow:hidden;cursor:pointer;padding:0;background:none}
+  #fc-app .gal .thumbs .t.on{border-color:var(--accent)}
+  #fc-app .gal .thumbs .t .pz,#fc-app .gal .thumbs .t img{height:100%;border-radius:0}
+  #fc-app .fspec{min-height:0;display:flex;flex-direction:column;justify-content:center;overflow:auto}
+  #fc-app .fspec h5{font-size:1rem;margin-bottom:8px}
+  #fc-app .frow{display:flex;justify-content:space-between;gap:14px;padding:9px 0;border-bottom:1px dashed var(--bordo);font-size:.86rem}
+  #fc-app .frow .l{color:var(--muto)}
+  #fc-app .frow .v{font-weight:700;color:var(--blu);text-align:right}
+  #fc-app .rollin{flex:1;min-height:0;display:flex;flex-direction:column;gap:12px}
+  #fc-app .rollin .img{flex:1;min-height:0}
+  #fc-app .rollin p{font-size:.9rem;color:var(--testo);line-height:1.5;flex:0 0 auto}
+  </style>
+
+  <div class="view home on" data-view="home">
+    <div class="kick" id="fc-kick"></div>
+    <h1 id="fc-titolo"></h1>
+    <div class="sub" id="fc-sub"></div>
+    <div class="cards" id="cards"></div>
+    <div class="foot" id="fc-foot"></div>
+  </div>
+
+  <script>
+/* ═══════════════════════════════════════════════════════════════════════════
+   FC-KIT · menu impostazioni per gli embed Frigo Control
+   ───────────────────────────────────────────────────────────────────────────
+   - Legge i contenuti dell'embed da Supabase (tabella "contenuti", una riga
+     per embed). Se il database non risponde, mostra i contenuti predefiniti
+     scritti nel codice: il sito non resta mai vuoto.
+   - Ingranaggio discreto → password → modulo di modifica generato dallo
+     "schema" dell'embed (testi, foto, liste, tabelle).
+   - Salvataggio tramite salva_contenuto(): la password la controlla il DB.
+   - Foto: ottimizzate nel browser (WebP) e caricate nel bucket "media".
+   ═══════════════════════════════════════════════════════════════════════════ */
+(function () {
+  "use strict";
+  if (window.FCKit) return;
+
+  var CFG = { url: "", anon: "", hash: "3d4abbee0f60fb6cd5d6ec850a1007cd1b76b07b1ea68b1eef0b3b2afda76886" };
+  CFG.url = String(CFG.url).replace(/\/+$/, "");
+  var ATTIVO = /^(https:\/\/[^/]+|http:\/\/(localhost|127\.0\.0\.1)(:\d+)?)$/.test(CFG.url) && CFG.anon.length > 30;
+  var BUCKET = "media";
+  var MAXFOTO = 1600;
+
+  /* ── utilità ─────────────────────────────────────────────────────────── */
+  function esc(s) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+  /* testo con **grassetto** e a capo */
+  function ricco(s) {
+    return esc(s).replace(/\*\*([^*]+)\*\*/g, "<b>$1</b>").replace(/\n/g, "<br>");
+  }
+  function clona(o) { return o === undefined ? undefined : JSON.parse(JSON.stringify(o)); }
+  function uguale(a, b) { return JSON.stringify(a) === JSON.stringify(b); }
+  function ora(t) {
+    var d = t ? new Date(t) : new Date();
+    if (isNaN(d)) d = new Date();
+    return d.toLocaleString("it-CH", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" });
+  }
+  function completa(def, db) {
+    if (!db || typeof db !== "object" || Array.isArray(db)) return clona(def);
+    var o = clona(db);
+    for (var k in def) if (Object.prototype.hasOwnProperty.call(def, k) && !(k in o)) o[k] = clona(def[k]);
+    return o;
+  }
+  function pwdLeggi() { try { return sessionStorage.getItem("fck_pwd") || ""; } catch (e) { return ""; } }
+  function pwdScrivi(v) { try { v ? sessionStorage.setItem("fck_pwd", v) : sessionStorage.removeItem("fck_pwd"); } catch (e) {} }
+
+  /* ── rete (REST di Supabase, nessuna libreria) ───────────────────────── */
+  function intestazioni(extra) {
+    var h = { apikey: CFG.anon, Authorization: "Bearer " + CFG.anon };
+    for (var k in extra) h[k] = extra[k];
+    return h;
+  }
+  function leggi(id) {
+    return fetch(CFG.url + "/rest/v1/contenuti?select=dati,aggiornato_il&id=eq." + encodeURIComponent(id), {
+      headers: intestazioni({ Accept: "application/json" }), cache: "no-store"
+    }).then(function (r) {
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      return r.json();
+    }).then(function (a) { return a && a[0] ? a[0] : null; });
+  }
+  function rpc(nome, args) {
+    return fetch(CFG.url + "/rest/v1/rpc/" + nome, {
+      method: "POST",
+      headers: intestazioni({ "Content-Type": "application/json", Accept: "application/json" }),
+      body: JSON.stringify(args)
+    }).then(function (r) {
+      return r.text().then(function (t) {
+        var j = null; try { j = t ? JSON.parse(t) : null; } catch (e) {}
+        if (!r.ok) {
+          var er = new Error((j && (j.message || j.error)) || ("Errore " + r.status));
+          er.codice = j && j.code; throw er;
+        }
+        return j;
+      });
+    });
+  }
+  function caricaFile(blob, id, est, tipo) {
+    var nome = id + "/" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 8) + "." + est;
+    return fetch(CFG.url + "/storage/v1/object/" + BUCKET + "/" + nome, {
+      method: "POST",
+      headers: intestazioni({ "Content-Type": tipo, "x-upsert": "false", "cache-control": "max-age=31536000" }),
+      body: blob
+    }).then(function (r) {
+      if (!r.ok) return r.text().then(function () { throw new Error("caricamento rifiutato (" + r.status + ")"); });
+      return CFG.url + "/storage/v1/object/public/" + BUCKET + "/" + nome;
+    });
+  }
+  function sha256(s) {
+    if (!(window.crypto && crypto.subtle && window.TextEncoder)) return Promise.resolve("");
+    return crypto.subtle.digest("SHA-256", new TextEncoder().encode(s)).then(function (b) {
+      return Array.prototype.map.call(new Uint8Array(b), function (x) { return ("0" + x.toString(16)).slice(-2); }).join("");
+    });
+  }
+  function verifica(p) {
+    if (ATTIVO) return rpc("verifica_password", { p_password: p }).then(function (r) { return r === true; });
+    return sha256(p).then(function (h) { return h === CFG.hash; });
+  }
+
+  /* ── ottimizzazione foto nel browser ─────────────────────────────────── */
+  function ottimizza(file) {
+    return new Promise(function (ok, ko) {
+      if (/svg|gif/i.test(file.type)) return ok({ blob: file, est: /svg/i.test(file.type) ? "svg" : "gif", tipo: file.type });
+      var img = new Image(), u = URL.createObjectURL(file);
+      img.onload = function () {
+        var w = img.naturalWidth, h = img.naturalHeight, r = Math.min(1, MAXFOTO / Math.max(w, h));
+        w = Math.max(1, Math.round(w * r)); h = Math.max(1, Math.round(h * r));
+        var c = document.createElement("canvas"); c.width = w; c.height = h;
+        c.getContext("2d").drawImage(img, 0, 0, w, h);
+        URL.revokeObjectURL(u);
+        c.toBlob(function (b) {
+          if (b && b.type === "image/webp") return ok({ blob: b, est: "webp", tipo: "image/webp" });
+          c.toBlob(function (j) { j ? ok({ blob: j, est: "jpg", tipo: "image/jpeg" }) : ko(new Error("conversione non riuscita")); }, "image/jpeg", 0.86);
+        }, "image/webp", 0.85);
+      };
+      img.onerror = function () { URL.revokeObjectURL(u); ko(new Error("il file non è un'immagine valida")); };
+      img.src = u;
+    });
+  }
+
+  /* ── icone ───────────────────────────────────────────────────────────── */
+  var IC = {
+    gear: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>',
+    lock: '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>',
+    su: "↑", giu: "↓", dup: "⧉", del: "🗑", apri: "▸"
+  };
+
+  /* ── stile del menu (inserito nel documento che lo ospita) ───────────── */
+  var CSS = [
+    ".fck-gear{position:fixed;z-index:2147483000;width:26px;height:26px;padding:0;border-radius:50%;border:1px solid rgba(0,0,0,.08);cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:.22;transition:opacity .2s,transform .3s;box-shadow:0 2px 6px rgba(0,0,0,.12)}",
+    ".fck-gear:hover,.fck-gear:focus-visible{opacity:1;transform:rotate(45deg)}",
+    ".fck-gear svg{width:15px;height:15px}",
+    ".fck-gear.fck-chiaro{background:#fff;color:#4b5b6b}.fck-gear.fck-scuro{background:#141a3a;color:#d7defa;border-color:rgba(255,255,255,.18)}",
+    ".fck-tl{top:6px;left:6px}.fck-tr{top:6px;right:6px}.fck-bl{bottom:6px;left:6px}.fck-br{bottom:6px;right:6px}",
+    ".fck-ov{position:fixed;inset:0;z-index:2147483001;background:rgba(8,20,36,.55);display:flex;align-items:stretch;justify-content:center}",
+    "body.fck-pop{margin:0;background:#eef3f8}",
+    ".fck-pan,.fck-pan *{box-sizing:border-box}",
+    ".fck-pan{--fb:#0b4f8a;--fb2:#1b8ad6;--fg:#eef6fc;--ft:#1c2733;--fm:#6b7c8d;--fl:#dbe7f2;font:14px/1.45 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:var(--ft);background:#fff;width:100%;max-width:1000px;height:100%;display:flex;flex-direction:column;text-align:left;position:relative}",
+    "body.fck-pop .fck-pan{margin:0 auto;min-height:100vh;height:100vh;box-shadow:0 0 30px rgba(6,32,56,.12)}",
+    ".fck-head{flex:0 0 auto;display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 14px;background:var(--fb);color:#fff}",
+    ".fck-tit{flex:1 1 200px;min-width:0;display:flex;flex-direction:column;line-height:1.2}",
+    ".fck-tit b{font-size:15px}.fck-tit span{font-size:12px;opacity:.8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}",
+    ".fck-az{display:flex;gap:6px;flex-wrap:wrap}",
+    ".fck-b{font:600 13px/1 inherit;font-family:inherit;border:0;border-radius:8px;padding:9px 13px;cursor:pointer;background:var(--fg);color:var(--fb);white-space:nowrap}",
+    ".fck-b:hover{filter:brightness(.96)}.fck-b:disabled{opacity:.5;cursor:default}",
+    ".fck-head .fck-b{background:rgba(255,255,255,.16);color:#fff}.fck-head .fck-b.fck-prim{background:#fff;color:var(--fb)}",
+    ".fck-b.fck-prim{background:var(--fb);color:#fff}",
+    ".fck-b.fck-x{width:34px;height:34px;padding:0;font-size:20px;line-height:1}",
+    ".fck-b.fck-del{background:#fdecea;color:#c0392b}",
+    ".fck-pulse{box-shadow:0 0 0 0 rgba(255,255,255,.7);animation:fckp 1.6s infinite}",
+    "@keyframes fckp{70%{box-shadow:0 0 0 8px rgba(255,255,255,0)}100%{box-shadow:0 0 0 0 rgba(255,255,255,0)}}",
+    ".fck-corpo{flex:1 1 auto;min-height:0;overflow:auto;padding:14px;background:#f7fafd}",
+    ".fck-piede{flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 14px;border-top:1px solid var(--fl);font-size:12px;color:var(--fm);background:#fff}",
+    ".fck-ok{color:#2e9e5b}.fck-warn{color:#d98324}.fck-errc{color:#c0392b}",
+    ".fck-login{max-width:320px;margin:30px auto;display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center}",
+    ".fck-lucch{width:48px;height:48px;border-radius:50%;background:var(--fg);color:var(--fb);display:flex;align-items:center;justify-content:center}",
+    ".fck-login p{margin:0;color:var(--fm)}.fck-nota{font-size:12px;background:#fff7ec;border:1px solid #f6dfbf;color:#9a5b12!important;border-radius:8px;padding:8px 10px}",
+    ".fck-err{color:#c0392b;font-weight:600;min-height:18px;font-size:13px}",
+    ".fck-pan input,.fck-pan select,.fck-pan textarea{font:inherit;color:var(--ft);border:1.5px solid var(--fl);border-radius:8px;padding:7px 9px;width:100%;background:#fff}",
+    ".fck-pan input:focus,.fck-pan select:focus,.fck-pan textarea:focus{outline:none;border-color:var(--fb2)}",
+    ".fck-pan textarea{resize:vertical;min-height:60px}",
+    ".fck-login input{text-align:center}",
+    ".fck-f{display:block;margin:0 0 11px}",
+    ".fck-l{display:block;font-size:11.5px;font-weight:700;color:var(--fm);text-transform:uppercase;letter-spacing:.04em;margin:0 0 4px}",
+    ".fck-l em{display:block;font-style:normal;text-transform:none;letter-spacing:0;font-weight:400;font-size:12px;margin-top:1px}",
+    ".fck-gr{border:1.5px solid var(--fl);border-radius:12px;padding:12px 12px 2px;margin:0 0 14px;background:#fff}",
+    ".fck-gr>legend{font-weight:700;font-size:13px;color:var(--fb);padding:0 6px}",
+    ".fck-aiuto{margin:-2px 0 10px;font-size:12px;color:var(--fm)}",
+    ".fck-lista{margin:0 0 14px}",
+    ".fck-lh{display:flex;align-items:center;justify-content:space-between;font-weight:700;font-size:13px;color:var(--fb);margin:0 0 6px}",
+    ".fck-lh i{font-style:normal;font-weight:600;font-size:11px;background:var(--fg);border-radius:999px;padding:2px 8px;margin-left:6px}",
+    ".fck-it{border:1.5px solid var(--fl);border-radius:10px;background:#fff;margin:0 0 6px}",
+    ".fck-it.fck-on{border-color:var(--fb2)}",
+    ".fck-ih{display:flex;align-items:center;gap:6px;padding:6px 8px;cursor:pointer;user-select:none}",
+    ".fck-ih .fck-car{width:16px;color:var(--fm);transition:transform .15s;flex:0 0 auto}",
+    ".fck-it.fck-on>.fck-ih .fck-car{transform:rotate(90deg)}",
+    ".fck-ih .fck-it-t{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600}",
+    ".fck-ih .fck-it-t small{color:var(--fm);font-weight:500;margin-right:6px}",
+    ".fck-ih img{width:30px;height:30px;object-fit:contain;border-radius:5px;background:#fff;border:1px solid var(--fl);flex:0 0 auto}",
+    ".fck-ib{display:none;padding:4px 10px 2px;border-top:1px solid var(--fl)}",
+    ".fck-it.fck-on>.fck-ib{display:block}",
+    ".fck-ic{width:28px;height:28px;flex:0 0 auto;border:1.5px solid var(--fl);border-radius:7px;background:#fff;color:var(--fm);cursor:pointer;font-size:13px;line-height:1;padding:0}",
+    ".fck-ic:hover{border-color:var(--fb2);color:var(--fb)}.fck-ic.fck-icdel:hover{border-color:#c0392b;color:#c0392b}",
+    ".fck-ic:disabled{opacity:.35;cursor:default}",
+    ".fck-add{width:100%;border:1.5px dashed var(--fb2);background:#fff}",
+    ".fck-img{display:flex;gap:8px;align-items:flex-start;flex-wrap:wrap}",
+    ".fck-img .fck-th{width:74px;height:74px;border-radius:8px;border:1.5px solid var(--fl);background:var(--fg) center/contain no-repeat;flex:0 0 auto}",
+    ".fck-img .fck-iw{flex:1 1 220px;min-width:0;display:flex;flex-direction:column;gap:6px}",
+    ".fck-img .fck-ir{display:flex;gap:6px;flex-wrap:wrap}",
+    ".fck-tw{overflow:auto;border:1.5px solid var(--fl);border-radius:10px;background:#fff;margin:0 0 8px}",
+    ".fck-tab{border-collapse:collapse;min-width:100%}",
+    ".fck-tab td,.fck-tab th{border:1px solid var(--fl);padding:3px;vertical-align:middle}",
+    ".fck-tab input{min-width:92px;padding:5px 6px;border-radius:6px;font-size:13px}",
+    ".fck-tab th input{font-weight:700;background:var(--fg)}",
+    ".fck-tab tr.fck-tg input{font-weight:700;background:#e3eefa}",
+    ".fck-tab .fck-tc{white-space:nowrap;width:1%}",
+    ".fck-tab .fck-tc .fck-ic{width:24px;height:24px;font-size:12px;margin:0 1px}",
+    ".fck-trow{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 14px}",
+    ".fck-trow .fck-b{padding:7px 10px;font-size:12px}",
+    ".fck-dlg{position:absolute;inset:0;z-index:5;background:rgba(8,20,36,.45);display:flex;align-items:center;justify-content:center;padding:16px}",
+    ".fck-dlg>div{background:#fff;border-radius:12px;max-width:420px;width:100%;padding:18px;box-shadow:0 12px 40px rgba(0,0,0,.25)}",
+    ".fck-dlg p{margin:0 0 14px}.fck-dlg .fck-az{justify-content:flex-end}",
+    ".fck-ver{max-width:620px;margin:0 auto}",
+    ".fck-ver h3{margin:0 0 4px;font-size:16px;color:var(--fb)}.fck-ver>p{margin:0 0 12px;color:var(--fm);font-size:13px}",
+    ".fck-vi{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 12px;border:1.5px solid var(--fl);border-radius:10px;background:#fff;margin:0 0 6px}",
+    "@media (max-width:560px){.fck-head{padding:8px 10px}.fck-b{padding:8px 10px;font-size:12px}.fck-corpo{padding:10px}}"
+  ].join("\n");
+
+  function stile(doc) {
+    if (doc.getElementById("fck-stile")) return;
+    var s = doc.createElement("style"); s.id = "fck-stile"; s.textContent = CSS;
+    (doc.head || doc.documentElement).appendChild(s);
+  }
+
+  /* ── valore predefinito di una voce nuova ────────────────────────────── */
+  function vuoto(f) {
+    if (!f) return "";
+    if (f.nuovo !== undefined) return clona(typeof f.nuovo === "function" ? f.nuovo() : f.nuovo);
+    if (f.t === "gruppo") { var o = {}; (f.campi || []).forEach(function (c) { if (c.k) o[c.k] = vuoto(c); else if (c.t === "gruppo") { var x = vuoto(c); for (var z in x) o[z] = x[z]; } }); return o; }
+    if (f.t === "lista") return [];
+    if (f.t === "tabella") return { intestazioni: ["", ""], righe: [] };
+    if (f.t === "num") return 0;
+    if (f.t === "si") return false;
+    if (f.t === "sel") return f.opz && f.opz[0] ? f.opz[0][0] : "";
+    return "";
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════════
+     MODULO DI MODIFICA (costruito dentro il documento ospite: iframe o finestra)
+     ═══════════════════════════════════════════════════════════════════════ */
+  function Editor(st, doc, box, chiudi) {
+    var win = doc.defaultView || window;
+    function el(tag, cls, html) {
+      var e = doc.createElement(tag);
+      if (cls) e.className = cls;
+      if (html != null) e.innerHTML = html;
+      return e;
+    }
+    function btn(cls, html, titolo) {
+      var b = el("button", cls, html); b.type = "button"; if (titolo) b.title = titolo; return b;
+    }
+
+    box.innerHTML = "";
+    var pan = el("div", "fck-pan"); box.appendChild(pan);
+    var head = el("div", "fck-head"); pan.appendChild(head);
+    head.appendChild(el("div", "fck-tit", "<b>Modifica contenuti</b><span>" + esc(st.cfg.nome) + "</span>"));
+    var azioni = el("div", "fck-az"); head.appendChild(azioni);
+    var bx = btn("fck-b fck-x", "×", "Chiudi"); head.appendChild(bx);
+    var corpo = el("div", "fck-corpo"); pan.appendChild(corpo);
+    var piede = el("div", "fck-piede"); pan.appendChild(piede);
+    var msg = el("span", "fck-msg"); piede.appendChild(msg);
+    var bEsci = btn("fck-b", "Esci", "Esci dal menu impostazioni"); bEsci.style.display = "none"; piede.appendChild(bEsci);
+
+    var sporco = false;
+    function info(h) { msg.innerHTML = h || ""; }
+    function stato() {
+      return ATTIVO ? '<span class="fck-ok">●</span> Database collegato'
+                    : '<span class="fck-warn">●</span> Modalità locale: database non collegato, le modifiche restano un\'anteprima';
+    }
+
+    /* finestra di conferma interna (le finestre native possono essere bloccate da Wix) */
+    function chiedi(testo, si, no) {
+      return new Promise(function (ok) {
+        var d = el("div", "fck-dlg"), c = el("div");
+        c.appendChild(el("p", null, esc(testo)));
+        var az = el("div", "fck-az");
+        var bn = btn("fck-b", esc(no || "Annulla")), bs = btn("fck-b fck-prim", esc(si || "Conferma"));
+        az.appendChild(bn); az.appendChild(bs); c.appendChild(az); d.appendChild(c); pan.appendChild(d);
+        bn.onclick = function () { d.remove(); ok(false); };
+        bs.onclick = function () { d.remove(); ok(true); };
+        setTimeout(function () { bs.focus(); }, 30);
+      });
+    }
+
+    bx.onclick = function () {
+      if (!sporco) return chiudi();
+      chiedi("Ci sono modifiche non salvate. Chiudere senza salvare?", "Chiudi senza salvare", "Resta").then(function (s) { if (s) chiudi(); });
+    };
+    bEsci.onclick = function () {
+      function esci() { pwdScrivi(""); st.pwd = ""; sporco = false; vistaLogin(); }
+      if (!sporco) return esci();
+      chiedi("Ci sono modifiche non salvate. Uscire senza salvare?", "Esci", "Resta").then(function (s) { if (s) esci(); });
+    };
+
+    /* ── accesso ── */
+    function vistaLogin(errore) {
+      azioni.innerHTML = ""; corpo.innerHTML = ""; bEsci.style.display = "none";
+      var f = el("form", "fck-login");
+      f.innerHTML = '<div class="fck-lucch">' + IC.lock + "</div>" +
+        "<p>Inserisci la password per modificare questa sezione del sito.</p>" +
+        '<input type="password" autocomplete="current-password" placeholder="Password">' +
+        '<div class="fck-err">' + esc(errore || "") + "</div>" +
+        '<button class="fck-b fck-prim" type="submit">Entra</button>' +
+        (ATTIVO ? "" : '<p class="fck-nota">Il database non è ancora collegato: puoi provare le modifiche in anteprima, ma non verranno pubblicate per gli altri visitatori.</p>');
+      corpo.appendChild(f);
+      var inp = f.querySelector("input"), err = f.querySelector(".fck-err"), bt = f.querySelector("button");
+      setTimeout(function () { inp.focus(); }, 60);
+      f.onsubmit = function (e) {
+        e.preventDefault();
+        var p = inp.value; if (!p) return;
+        bt.disabled = true; err.textContent = ""; info("Verifica in corso…");
+        verifica(p).then(function (ok) {
+          bt.disabled = false;
+          if (ok) { pwdScrivi(p); st.pwd = p; vistaEditor(); }
+          else { err.textContent = "Password errata"; inp.value = ""; inp.focus(); info(stato()); }
+        }).catch(function (e2) { bt.disabled = false; err.textContent = "Connessione non riuscita (" + e2.message + ")"; info(stato()); });
+      };
+      info(stato());
+    }
+
+    /* ── editor ── */
+    var bozza;
+    function vistaEditor() {
+      bozza = clona(st.dati); sporco = false;
+      azioni.innerHTML = ""; bEsci.style.display = "";
+      var bVer = btn("fck-b", "Versioni", "Versioni precedenti e contenuto originale");
+      var bAnn = btn("fck-b", "Annulla modifiche", "Torna all'ultima versione pubblicata");
+      var bSal = btn("fck-b fck-prim", ATTIVO ? "Salva e pubblica" : "Applica anteprima");
+      azioni.appendChild(bVer); azioni.appendChild(bAnn); azioni.appendChild(bSal);
+
+      function segna() {
+        if (!sporco) { sporco = true; bSal.classList.add("fck-pulse"); }
+        info('<span class="fck-warn">●</span> Modifiche non ancora salvate');
+      }
+      function disegna() {
+        corpo.innerHTML = "";
+        var form = el("div", "fck-form"); corpo.appendChild(form);
+        campi(st.cfg.schema, bozza, form);
+      }
+      var ctx = { segna: segna };
+
+      /* — campi — */
+      function campi(lista, obj, cont) { lista.forEach(function (f) { campo(f, obj, cont); }); }
+      function campo(f, obj, cont) {
+        if (f.t === "gruppo") {
+          var tgt = obj;
+          if (f.k) { if (!obj[f.k] || typeof obj[f.k] !== "object") obj[f.k] = vuoto(f); tgt = obj[f.k]; }
+          var g = el("fieldset", "fck-gr");
+          if (f.l) g.appendChild(el("legend", null, esc(f.l)));
+          if (f.aiuto) g.appendChild(el("p", "fck-aiuto", esc(f.aiuto)));
+          campi(f.campi, tgt, g); cont.appendChild(g); return;
+        }
+        if (f.t === "lista") return lista(f, obj, cont);
+        if (f.t === "tabella") return tabella(f, obj, cont);
+        if (obj[f.k] === undefined) obj[f.k] = vuoto(f);
+        var w = el("div", "fck-f");
+        w.appendChild(el("span", "fck-l", esc(f.l) + (f.aiuto ? "<em>" + esc(f.aiuto) + "</em>" : "")));
+        w.appendChild(input(f, function () { return obj[f.k]; }, function (v) { obj[f.k] = v; }));
+        cont.appendChild(w);
+      }
+      function input(f, get, set) {
+        var i;
+        if (f.t === "img") return immagine(f, get, set);
+        if (f.t === "area") {
+          i = el("textarea"); i.rows = f.righe || 3; i.value = get() == null ? "" : get();
+          i.oninput = function () { set(i.value); ctx.segna(); };
+          return i;
+        }
+        if (f.t === "sel") {
+          i = el("select");
+          (f.opz || []).forEach(function (o) { var op = el("option", null, esc(o[1])); op.value = o[0]; i.appendChild(op); });
+          i.value = get(); if (i.value !== get() && f.opz && f.opz[0]) { i.value = f.opz[0][0]; }
+          i.onchange = function () { set(i.value); ctx.segna(); };
+          return i;
+        }
+        if (f.t === "si") {
+          var lab = el("label", null); i = el("input"); i.type = "checkbox"; i.style.width = "auto"; i.checked = !!get();
+          i.onchange = function () { set(i.checked); ctx.segna(); };
+          lab.appendChild(i); lab.appendChild(doc.createTextNode(" " + (f.testo || "Sì"))); return lab;
+        }
+        i = el("input"); i.type = f.t === "num" ? "number" : f.t === "link" ? "url" : "text";
+        if (f.ph) i.placeholder = f.ph;
+        i.value = get() == null ? "" : get();
+        i.oninput = function () { set(f.t === "num" ? (i.value === "" ? 0 : Number(i.value)) : i.value); ctx.segna(); };
+        return i;
+      }
+      function immagine(f, get, set) {
+        var w = el("div", "fck-img");
+        var th = el("div", "fck-th"); w.appendChild(th);
+        var iw = el("div", "fck-iw"); w.appendChild(iw);
+        var url = el("input"); url.type = "url";
+        function mostraUrl() {
+          var v = get() || "", dentro = /^data:/.test(v);
+          url.value = dentro ? "" : v;
+          url.placeholder = dentro ? "Foto incorporata nel codice — per cambiarla carica una foto o incolla un indirizzo"
+                                   : "Indirizzo dell'immagine (https://…)";
+        }
+        mostraUrl();
+        var ir = el("div", "fck-ir");
+        var bc = btn("fck-b", "Carica foto dal computer");
+        var fi = el("input"); fi.type = "file"; fi.accept = "image/*"; fi.style.display = "none";
+        ir.appendChild(bc); ir.appendChild(fi);
+        iw.appendChild(url); iw.appendChild(ir);
+        var nota = el("span", "fck-aiuto"); iw.appendChild(nota);
+        function anteprima() { var v = get(); th.style.backgroundImage = v ? 'url("' + String(v).replace(/"/g, "%22") + '")' : "none"; }
+        anteprima();
+        url.oninput = function () { if (!url.value.trim() && /^data:/.test(get() || "")) return; set(url.value.trim()); anteprima(); ctx.segna(); };
+        bc.onclick = function () { fi.click(); };
+        fi.onchange = function () {
+          var file = fi.files && fi.files[0]; fi.value = "";
+          if (!file) return;
+          if (!/^image\//.test(file.type)) { nota.innerHTML = '<span class="fck-errc">Il file scelto non è un\'immagine.</span>'; return; }
+          bc.disabled = true; nota.textContent = "Ottimizzazione e caricamento…";
+          ottimizza(file).then(function (o) {
+            if (!ATTIVO) {
+              return new Promise(function (ok) {
+                var r = new FileReader(); r.onload = function () { ok(r.result); }; r.readAsDataURL(o.blob);
+              }).then(function (du) { nota.innerHTML = '<span class="fck-warn">Anteprima locale: la foto verrà caricata davvero quando il database sarà collegato.</span>'; return du; });
+            }
+            return caricaFile(o.blob, st.cfg.id, o.est, o.tipo).then(function (u) { nota.innerHTML = '<span class="fck-ok">Foto caricata ✓</span> ricordati di premere <b>Salva e pubblica</b>.'; return u; });
+          }).then(function (u) {
+            set(u); mostraUrl(); anteprima(); ctx.segna(); bc.disabled = false;
+          }).catch(function (e) { bc.disabled = false; nota.innerHTML = '<span class="fck-errc">Errore: ' + esc(e.message) + "</span>"; });
+        };
+        return w;
+      }
+
+      /* — liste — */
+      function lista(f, obj, cont) {
+        if (!Array.isArray(obj[f.k])) obj[f.k] = [];
+        var arr = obj[f.k];
+        var box2 = el("div", "fck-lista");
+        var hd = el("div", "fck-lh", "<span>" + esc(f.l) + "<i></i></span>");
+        box2.appendChild(hd);
+        if (f.aiuto) box2.appendChild(el("p", "fck-aiuto", esc(f.aiuto)));
+        var items = el("div"); box2.appendChild(items);
+        var add = btn("fck-b fck-add", "+ " + esc(f.agg || "Aggiungi")); box2.appendChild(add);
+        var aperti = arr.map(function () { return false; });
+        var primitivo = !f.voce || f.voce.t !== "gruppo";
+
+        function etichetta(it, i) {
+          var t = "";
+          if (typeof f.titolo === "function") t = f.titolo(it, i);
+          else if (f.titolo && it && typeof it === "object") t = it[f.titolo];
+          else if (typeof it === "string" && (!f.voce || f.voce.t !== "img")) t = it;
+          t = String(t == null ? "" : t).replace(/\*\*/g, "").trim();
+          return t || "(senza titolo)";
+        }
+        function miniatura(it) {
+          var u = f.miniatura ? (typeof f.miniatura === "function" ? f.miniatura(it) : it && it[f.miniatura]) : (f.voce && f.voce.t === "img" ? it : "");
+          return u ? '<img alt="" src="' + esc(u) + '">' : "";
+        }
+        function disegna() {
+          items.innerHTML = "";
+          hd.querySelector("i").textContent = arr.length;
+          add.disabled = !!(f.max && arr.length >= f.max);
+          arr.forEach(function (it, i) {
+            var c = el("div", "fck-it" + (aperti[i] ? " fck-on" : ""));
+            var h = el("div", "fck-ih");
+            var t = el("span", "fck-it-t");
+            function titola() { t.innerHTML = "<small>" + (i + 1) + ".</small>" + esc(etichetta(arr[i], i)); }
+            titola();
+            h.appendChild(el("span", "fck-car", IC.apri));
+            var mi = miniatura(it); if (mi) h.insertAdjacentHTML("beforeend", mi);
+            h.appendChild(t);
+            var bs = btn("fck-ic", IC.su, "Sposta su"), bg = btn("fck-ic", IC.giu, "Sposta giù"),
+                bd = btn("fck-ic", IC.dup, "Duplica"), be = btn("fck-ic fck-icdel", IC.del, "Elimina");
+            bs.disabled = i === 0; bg.disabled = i === arr.length - 1;
+            if (f.max && arr.length >= f.max) bd.disabled = true;
+            if (f.min && arr.length <= f.min) be.disabled = true;
+            [bs, bg, bd, be].forEach(function (b) { h.appendChild(b); });
+            c.appendChild(h);
+            var b = el("div", "fck-ib");
+            if (primitivo) {
+              var w = el("div", "fck-f");
+              w.appendChild(input(f.voce || { t: "testo" }, function () { return arr[i]; }, function (v) { arr[i] = v; }));
+              b.appendChild(w);
+            } else {
+              campi(f.voce.campi, arr[i], b);
+            }
+            b.addEventListener("input", titola); b.addEventListener("change", titola);
+            c.appendChild(b);
+            h.onclick = function (e) {
+              if (e.target.closest("button")) return;
+              aperti[i] = !aperti[i]; c.classList.toggle("fck-on", aperti[i]);
+            };
+            function scambia(a, z) {
+              var x = arr[a]; arr[a] = arr[z]; arr[z] = x;
+              var y = aperti[a]; aperti[a] = aperti[z]; aperti[z] = y;
+              ctx.segna(); disegna();
+            }
+            bs.onclick = function () { scambia(i, i - 1); };
+            bg.onclick = function () { scambia(i, i + 1); };
+            bd.onclick = function () { arr.splice(i + 1, 0, clona(arr[i])); aperti.splice(i + 1, 0, true); ctx.segna(); disegna(); };
+            be.onclick = function () {
+              chiedi('Eliminare "' + etichetta(arr[i], i) + '"?', "Elimina").then(function (s) {
+                if (!s) return; arr.splice(i, 1); aperti.splice(i, 1); ctx.segna(); disegna();
+              });
+            };
+            items.appendChild(c);
+          });
+        }
+        add.onclick = function () {
+          arr.push(vuoto(f.voce ? (primitivo ? f.voce : f.voce) : { t: "testo" }));
+          if (f.nuovo !== undefined) arr[arr.length - 1] = clona(typeof f.nuovo === "function" ? f.nuovo() : f.nuovo);
+          aperti.push(true); ctx.segna(); disegna();
+        };
+        disegna();
+        cont.appendChild(box2);
+      }
+
+      /* — tabelle: {intestazioni:[…], righe:[{gruppo:"…"} | {celle:[…]}]} — */
+      function tabella(f, obj, cont) {
+        if (!obj[f.k] || typeof obj[f.k] !== "object") obj[f.k] = { intestazioni: ["", ""], righe: [] };
+        var tb = obj[f.k];
+        if (!Array.isArray(tb.intestazioni)) tb.intestazioni = [];
+        if (!Array.isArray(tb.righe)) tb.righe = [];
+        var wrap = el("div", "fck-lista");
+        wrap.appendChild(el("div", "fck-lh", "<span>" + esc(f.l) + "</span>"));
+        if (f.aiuto) wrap.appendChild(el("p", "fck-aiuto", esc(f.aiuto)));
+        var tw = el("div", "fck-tw"); wrap.appendChild(tw);
+        var bar = el("div", "fck-trow"); wrap.appendChild(bar);
+        var bR = btn("fck-b", "+ Riga"), bG = btn("fck-b", "+ Riga titolo"), bC = btn("fck-b", "+ Colonna"), bCm = btn("fck-b", "− Ultima colonna");
+        [bR, bG, bC, bCm].forEach(function (b) { bar.appendChild(b); });
+        function cella(get, set) {
+          var i = el("input"); i.type = "text"; i.value = get() == null ? "" : get();
+          i.oninput = function () { set(i.value); ctx.segna(); };
+          return i;
+        }
+        function disegna() {
+          var n = tb.intestazioni.length;
+          var t = el("table", "fck-tab");
+          var tr = el("tr");
+          tb.intestazioni.forEach(function (_, c) {
+            var th = el("th"); th.appendChild(cella(function () { return tb.intestazioni[c]; }, function (v) { tb.intestazioni[c] = v; })); tr.appendChild(th);
+          });
+          tr.appendChild(el("th", "fck-tc")); t.appendChild(tr);
+          tb.righe.forEach(function (r, ri) {
+            var row = el("tr", r.gruppo !== undefined ? "fck-tg" : "");
+            if (r.gruppo !== undefined) {
+              var td = el("td"); td.colSpan = n;
+              td.appendChild(cella(function () { return r.gruppo; }, function (v) { r.gruppo = v; }));
+              row.appendChild(td);
+            } else {
+              if (!Array.isArray(r.celle)) r.celle = [];
+              for (var c = 0; c < n; c++) (function (c) {
+                var td2 = el(c === 0 ? "th" : "td");
+                td2.appendChild(cella(function () { return r.celle[c]; }, function (v) { r.celle[c] = v; }));
+                row.appendChild(td2);
+              })(c);
+            }
+            var tc = el("td", "fck-tc");
+            var bs = btn("fck-ic", IC.su, "Sposta su"), bg = btn("fck-ic", IC.giu, "Sposta giù"), be = btn("fck-ic fck-icdel", IC.del, "Elimina riga");
+            bs.disabled = ri === 0; bg.disabled = ri === tb.righe.length - 1;
+            bs.onclick = function () { var x = tb.righe[ri]; tb.righe[ri] = tb.righe[ri - 1]; tb.righe[ri - 1] = x; ctx.segna(); disegna(); };
+            bg.onclick = function () { var x = tb.righe[ri]; tb.righe[ri] = tb.righe[ri + 1]; tb.righe[ri + 1] = x; ctx.segna(); disegna(); };
+            be.onclick = function () { chiedi("Eliminare questa riga della tabella?", "Elimina").then(function (s) { if (s) { tb.righe.splice(ri, 1); ctx.segna(); disegna(); } }); };
+            tc.appendChild(bs); tc.appendChild(bg); tc.appendChild(be); row.appendChild(tc);
+            t.appendChild(row);
+          });
+          tw.innerHTML = ""; tw.appendChild(t);
+          bCm.disabled = n <= 1;
+        }
+        bR.onclick = function () { tb.righe.push({ celle: tb.intestazioni.map(function () { return ""; }) }); ctx.segna(); disegna(); };
+        bG.onclick = function () { tb.righe.push({ gruppo: "Nuovo gruppo" }); ctx.segna(); disegna(); };
+        bC.onclick = function () { tb.intestazioni.push(""); tb.righe.forEach(function (r) { if (r.celle) r.celle.push(""); }); ctx.segna(); disegna(); };
+        bCm.onclick = function () {
+          chiedi("Eliminare l'ultima colonna della tabella?", "Elimina").then(function (s) {
+            if (!s) return; tb.intestazioni.pop(); tb.righe.forEach(function (r) { if (r.celle) r.celle.pop(); }); ctx.segna(); disegna();
+          });
+        };
+        disegna();
+        cont.appendChild(wrap);
+      }
+
+      /* — azioni — */
+      bAnn.onclick = function () {
+        if (!sporco) { info("Nessuna modifica da annullare"); return; }
+        chiedi("Annullare tutte le modifiche non salvate?", "Annulla le modifiche", "No").then(function (s) {
+          if (!s) return; bozza = clona(st.dati); sporco = false; bSal.classList.remove("fck-pulse"); disegna(); info(stato());
+        });
+      };
+      bSal.onclick = function () {
+        /* prova il nuovo contenuto sul widget prima di pubblicarlo */
+        try { st.cfg.render(clona(bozza)); }
+        catch (e) {
+          try { st.cfg.render(clona(st.dati)); } catch (e2) {}
+          info('<span class="fck-errc">● Il contenuto non è valido (' + esc(e.message) + "): non è stato salvato.</span>");
+          return;
+        }
+        if (!ATTIVO) {
+          st.dati = clona(bozza); sporco = false; bSal.classList.remove("fck-pulse");
+          info('<span class="fck-warn">●</span> Anteprima applicata solo su questo browser (database non collegato)');
+          return;
+        }
+        bSal.disabled = true; info("Pubblicazione in corso…");
+        rpc("salva_contenuto", { p_id: st.cfg.id, p_dati: bozza, p_password: st.pwd }).then(function (t) {
+          st.dati = clona(bozza); sporco = false; bSal.disabled = false; bSal.classList.remove("fck-pulse");
+          info('<span class="fck-ok">●</span> Pubblicato il ' + ora(t) + " — lo vedono tutti i visitatori");
+        }).catch(function (e) {
+          bSal.disabled = false;
+          try { st.cfg.render(clona(st.dati)); } catch (e2) {}
+          if (/password/i.test(e.message)) { pwdScrivi(""); st.pwd = ""; vistaLogin("Password non più valida: accedi di nuovo"); return; }
+          info('<span class="fck-errc">● Salvataggio non riuscito: ' + esc(e.message) + "</span>");
+        });
+      };
+      bVer.onclick = function () { vistaVersioni(); };
+
+      function vistaVersioni() {
+        corpo.innerHTML = "";
+        var v = el("div", "fck-ver"); corpo.appendChild(v);
+        v.appendChild(el("h3", null, "Versioni precedenti"));
+        v.appendChild(el("p", null, "Scegli una versione da riaprire. Viene caricata nel modulo: diventa visibile a tutti solo quando premi «Salva e pubblica»."));
+        var torna = btn("fck-b", "← Torna al modulo"); torna.style.marginBottom = "12px"; v.appendChild(torna);
+        torna.onclick = disegna;
+        function voce(testo, azione) {
+          var r = el("div", "fck-vi"); r.appendChild(el("span", null, testo));
+          var b = btn("fck-b", "Apri"); r.appendChild(b); b.onclick = azione; v.appendChild(r); return b;
+        }
+        voce("<b>Contenuto originale</b> (quello di partenza scritto nel codice)", function () {
+          bozza = clona(st.cfg.dati); segna(); disegna();
+          info('<span class="fck-warn">●</span> Caricato il contenuto originale: premi «Salva e pubblica» per rimetterlo online');
+        });
+        if (!ATTIVO) { v.appendChild(el("p", null, "Lo storico dei salvataggi sarà disponibile quando il database sarà collegato.")); return; }
+        var att = el("p", null, "Caricamento dello storico…"); v.appendChild(att);
+        rpc("versioni_contenuto", { p_id: st.cfg.id, p_password: st.pwd }).then(function (lista) {
+          att.remove();
+          if (!lista || !lista.length) { v.appendChild(el("p", null, "Non ci sono ancora salvataggi precedenti.")); return; }
+          lista.forEach(function (x) {
+            voce("Versione salvata prima del " + esc(ora(x.salvato_il)), function () {
+              rpc("leggi_versione", { p_n: x.n, p_password: st.pwd }).then(function (d) {
+                if (!d) return;
+                bozza = completa(st.cfg.dati, d); segna(); disegna();
+                info('<span class="fck-warn">●</span> Versione caricata: premi «Salva e pubblica» per rimetterla online');
+              }).catch(function (e) { info('<span class="fck-errc">● ' + esc(e.message) + "</span>"); });
+            });
+          });
+        }).catch(function (e) { att.innerHTML = '<span class="fck-errc">Storico non disponibile: ' + esc(e.message) + "</span>"; });
+      }
+
+      disegna();
+      info(stato());
+    }
+
+    /* accesso automatico se la password è già stata inserita in questa scheda */
+    var memo = pwdLeggi();
+    if (memo) {
+      info("Accesso in corso…");
+      verifica(memo).then(function (ok) {
+        if (ok) { st.pwd = memo; vistaEditor(); } else { pwdScrivi(""); vistaLogin(); }
+      }).catch(function () { vistaLogin(); });
+    } else vistaLogin();
+  }
+
+  /* ── apertura del menu: dentro l'embed se c'è spazio, altrimenti finestra ── */
+  function apri(st) {
+    if (st.finestra && !st.finestra.closed) { try { st.finestra.focus(); } catch (e) {} return; }
+    if (st.ov && st.ov.parentNode) return;
+    var stretto = window.innerHeight < 470 || window.innerWidth < 340;
+    if (stretto) {
+      var w = null;
+      try { w = window.open("", "fck_" + st.cfg.id, "width=1000,height=820,scrollbars=yes,resizable=yes"); } catch (e) {}
+      if (w) {
+        try {
+          /* se il browser non ci lascia scrivere nella finestra (iframe isolato), si ripiega sotto */
+          var d = w.document;
+          d.open();
+          d.write('<!doctype html><html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Modifica · ' + esc(st.cfg.nome) + '</title></head><body class="fck-pop"></body></html>');
+          d.close();
+          stile(d);
+          st.finestra = w;
+          Editor(st, d, d.body, function () { try { w.close(); } catch (e) {} st.finestra = null; });
+          return;
+        } catch (e) {
+          try { w.close(); } catch (e2) {}
+          st.finestra = null;
+        }
+      }
+    }
+    var ov = document.createElement("div"); ov.className = "fck-ov";
+    document.body.appendChild(ov); st.ov = ov;
+    Editor(st, document, ov, function () { ov.remove(); st.ov = null; });
+  }
+
+  function ingranaggio(st) {
+    var g = st.cfg.ingranaggio || {};
+    var b = document.createElement("button");
+    b.type = "button";
+    b.className = "fck-gear fck-" + (g.pos || "br") + " fck-" + (g.tono || "chiaro");
+    b.title = "Impostazioni contenuti";
+    b.setAttribute("aria-label", "Impostazioni contenuti");
+    b.innerHTML = IC.gear;
+    b.onclick = function (e) { e.preventDefault(); e.stopPropagation(); apri(st); };
+    document.body.appendChild(b);
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════════
+     AVVIO DI UN EMBED
+     cfg = { id, nome, dati (predefiniti), schema, render(dati), ingranaggio:{pos,tono}, attesa }
+     ═══════════════════════════════════════════════════════════════════════ */
+  function avvia(cfg) {
+    var st = { cfg: cfg, dati: null, mostrato: false, pwd: "" };
+    function mostra(d) {
+      try { cfg.render(d); st.dati = d; }
+      catch (e) {
+        console.error("[FC] contenuto non valido, uso quello predefinito", e);
+        st.dati = clona(cfg.dati); cfg.render(st.dati);
+      }
+      st.mostrato = true;
+    }
+    function parti() {
+      stile(document);
+      if (!ATTIVO) mostra(clona(cfg.dati));
+      else {
+        var timer = setTimeout(function () { if (!st.mostrato) mostra(clona(cfg.dati)); }, cfg.attesa || 1500);
+        leggi(cfg.id).then(function (r) {
+          clearTimeout(timer);
+          var d = r ? completa(cfg.dati, r.dati) : clona(cfg.dati);
+          if (!st.mostrato || !uguale(d, st.dati)) mostra(d);
+        }).catch(function (e) {
+          clearTimeout(timer);
+          console.warn("[FC] database non raggiungibile, uso i contenuti predefiniti", e);
+          if (!st.mostrato) mostra(clona(cfg.dati));
+        });
+      }
+      ingranaggio(st);
+    }
+    if (document.body) parti(); else document.addEventListener("DOMContentLoaded", parti);
+    return { dati: function () { return st.dati; } };
+  }
+
+  window.FCKit = {
+    avvia: avvia, esc: esc, ricco: ricco, clona: clona, attivo: ATTIVO,
+    /* funzioni di base per embed con un pannello proprio (es. galleria) */
+    rete: { leggi: leggi, rpc: rpc, caricaFile: caricaFile, verifica: verifica, ottimizza: ottimizza,
+            pwdLeggi: pwdLeggi, pwdScrivi: pwdScrivi }
+  };
+})();
+
+</script>
+  <script>
+  (function(){
+    var root=document.getElementById('fc-app');
+    if(root.dataset.init) return; root.dataset.init='1';
+    function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+    /* Contenuti predefiniti (quelli attualmente online) */
+    var DATI={
+ "home": {
+  "kick": "Frigo Control Ticino · Everlasting",
+  "titolo": "Armadi refrigerati professionali",
+  "sub": "Armadi frigo per ristorazione e attività commerciali: robusti, efficienti e curati nei dettagli. Scegli la gamma.",
+  "foot": "Refrigerante R290 Green · TN e BT · Sopralluogo e assistenza in Ticino"
+ },
+ "famiglie": [
+  {
+   "name": "Basic",
+   "card": "https://frigocontrolch.10web.me/wp-content/uploads/2025/09/basic-700-1.webp",
+   "desc": "Affidabili e duraturi, dal design minimale e finiture essenziali. La loro forza è la semplicità: manutenzione, pulizia e sostituzione dell’unità monoblocco facili e rapide.",
+   "models": [
+    {
+     "name": "Basic 700",
+     "imgs": [
+      "https://frigocontrolch.10web.me/wp-content/uploads/2025/09/basic-700-1.webp",
+      "https://frigocontrolch.10web.me/wp-content/uploads/2025/09/basic-700-2.webp"
+     ],
+     "specs": [
+      {
+       "l": "Temperatura TN",
+       "v": "−2°C / +10°C"
+      },
+      {
+       "l": "Temperatura BT",
+       "v": "−10°C / −20°C"
+      },
+      {
+       "l": "Refrigerante",
+       "v": "R290 Green"
+      },
+      {
+       "l": "Capacità",
+       "v": "625 L"
+      },
+      {
+       "l": "Dimensioni",
+       "v": "L 750 × P 815 × H 2080 mm"
+      }
+     ]
+    },
+    {
+     "name": "Basic 1500",
+     "imgs": [
+      "https://frigocontrolch.10web.me/wp-content/uploads/2025/09/basic-1500-1.webp",
+      "https://frigocontrolch.10web.me/wp-content/uploads/2025/09/basic-1500-2.webp"
+     ],
+     "specs": [
+      {
+       "l": "Temperatura TN",
+       "v": "−2°C / +10°C"
+      },
+      {
+       "l": "Temperatura BT",
+       "v": "−10°C / −20°C"
+      },
+      {
+       "l": "Refrigerante",
+       "v": "R290 Green"
+      },
+      {
+       "l": "Capacità",
+       "v": "1365 L"
+      },
+      {
+       "l": "Dimensioni",
+       "v": "L 1500 × P 815 × H 2080 mm"
+      }
+     ]
+    }
+   ],
+   "banner": "",
+   "text": ""
+  },
+  {
+   "name": "Master",
+   "card": "https://frigocontrolch.10web.me/wp-content/uploads/2025/09/master-700-glass-1.webp",
+   "desc": "Funzioni tecnologicamente avanzate, performance ed efficienza elevate. Totale personalizzazione interna ed esterna, design elegante: ideale per cucine e laboratori a vista.",
+   "models": [
+    {
+     "name": "Master 700",
+     "imgs": [
+      "https://frigocontrolch.10web.me/wp-content/uploads/2025/09/master-700-1.webp",
+      "https://frigocontrolch.10web.me/wp-content/uploads/2025/09/master-700-2.webp"
+     ],
+     "specs": [
+      {
+       "l": "Temperatura TN",
+       "v": "−2°C / +10°C"
+      },
+      {
+       "l": "Temperatura BT",
+       "v": "−10°C / −22°C"
+      },
+      {
+       "l": "Refrigerante",
+       "v": "R290 Green"
+      },
+      {
+       "l": "Capacità",
+       "v": "625 L"
+      },
+      {
+       "l": "Dimensioni",
+       "v": "L 750 × P 850 × H 2080 mm"
+      }
+     ]
+    },
+    {
+     "name": "Master 700 Glass",
+     "imgs": [
+      "https://frigocontrolch.10web.me/wp-content/uploads/2025/09/master-700-glass-1.webp",
+      "https://frigocontrolch.10web.me/wp-content/uploads/2025/09/master-700-glass-2.webp"
+     ],
+     "specs": [
+      {
+       "l": "Temperatura TN",
+       "v": "+2°C / +10°C"
+      },
+      {
+       "l": "Temperatura BT",
+       "v": "−10°C / −20°C"
+      },
+      {
+       "l": "Refrigerante",
+       "v": "R290 Green"
+      },
+      {
+       "l": "Capacità",
+       "v": "625 L"
+      },
+      {
+       "l": "Dimensioni",
+       "v": "L 750 × P 850 × H 2080 mm"
+      }
+     ]
+    },
+    {
+     "name": "Master 1500 Glass",
+     "imgs": [
+      "https://frigocontrolch.10web.me/wp-content/uploads/2025/09/master-1500-glass-1.webp",
+      "https://frigocontrolch.10web.me/wp-content/uploads/2025/09/master-1500-glass-2.webp"
+     ],
+     "specs": [
+      {
+       "l": "Temperatura TN",
+       "v": "−2°C / +10°C"
+      },
+      {
+       "l": "Temperatura BT",
+       "v": "−10°C / −22°C"
+      },
+      {
+       "l": "Refrigerante",
+       "v": "R290 Green"
+      },
+      {
+       "l": "Capacità",
+       "v": "1365 L"
+      },
+      {
+       "l": "Dimensioni",
+       "v": "L 1500 × P 850 × H 2080 mm"
+      }
+     ]
+    },
+    {
+     "name": "Master 1500 Glass · TNV",
+     "imgs": [
+      "https://frigocontrolch.10web.me/wp-content/uploads/2025/09/master-1500-glass-11.webp",
+      "https://frigocontrolch.10web.me/wp-content/uploads/2025/09/master-1500-glass-22.webp"
+     ],
+     "specs": [
+      {
+       "l": "Temperatura TN",
+       "v": "+2°C / +10°C"
+      },
+      {
+       "l": "Temperatura BT",
+       "v": "−10°C / −20°C"
+      },
+      {
+       "l": "Refrigerante",
+       "v": "R290 Green"
+      },
+      {
+       "l": "Capacità",
+       "v": "1365 L"
+      },
+      {
+       "l": "Dimensioni",
+       "v": "L 1500 × P 850 × H 2080 mm"
+      }
+     ]
+    }
+   ],
+   "banner": "",
+   "text": ""
+  },
+  {
+   "name": "Classic",
+   "card": "https://frigocontrolch.10web.me/wp-content/uploads/2025/09/classic-600-1.webp",
+   "desc": "Funzioni avanzate ed efficienza unica. Personalizzazione totale interna ed esterna, design elegante e finiture ricercate: indicato per cucine e laboratori a vista.",
+   "models": [
+    {
+     "name": "Classic 600",
+     "imgs": [
+      "https://frigocontrolch.10web.me/wp-content/uploads/2025/09/classic-600-1.webp",
+      "https://frigocontrolch.10web.me/wp-content/uploads/2025/09/classic-600-2.webp"
+     ],
+     "specs": [
+      {
+       "l": "Temperatura TN",
+       "v": "−2°C / +10°C"
+      },
+      {
+       "l": "Temperatura BT",
+       "v": "−10°C / −22°C"
+      },
+      {
+       "l": "Refrigerante",
+       "v": "R290 Green · R452A · REM R452A-CO2"
+      },
+      {
+       "l": "Capacità",
+       "v": "534 L"
+      },
+      {
+       "l": "Dimensioni",
+       "v": "L 750 × P 735 × H 2080 mm"
+      }
+     ]
+    },
+    {
+     "name": "Classic 600 Glass",
+     "imgs": [
+      "https://frigocontrolch.10web.me/wp-content/uploads/2025/09/classic-600-glass-1.webp",
+      "https://frigocontrolch.10web.me/wp-content/uploads/2025/09/classic-600-glass-2.webp"
+     ],
+     "specs": [
+      {
+       "l": "Temperatura TN",
+       "v": "+2°C / +10°C"
+      },
+      {
+       "l": "Temperatura BT",
+       "v": "−10°C / −20°C"
+      },
+      {
+       "l": "Refrigerante",
+       "v": "R290 Green · R452A · REM R452A-CO2"
+      },
+      {
+       "l": "Capacità",
+       "v": "534 L"
+      },
+      {
+       "l": "Dimensioni",
+       "v": "L 750 × P 735 × H 2080 mm"
+      }
+     ]
+    },
+    {
+     "name": "Classic 1200",
+     "imgs": [
+      "https://frigocontrolch.10web.me/wp-content/uploads/2025/09/classic-1200-1.webp",
+      "https://frigocontrolch.10web.me/wp-content/uploads/2025/09/classic-1200-2.webp"
+     ],
+     "specs": [
+      {
+       "l": "Temperatura TN",
+       "v": "−2°C / +10°C"
+      },
+      {
+       "l": "Temperatura BT",
+       "v": "−10°C / −22°C"
+      },
+      {
+       "l": "Refrigerante",
+       "v": "R290 Green · R452A · REM R452A-CO2"
+      },
+      {
+       "l": "Capacità",
+       "v": "1167 L"
+      },
+      {
+       "l": "Dimensioni",
+       "v": "L 1500 × P 735 × H 2080 mm"
+      }
+     ]
+    },
+    {
+     "name": "Classic 1200 Glass",
+     "imgs": [
+      "https://frigocontrolch.10web.me/wp-content/uploads/2025/09/classic-1200-class-1.webp",
+      "https://frigocontrolch.10web.me/wp-content/uploads/2025/09/classic-1200-class-2.webp"
+     ],
+     "specs": [
+      {
+       "l": "Temperatura TN",
+       "v": "+2°C / +10°C"
+      },
+      {
+       "l": "Temperatura BT",
+       "v": "−10°C / −20°C"
+      },
+      {
+       "l": "Refrigerante",
+       "v": "R290 Green · R452A · REM R452A-CO2"
+      },
+      {
+       "l": "Capacità",
+       "v": "1167 L"
+      },
+      {
+       "l": "Dimensioni",
+       "v": "L 1500 × P 735 × H 2080 mm"
+      }
+     ]
+    }
+   ],
+   "banner": "",
+   "text": ""
+  },
+  {
+   "name": "Professional",
+   "card": "https://frigocontrolch.10web.me/wp-content/uploads/2025/09/professional-1500-1.webp",
+   "desc": "Design elegante e finiture ricercate, ideali per cucine e laboratori a vista. Altamente efficienti; l’assenza dell’evaporatore in camera offre la massima capacità di carico. Personalizzabili con ampia gamma di optional.",
+   "models": [
+    {
+     "name": "Professional 700",
+     "imgs": [
+      "https://frigocontrolch.10web.me/wp-content/uploads/2025/09/professional-700-1.webp",
+      "https://frigocontrolch.10web.me/wp-content/uploads/2025/09/professional-700-2.webp"
+     ],
+     "specs": [
+      {
+       "l": "Temperatura TN",
+       "v": "−2°C / +10°C"
+      },
+      {
+       "l": "Temperatura BT",
+       "v": "−10°C / −22°C"
+      },
+      {
+       "l": "Refrigerante",
+       "v": "R290 · R452A · REM R452A-CO2"
+      },
+      {
+       "l": "Capacità",
+       "v": "625 L"
+      },
+      {
+       "l": "Dimensioni",
+       "v": "L 750 × P 815-850 REM × H 2080 mm"
+      }
+     ]
+    },
+    {
+     "name": "Professional 700 Glass",
+     "imgs": [
+      "https://frigocontrolch.10web.me/wp-content/uploads/2025/09/professional-700-glass-1.webp",
+      "https://frigocontrolch.10web.me/wp-content/uploads/2025/09/professional-700-glass-2.webp"
+     ],
+     "specs": [
+      {
+       "l": "Temperatura TN",
+       "v": "+2°C / +10°C"
+      },
+      {
+       "l": "Temperatura BT",
+       "v": "−10°C / −20°C"
+      },
+      {
+       "l": "Refrigerante",
+       "v": "R290 Green · R452A · REM R452A-CO2"
+      },
+      {
+       "l": "Capacità",
+       "v": "625 L"
+      },
+      {
+       "l": "Dimensioni",
+       "v": "L 750 × P 815-850 REM × H 2080 mm"
+      }
+     ]
+    },
+    {
+     "name": "Professional 1500",
+     "imgs": [
+      "https://frigocontrolch.10web.me/wp-content/uploads/2025/09/professional-1500-1.webp",
+      "https://frigocontrolch.10web.me/wp-content/uploads/2025/09/professional-1500-2.webp"
+     ],
+     "specs": [
+      {
+       "l": "Temperatura TN",
+       "v": "−2°C / +10°C"
+      },
+      {
+       "l": "Temperatura BT",
+       "v": "−10°C / −22°C"
+      },
+      {
+       "l": "Refrigerante",
+       "v": "R290 Green · R452A · REM R452A-CO2"
+      },
+      {
+       "l": "Capacità",
+       "v": "1365 L"
+      },
+      {
+       "l": "Dimensioni",
+       "v": "L 1500 × P 815-850 REM × H 2080 mm"
+      }
+     ]
+    },
+    {
+     "name": "Professional 1500 Glass",
+     "imgs": [
+      "https://frigocontrolch.10web.me/wp-content/uploads/2025/09/professional-1500-glass-1.webp",
+      "https://frigocontrolch.10web.me/wp-content/uploads/2025/09/professional-1500-glass-2.webp"
+     ],
+     "specs": [
+      {
+       "l": "Temperatura TN",
+       "v": "+2°C / +10°C"
+      },
+      {
+       "l": "Temperatura BT",
+       "v": "−10°C / −20°C"
+      },
+      {
+       "l": "Refrigerante",
+       "v": "R290 Green · R452A · REM R452A-CO2"
+      },
+      {
+       "l": "Capacità",
+       "v": "1365 L"
+      },
+      {
+       "l": "Dimensioni",
+       "v": "L 1500 × P 815-850 REM × H 2080 mm"
+      }
+     ]
+    },
+    {
+     "name": "Professional 2300",
+     "imgs": [
+      "https://frigocontrolch.10web.me/wp-content/uploads/2025/09/profession-2300-1.webp",
+      "https://frigocontrolch.10web.me/wp-content/uploads/2025/09/profession-2300-2.webp"
+     ],
+     "specs": [
+      {
+       "l": "Temperatura TN",
+       "v": "−2°C / +10°C"
+      },
+      {
+       "l": "Temperatura BT",
+       "v": "−10°C / −22°C"
+      },
+      {
+       "l": "Refrigerante",
+       "v": "R290 Green · R452A"
+      },
+      {
+       "l": "Capacità",
+       "v": "2102 L"
+      },
+      {
+       "l": "Dimensioni",
+       "v": "L 2250 × P 815-850 REM × H 2080 mm"
+      }
+     ]
+    },
+    {
+     "name": "Professional 2300 Glass",
+     "imgs": [
+      "https://frigocontrolch.10web.me/wp-content/uploads/2025/09/professional-2300-glass-1.webp",
+      "https://frigocontrolch.10web.me/wp-content/uploads/2025/09/professional-2300-glass-2.webp"
+     ],
+     "specs": [
+      {
+       "l": "Temperatura TN",
+       "v": "+2°C / +10°C"
+      },
+      {
+       "l": "Temperatura BT",
+       "v": "−10°C / −20°C"
+      },
+      {
+       "l": "Refrigerante",
+       "v": "R290 Green · R452A"
+      },
+      {
+       "l": "Capacità",
+       "v": "2102 L"
+      },
+      {
+       "l": "Dimensioni",
+       "v": "L 2250 × P 815-850 REM × H 2080 mm"
+      }
+     ]
+    }
+   ],
+   "banner": "",
+   "text": ""
+  },
+  {
+   "name": "Roll-in / Roll-through",
+   "card": "https://frigocontrolch.10web.me/wp-content/uploads/2025/08/armadi-refrigerati-carrelli-everlasting-ticino-600x250.webp",
+   "desc": "Conservano e movimentano grandi quantità di prodotto grazie all’introduzione diretta di carrelli Gastronorm.",
+   "models": [],
+   "banner": "https://frigocontrolch.10web.me/wp-content/uploads/2025/08/armadi-refrigerati-carrelli-everlasting-ticino-600x250.webp",
+   "text": "Le serie ROLL-IN e ROLL-THROUGH permettono di conservare e movimentare una grande quantità di prodotto grazie all’introduzione diretta di carrelli Gastronorm. Disponibili in versione a una o due porte, oltre all’opzione passante (porte sul fronte e sul retro, per carico e scarico su lati opposti). Sono la soluzione ideale per grandi cucine — hotel, servizi di catering — e per comunità come mense e ospedali."
+  }
+ ]
+};
+
+    /* Cosa si può modificare dal menu impostazioni */
+    var SCHEMA=[
+      {t:'gruppo',k:'home',l:'Schermata iniziale',campi:[
+        {t:'testo',k:'kick',l:'Scritta piccola in alto'},
+        {t:'testo',k:'titolo',l:'Titolo'},
+        {t:'area',k:'sub',l:'Sottotitolo'},
+        {t:'testo',k:'foot',l:'Riga in fondo'}]},
+      {t:'lista',k:'famiglie',l:'Gamme (una card ciascuna)',agg:'Aggiungi una gamma',titolo:'name',miniatura:'card',min:1,
+        nuovo:{name:'',card:'',desc:'',models:[],banner:'',text:''},
+        voce:{t:'gruppo',campi:[
+          {t:'testo',k:'name',l:'Nome della gamma'},
+          {t:'img',k:'card',l:'Foto della card'},
+          {t:'area',k:'desc',l:'Descrizione della gamma'},
+          {t:'lista',k:'models',l:'Modelli',agg:'Aggiungi un modello',titolo:'name',miniatura:function(m){return m&&m.imgs&&m.imgs[0];},
+            aiuto:'Se una gamma non ha modelli, mostra invece la pagina descrittiva qui sotto (foto grande + testo).',
+            nuovo:{name:'',imgs:[''],specs:[{l:'Temperatura TN',v:''},{l:'Temperatura BT',v:''},{l:'Refrigerante',v:''},{l:'Capacità',v:''},{l:'Dimensioni',v:''}]},
+            voce:{t:'gruppo',campi:[
+              {t:'testo',k:'name',l:'Nome del modello'},
+              {t:'lista',k:'imgs',l:'Foto',agg:'Aggiungi una foto',min:1,voce:{t:'img',l:'Foto'},aiuto:'La prima è quella principale.'},
+              {t:'lista',k:'specs',l:'Caratteristiche tecniche',agg:'Aggiungi una riga',titolo:function(s){return (s.l||'')+(s.v?': '+s.v:'');},
+                nuovo:{l:'',v:''},voce:{t:'gruppo',campi:[{t:'testo',k:'l',l:'Voce'},{t:'testo',k:'v',l:'Valore'}]}}
+            ]}},
+          {t:'gruppo',l:'Pagina descrittiva (solo per gamme senza modelli)',campi:[
+            {t:'img',k:'banner',l:'Foto grande'},
+            {t:'area',k:'text',l:'Testo',righe:5}]}
+        ]}}
+    ];
+
+    var FAM={}, ORDER=[], cur={};
+
+    /* family views */
+    function renderFam(k){
+      var f=FAM[k];
+      if(!f.models.length){
+        return '<div class="top"><button class="back" type="button" data-back><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg> Indietro</button><span class="badge">Everlasting</span><h2>'+esc(f.name)+'</h2></div>'
+          +'<div class="rollin"><div class="img pz ct"><img src="'+f.banner+'" alt="'+esc(f.name)+'" loading="lazy"></div><p>'+esc(f.text)+'</p></div>';
+      }
+      var chips=f.models.map(function(m,i){return '<button class="mchip'+(i===0?' on':'')+'" type="button" data-i="'+i+'">'+esc(m.name)+'</button>';}).join('');
+      return '<div class="top"><button class="back" type="button" data-back><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg> Indietro</button><span class="badge">Everlasting</span><h2>'+esc(f.name)+'</h2></div>'
+        +'<div class="fdesc">'+esc(f.desc)+'</div>'
+        +'<div class="modelbar" data-fam="'+k+'">'+chips+'</div>'
+        +'<div class="fbody">'
+          +'<div class="gal"><div class="main pz ct"><img id="gm-'+k+'"></div><div class="thumbs" id="gt-'+k+'"></div></div>'
+          +'<div class="fspec"><h5 id="mn-'+k+'"></h5><div id="fs-'+k+'"></div></div>'
+        +'</div>';
+    }
+
+    function setModel(k,i){
+      var f=FAM[k]; if(!f.models.length) return; var m=f.models[i]; cur[k]={model:i,img:0};
+      document.getElementById('mn-'+k).textContent=m.name;
+      document.getElementById('fs-'+k).innerHTML=m.specs.map(function(s){return '<div class="frow"><span class="l">'+esc(s.l)+'</span><span class="v">'+esc(s.v)+'</span></div>';}).join('');
+      var gm=document.getElementById('gm-'+k); gm.src=m.imgs[0]||''; gm.alt=m.name;
+      document.getElementById('gt-'+k).innerHTML=m.imgs.map(function(u,j){return '<button class="t'+(j===0?' on':'')+'" type="button" data-img="'+j+'"><span class="pz"><img src="'+u+'" alt="'+esc(m.name)+'" loading="lazy"></span></button>';}).join('');
+      var bar=document.querySelector('.modelbar[data-fam="'+k+'"]');
+      if(bar) bar.querySelectorAll('.mchip').forEach(function(c,ci){c.classList.toggle('on',ci===i);});
+    }
+
+    /* disegna tutto a partire dai dati */
+    function render(d){
+      FAM={}; ORDER=[]; cur={};
+      d.famiglie.forEach(function(f,i){ var k='f'+i; FAM[k]=f; ORDER.push(k); });
+      document.getElementById('fc-kick').textContent=d.home.kick;
+      document.getElementById('fc-titolo').textContent=d.home.titolo;
+      document.getElementById('fc-sub').textContent=d.home.sub;
+      document.getElementById('fc-foot').textContent=d.home.foot;
+      /* home cards */
+      document.getElementById('cards').innerHTML=ORDER.map(function(k){var f=FAM[k];
+        return '<button class="card" type="button" data-open="'+k+'"><div class="ph pz"><img src="'+f.card+'" alt="'+esc(f.name)+'" loading="lazy"></div>'
+          +'<div class="bd"><span class="badge">Everlasting</span><h3>'+esc(f.name)+'</h3><p>'+(f.models.length?(f.models.length+' modelli disponibili'):esc(f.name))+'</p><div class="go">Scopri →</div></div></button>';
+      }).join('');
+      /* viste delle gamme */
+      root.querySelectorAll('.view:not(.home)').forEach(function(v){v.remove();});
+      var fine=root.querySelector('script');
+      ORDER.forEach(function(k){
+        var v=document.createElement('div'); v.className='view'; v.setAttribute('data-view',k); v.id='v-'+k;
+        v.innerHTML=renderFam(k); root.insertBefore(v,fine);
+      });
+      ORDER.forEach(function(k){ if(FAM[k].models.length) setModel(k,0); });
+      show('home');
+    }
+
+    function show(v){ root.querySelectorAll('.view').forEach(function(el){el.classList.toggle('on', el.getAttribute('data-view')===v);}); }
+    root.addEventListener('click',function(e){
+      var op=e.target.closest('[data-open]'); if(op){ show(op.getAttribute('data-open')); return; }
+      if(e.target.closest('[data-back]')){ show('home'); return; }
+      var mc=e.target.closest('.mchip'); if(mc){ var k=mc.closest('.modelbar').getAttribute('data-fam'); setModel(k,+mc.getAttribute('data-i')); return; }
+      var th=e.target.closest('.thumbs .t'); if(th){ var view=th.closest('.view'); var k=view.getAttribute('data-view'); var j=+th.getAttribute('data-img');
+        var m=FAM[k].models[cur[k].model]; var gm=document.getElementById('gm-'+k); gm.src=m.imgs[j]; gm.alt=m.name;
+        view.querySelectorAll('.thumbs .t').forEach(function(x){x.classList.remove('on');}); th.classList.add('on'); return; }
+    });
+    root.addEventListener('contextmenu',function(e){ if(e.target.closest('.pz,img')) e.preventDefault(); });
+    root.addEventListener('dragstart',function(e){ if(e.target.tagName==='IMG') e.preventDefault(); });
+
+    FCKit.avvia({id:'armadi-refrigerati',nome:'Armadi refrigerati',dati:DATI,schema:SCHEMA,render:render,ingranaggio:{pos:'br',tono:'chiaro'}});
+  })();
+  </script>
+</div>
