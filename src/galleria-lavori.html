@@ -7,9 +7,9 @@
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 /* ═════════════════════════════════════════════════
-   FRIGO CONTROL — GALLERIA LAVORI v3 (Supabase)
+   FRIGO CONTROL — GALLERIA LAVORI v4
    Griglia + filtri combinabili + lightbox + admin
-   + caricamento diretto immagini (Supabase Storage)
+   + caricamento diretto immagini e database condiviso (Supabase)
    Il box riempie sempre il 100% dell'iframe Wix.
    ═════════════════════════════════════════════════ */
 
@@ -271,6 +271,13 @@ label{display:block;font-size:.69rem;font-weight:600;color:var(--grigio);margin-
   border-top:1px solid var(--bordo);display:flex;align-items:center;justify-content:space-between;gap:10px;
 }
 .ok{color:#2e9e5b;font-weight:600}
+.ko{color:#e0574d;font-weight:600}
+.dlg{position:absolute;inset:0;z-index:80;background:rgba(8,28,48,.5);display:none;align-items:center;justify-content:center;padding:16px;border-radius:var(--radius)}
+.dlg.on{display:flex}
+.dlg-box{background:#fff;border-radius:12px;padding:16px;max-width:360px;width:100%;box-shadow:0 12px 40px rgba(6,32,56,.3)}
+.dlg-box p{font-size:.86rem;margin-bottom:12px;line-height:1.45}
+.dlg-box input{margin-bottom:12px}
+.dlg-az{display:flex;justify-content:flex-end;gap:8px}
 .warn{color:#d98324;font-weight:600}
 
 .login{flex:1 1 auto;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:11px;padding:22px}
@@ -409,25 +416,28 @@ label{display:block;font-size:.69rem;font-weight:600;color:var(--grigio);margin-
       <button class="btn mini ghost" id="esci">Esci</button>
     </div>
   </div>
+
+  <!-- finestra di dialogo interna -->
+  <div class="dlg" id="dlg"><div class="dlg-box">
+    <p id="dlgT"></p><input id="dlgI">
+    <div class="dlg-az"><button class="btn ghost" id="dlgNo">Annulla</button><button class="btn" id="dlgSi">OK</button></div>
+  </div></div>
 </div>
 
+<!--FC-KIT-->
 <script type="module">
 /* ═════════════════════════════════════════════════
    ⚙️  CONFIGURAZIONE
-   ─────────────────────────────────────────────────
-   Incolla qui i 2 valori del tuo progetto Supabase:
-   Project Settings → API → "Project URL" e "anon public".
-   Finché sono vuoti, il widget resta in modalità locale.
+   Database, password e caricamento foto sono gestiti dal kit
+   comune degli embed (FCKit): stessa password di tutto il sito.
    ═════════════════════════════════════════════════ */
 
-const ADMIN_PASSWORD = "frigo2026";
-const DOC_ID         = "frigocontrol";
-const BUCKET         = "galleria";
+const DOC_ID = "galleria";
+const R = FCKit.rete;
+let PWD = "";
 
-const SUPABASE_URL   = "";   // es. https://abcd1234.supabase.co
-const SUPABASE_ANON  = "";   // es. eyJhbGciOi... (chiave "anon public")
-
-// Immagini dimostrative da Unsplash (usate SOLO in modalità locale, senza Supabase).
+// Immagini dimostrative da Unsplash (libere, visibili a chiunque).
+// Quando carichi quelle vere: scheda Immagini → Seleziona tutte → Elimina.
 const demo = (p, titolo, tipo, ambiente) => ({
   id: "demo-" + p.slice(0, 8),
   url: `https://images.unsplash.com/photo-${p}?w=700&h=700&fit=crop&auto=format&q=70`,
@@ -442,11 +452,24 @@ const SEED = {
   immagini: [
     demo("1718203862467-c33159fdc504", "Split a parete, appartamento privato",      "Climatizzazione", "Residenziale"),
     demo("1726614846573-c1ac2e6161d1", "Unità interna in soggiorno",                "Climatizzazione", "Residenziale"),
+    demo("1759772238012-9d5ad59ae637", "Split in camera da letto",                  "Climatizzazione", "Residenziale"),
+    demo("1724488751821-1415f5cf4960", "Unità esterna, villa monofamiliare",        "Climatizzazione", "Residenziale"),
+    demo("1722010811002-a772b2066890", "Installazione su facciata",                 "Climatizzazione", "Residenziale"),
     demo("1757219525975-03b5984bc6e8", "Climatizzazione uffici open space",         "Climatizzazione", "Uffici"),
     demo("1679303777007-c6c4522beb02", "Impianto per esercizio pubblico",           "Climatizzazione", "Commerciale"),
+    demo("1681042803902-f79c240d8f03", "Unità esterna su copertura",                "Climatizzazione", "Commerciale"),
+    demo("1698479603408-1a66a6d9e80f", "Batteria di unità esterne, stabile",        "Climatizzazione", "Commerciale"),
+    demo("1545649311-24d0ac00ae82",    "Gruppi di condensazione in linea",          "Climatizzazione", "Industriale"),
+    demo("1642749776312-aa42ce20c9f5", "Posa unità in copertura",                   "Pompa di calore", "Industriale"),
     demo("1566917064245-1c6bff30dbf1", "Pompa di calore aria-acqua",                "Pompa di calore", "Residenziale"),
     demo("1635604866833-70844856de75", "Canalizzazioni e distribuzione aria",       "Ventilazione",    "Industriale"),
+    demo("1665826254141-bfa10685e002", "Bocchetta di ripresa, controsoffitto",      "Ventilazione",    "Uffici"),
     demo("1601599967100-f16100982063", "Banco refrigerato per gastronomia",         "Refrigerazione",  "Commerciale"),
+    demo("1601599963032-5df76ef84343", "Vetrina refrigerata da banco",              "Refrigerazione",  "Commerciale"),
+    demo("1646533683258-db0395219e50", "Armadi bevande per punto vendita",          "Refrigerazione",  "Commerciale"),
+    demo("1783408355139-4645dc371ce6", "Frigoriferi bevande, caffetteria",          "Refrigerazione",  "Commerciale"),
+    demo("1784039534969-26e424548f3e", "Cucina professionale, ristorante",          "Refrigerazione",  "Commerciale"),
+    demo("1768464705938-1d43e07023cf", "Impianto per negozio alimentari",           "Refrigerazione",  "Commerciale"),
     demo("1601599561213-832382fd07ba", "Cella frigo per magazzino",                 "Cella frigo",     "Industriale")
   ]
 };
@@ -467,50 +490,35 @@ const locLeggi = () => { try{ const r=localStorage.getItem("gal_"+DOC_ID); retur
 const locScrivi = d => { try{ localStorage.setItem("gal_"+DOC_ID, JSON.stringify(d)) }catch{} };
 
 async function avvia(){
-  if(SUPABASE_URL && SUPABASE_ANON){
+  if(FCKit.attivo){
+    cloud = true;
     try{
-      const { createClient } = await import("https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm");
-      const sb = createClient(SUPABASE_URL, SUPABASE_ANON);
-      cloud = { sb };
-
-      // Caricamento iniziale
-      const { data, error } = await sb.from("galleria").select("dati").eq("id", DOC_ID).maybeSingle();
-      if(error) throw error;
-      if(data && data.dati){
-        dati = { gruppi:data.dati.gruppi||[], immagini:data.dati.immagini||[] };
-        rendi();
-      } else {
-        await salva();   // crea la riga se non esiste
-      }
-
-      // Realtime: ogni modifica arriva a tutti
-      sb.channel("galleria-"+DOC_ID)
-        .on("postgres_changes",
-            { event:"*", schema:"public", table:"galleria", filter:"id=eq."+DOC_ID },
-            payload=>{
-              const d = payload.new && payload.new.dati;
-              if(d){ dati = { gruppi:d.gruppi||[], immagini:d.immagini||[] }; rendi(); }
-            })
-        .subscribe();
-
-      msg('<span class="ok">● Supabase connesso</span> — le modifiche le vedono tutti.');
-      return;
-    }catch(e){ console.error(e); }
+      const r = await R.leggi(DOC_ID);
+      if(r && r.dati) dati = { gruppi:r.dati.gruppi||[], immagini:r.dati.immagini||[] };
+    }catch(e){ console.warn("[FC] galleria: database non raggiungibile, mostro i contenuti predefiniti", e); }
+    rendi(); return;
   }
   const l=locLeggi(); if(l) dati=l;
-  msg('<span class="warn">● Modalità locale</span> — modifiche visibili solo su questo browser.');
   rendi();
 }
-
+function statoBase(){
+  return FCKit.attivo ? '<span class="ok">● Database collegato</span> — le modifiche le vedono tutti.'
+                      : '<span class="warn">● Modalità locale</span> — modifiche visibili solo su questo browser.';
+}
 async function salva(){
-  locScrivi(dati);
-  if(cloud){
-    try{
-      const { error } = await cloud.sb.from("galleria").upsert({ id: DOC_ID, dati });
-      if(error) throw error;
-    }catch(e){ console.error(e); alert("Salvataggio non riuscito. Controlla la connessione o le policy di Supabase."); }
-  }
   rendi();
+  if(!cloud){ locScrivi(dati); return true; }
+  msg("Salvataggio in corso…");
+  try{
+    await R.rpc("salva_contenuto", { p_id: DOC_ID, p_dati: dati, p_password: PWD });
+    msg('<span class="ok">● Salvato e pubblicato</span> — lo vedono tutti i visitatori.');
+    return true;
+  }catch(e){
+    console.error(e);
+    if(/password/i.test(e.message)){ R.pwdScrivi(""); esci(); avviso("La password non è più valida: accedi di nuovo."); return false; }
+    msg('<span class="ko">● Salvataggio non riuscito:</span> '+esc(e.message));
+    return false;
+  }
 }
 const msg = h => $("statoTesto").innerHTML = h;
 
@@ -603,30 +611,48 @@ $("lb").addEventListener("touchend",e=>{
 },{passive:true});
 
 /* ── ADMIN ────────────────────────────────── */
-$("apriAdmin").onclick = ()=>{ $("pannello").classList.add("on"); if(!admin){ $("pwd").value=""; $("err").textContent=""; setTimeout(()=>$("pwd").focus(),60); } };
+$("apriAdmin").onclick = async ()=>{
+  $("pannello").classList.add("on");
+  if(admin) return;
+  $("pwd").value=""; $("err").textContent="";
+  const memo = R.pwdLeggi();
+  if(memo){ try{ if(await R.verifica(memo)){ PWD=memo; entra(); return; } }catch(e){} R.pwdScrivi(""); }
+  setTimeout(()=>$("pwd").focus(),60);
+};
 $("chiudiAdmin").onclick = ()=> $("pannello").classList.remove("on");
 $("entra").onclick = login;
 $("pwd").addEventListener("keydown", e=>{ if(e.key==="Enter") login(); });
 
-function login(){
-  if($("pwd").value !== ADMIN_PASSWORD){ $("err").textContent="Password errata"; $("pwd").value=""; return; }
+async function login(){
+  const p = $("pwd").value; if(!p) return;
+  $("entra").disabled = true; $("err").textContent = "Verifica…";
+  let ok = false;
+  try{ ok = await R.verifica(p); $("err").textContent = ""; }
+  catch(e){ $("err").textContent = "Connessione non riuscita"; }
+  $("entra").disabled = false;
+  if(!ok){ if(!$("err").textContent) $("err").textContent = "Password errata"; $("pwd").value=""; return; }
+  PWD = p; R.pwdScrivi(p); entra();
+}
+function entra(){
   admin = true;
   $("login").style.display="none";
   $("tabs").style.display="flex";
   $("pbody").style.display="block";
   $("stato").style.display="flex";
   $("pTitolo").textContent="Gestione galleria";
+  msg(statoBase());
   rendiAdmin();
 }
-$("esci").onclick = ()=>{
-  admin=false; selez.clear(); editId=null;
+function esci(){
+  admin=false; selez.clear(); editId=null; PWD="";
   $("login").style.display="flex";
   $("tabs").style.display="none";
   $("pbody").style.display="none";
   $("stato").style.display="none";
   $("pTitolo").textContent="Area riservata";
   $("pannello").classList.remove("on");
-};
+}
+$("esci").onclick = ()=>{ R.pwdScrivi(""); esci(); };
 $("tabs").onclick = e=>{
   const t = e.target.closest(".tab"); if(!t) return;
   [...$("tabs").children].forEach(x=>x.classList.remove("on"));
@@ -668,19 +694,19 @@ function rendiAdmin(){
         <div><input placeholder="Nuova voce" data-in="val"></div>
         <button class="btn mini" data-a="addval">Aggiungi voce</button>
       </div>`;
-    card.onclick = e=>{
+    card.onclick = async e=>{
       const b = e.target.closest("[data-a]"); if(!b) return;
       const a = b.dataset.a;
       if(a==="su" && gi>0){ [dati.gruppi[gi-1],dati.gruppi[gi]]=[dati.gruppi[gi],dati.gruppi[gi-1]]; salva(); }
       if(a==="giu" && gi<dati.gruppi.length-1){ [dati.gruppi[gi+1],dati.gruppi[gi]]=[dati.gruppi[gi],dati.gruppi[gi+1]]; salva(); }
-      if(a==="ren"){ const n=prompt("Nome gruppo:",g.nome); if(n&&n.trim()){ g.nome=n.trim(); salva(); } }
-      if(a==="del"){ if(confirm(`Eliminare il gruppo "${g.nome}"? I tag relativi verranno rimossi dalle immagini.`)){
+      if(a==="ren"){ const n=await chiediTesto("Nuovo nome del gruppo:",g.nome); if(n&&n.trim()){ g.nome=n.trim(); salva(); } }
+      if(a==="del"){ if(await conferma(`Eliminare il gruppo "${g.nome}"? I tag relativi verranno rimossi dalle immagini.`)){
         dati.immagini.forEach(i=>{ if(i.tag) delete i.tag[g.id] });
         delete filtri[g.id];
         dati.gruppi.splice(gi,1); salva(); } }
       if(a==="delval"){
         const v = g.valori[+b.dataset.vi];
-        if(confirm(`Eliminare la voce "${v}"?`)){
+        if(await conferma(`Eliminare la voce "${v}"?`)){
           dati.immagini.forEach(i=>{ if(i.tag && i.tag[g.id]===v) delete i.tag[g.id] });
           if(filtri[g.id]===v) delete filtri[g.id];
           g.valori.splice(+b.dataset.vi,1); salva();
@@ -690,7 +716,7 @@ function rendiAdmin(){
         const inp = card.querySelector('[data-in="val"]');
         const v = inp.value.trim();
         if(!v) return;
-        if(g.valori.includes(v)){ alert("Voce già presente."); return; }
+        if(g.valori.includes(v)){ avviso("Voce già presente."); return; }
         g.valori.push(v); inp.value=""; salva();
       }
     };
@@ -733,12 +759,12 @@ function rendiLista(){
       e.target.checked ? selez.add(img.id) : selez.delete(img.id);
       aggiornaBulk();
     };
-    row.onclick = e=>{
+    row.onclick = async e=>{
       const b = e.target.closest("[data-a]"); if(!b) return;
       const a = b.dataset.a;
       if(a==="su" && i>0){ [dati.immagini[i-1],dati.immagini[i]]=[dati.immagini[i],dati.immagini[i-1]]; salva(); }
       if(a==="giu" && i<dati.immagini.length-1){ [dati.immagini[i+1],dati.immagini[i]]=[dati.immagini[i],dati.immagini[i+1]]; salva(); }
-      if(a==="del"){ if(confirm("Eliminare questa immagine?")){ rimuoviFile(img); selez.delete(img.id); dati.immagini.splice(i,1); salva(); } }
+      if(a==="del"){ if(await conferma("Eliminare questa immagine?")){ rimuoviFile(img); selez.delete(img.id); dati.immagini.splice(i,1); salva(); } }
       if(a==="mod"){ editId = editId===img.id ? null : img.id; rendiLista(); }
     };
     box.appendChild(row);
@@ -791,8 +817,8 @@ $("bulkApplica").onclick = ()=>{
   });
   salva();
 };
-$("bulkElimina").onclick = ()=>{
-  if(!confirm(`Eliminare ${selez.size} immagini?`)) return;
+$("bulkElimina").onclick = async ()=>{
+  if(!(await conferma(`Eliminare ${selez.size} immagini?`))) return;
   dati.immagini.filter(i=>selez.has(i.id)).forEach(rimuoviFile);
   dati.immagini = dati.immagini.filter(i=>!selez.has(i.id));
   selez.clear(); salva();
@@ -809,7 +835,7 @@ $("addGruppo").onclick = ()=>{
 /* ── AGGIUNTA DA URL ──────────────────────── */
 $("addImg").onclick = ()=>{
   const urls = $("nuoveUrl").value.split("\n").map(u=>u.trim()).filter(Boolean);
-  if(!urls.length){ alert("Incolla almeno un URL."); return; }
+  if(!urls.length){ avviso("Incolla almeno un URL."); return; }
   const t = $("nuovoTitolo").value.trim();
   const tag = {};
   document.querySelectorAll(".addsel").forEach(s=>{ if(s.value) tag[s.dataset.g]=s.value; });
@@ -819,7 +845,7 @@ $("addImg").onclick = ()=>{
     tag: {...tag}
   }));
   $("nuoveUrl").value="";
-  alert(`${urls.length} immagini aggiunte.`);
+  avviso(`${urls.length} immagini aggiunte.`);
   salva();
 };
 
@@ -831,25 +857,8 @@ dz.addEventListener("dragleave", ()=> dz.classList.remove("drag"));
 dz.addEventListener("drop", e=>{ e.preventDefault(); dz.classList.remove("drag"); if(e.dataTransfer.files.length) caricaFile(e.dataTransfer.files); });
 fileInput.onchange = ()=>{ if(fileInput.files.length) caricaFile(fileInput.files); fileInput.value=""; };
 
-// Ridimensiona ogni foto (max 1000px) e la converte in WebP: file piccoli, zero costi.
-function ottimizza(file, max=1000, q=0.82){
-  return new Promise((res,rej)=>{
-    const img = new Image();
-    img.onload = ()=>{
-      let {width:w, height:h} = img;
-      if(w>max || h>max){ const r=Math.min(max/w, max/h); w=Math.round(w*r); h=Math.round(h*r); }
-      const c = document.createElement("canvas"); c.width=w; c.height=h;
-      c.getContext("2d").drawImage(img,0,0,w,h);
-      URL.revokeObjectURL(img.src);
-      c.toBlob(b=> b ? res(b) : rej(new Error("conversione fallita")), "image/webp", q);
-    };
-    img.onerror = ()=>{ URL.revokeObjectURL(img.src); rej(new Error("immagine non valida")); };
-    img.src = URL.createObjectURL(file);
-  });
-}
-
 async function caricaFile(fileList){
-  if(!cloud){ alert("Il caricamento diretto funziona solo con Supabase collegato. Per ora puoi incollare gli URL qui sotto."); return; }
+  if(!cloud){ avviso("Il caricamento dal computer funziona quando il database è collegato. Per ora puoi incollare gli indirizzi delle immagini qui sotto."); return; }
   const files = [...fileList].filter(f=> f.type.startsWith("image/"));
   if(!files.length) return;
 
@@ -864,13 +873,10 @@ async function caricaFile(fileList){
     $("avanzTesto").textContent = `Caricamento ${k+1} di ${files.length}…`;
     $("avanzBar").style.width = Math.round((k/files.length)*100) + "%";
     try{
-      const blob = await ottimizza(files[k]);
-      const path = DOC_ID + "/" + uid() + ".webp";
-      const { error } = await cloud.sb.storage.from(BUCKET).upload(path, blob, { contentType:"image/webp", cacheControl:"31536000", upsert:false });
-      if(error) throw error;
-      const { data } = cloud.sb.storage.from(BUCKET).getPublicUrl(path);
+      const o = await R.ottimizza(files[k]);
+      const url = await R.caricaFile(o.blob, DOC_ID, o.est, o.tipo);
       dati.immagini.push({
-        id: uid(), url: data.publicUrl, path,
+        id: uid(), url,
         titolo: base ? (files.length>1 ? `${base} ${ok+1}` : base) : "",
         tag: {...tag}
       });
@@ -884,12 +890,28 @@ async function caricaFile(fileList){
   setTimeout(()=> av.classList.remove("on"), 2500);
 }
 
-// Cancella il file da Storage quando l'immagine viene eliminata (best-effort).
-function rimuoviFile(img){
-  if(cloud && img && img.path){
-    cloud.sb.storage.from(BUCKET).remove([img.path]).catch(e=>console.warn("File non rimosso:", e));
-  }
+// I file caricati restano nell'archivio foto: dal sito si toglie solo l'immagine dalla galleria.
+function rimuoviFile(){}
+
+/* ── finestre di dialogo interne ─────────── */
+function dialogo(testo, o={}){
+  return new Promise(fine=>{
+    const D=$("dlg"), I=$("dlgI"), conInput = o.input !== undefined;
+    $("dlgT").textContent = testo;
+    I.style.display = conInput ? "block" : "none"; I.value = conInput ? (o.input||"") : "";
+    $("dlgNo").style.display = o.soloOk ? "none" : "";
+    $("dlgSi").textContent = o.si || "OK";
+    D.classList.add("on");
+    const chiudi = v=>{ D.classList.remove("on"); $("dlgSi").onclick = $("dlgNo").onclick = I.onkeydown = null; fine(v); };
+    $("dlgSi").onclick = ()=> chiudi(conInput ? I.value : true);
+    $("dlgNo").onclick = ()=> chiudi(conInput ? null : false);
+    I.onkeydown = e=>{ if(e.key==="Enter") chiudi(I.value); if(e.key==="Escape") chiudi(null); };
+    setTimeout(()=> (conInput ? I : $("dlgSi")).focus(), 40);
+  });
 }
+const conferma = (t)=> dialogo(t, { si: "Elimina" });
+const avviso = (t)=> dialogo(t, { soloOk: true });
+const chiediTesto = (t, v)=> dialogo(t, { input: v, si: "Salva" });
 
 avvia();
 </script>

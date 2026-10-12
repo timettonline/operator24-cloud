@@ -713,5 +713,10 @@
     return { dati: function () { return st.dati; } };
   }
 
-  window.FCKit = { avvia: avvia, esc: esc, ricco: ricco, clona: clona, attivo: ATTIVO };
+  window.FCKit = {
+    avvia: avvia, esc: esc, ricco: ricco, clona: clona, attivo: ATTIVO,
+    /* funzioni di base per embed con un pannello proprio (es. galleria) */
+    rete: { leggi: leggi, rpc: rpc, caricaFile: caricaFile, verifica: verifica, ottimizza: ottimizza,
+            pwdLeggi: pwdLeggi, pwdScrivi: pwdScrivi }
+  };
 })();
