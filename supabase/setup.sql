@@ -11,6 +11,7 @@
 --    · accesso_admin      → la password del menu impostazioni (cifrata)
 --    · salva_contenuto()  → l'unico modo di modificare: controlla la password
 --    · bucket "media"     → le foto caricate dagli embed
+--    · battito()          → chiamata ogni giorno da GitHub: evita la pausa del piano gratuito
 --
 --  SICUREZZA
 --    Chiunque visiti il sito può LEGGERE i contenuti (servono per mostrarli).
@@ -153,6 +154,30 @@ grant execute on function public.verifica_password(text)             to anon, au
 grant execute on function public.salva_contenuto(text, jsonb, text)  to anon, authenticated;
 grant execute on function public.versioni_contenuto(text, text)      to anon, authenticated;
 grant execute on function public.leggi_versione(bigint, text)        to anon, authenticated;
+
+-- ------------------------------------------------- battito (anti-pausa)
+-- Il piano gratuito mette in pausa i progetti senza attività per 7 giorni.
+-- Ogni giorno GitHub chiama battito(): una piccola scrittura che tiene sveglio
+-- il progetto. Aggiorna solo questa riga, non tocca i contenuti.
+create table if not exists public.battito (
+  unico     boolean primary key default true check (unico),
+  ultimo    timestamptz not null default now(),
+  conteggio bigint not null default 0
+);
+alter table public.battito enable row level security;
+
+create or replace function public.battito()
+returns timestamptz
+language sql
+security definer
+set search_path = public
+as $$
+  insert into public.battito (unico, ultimo, conteggio) values (true, now(), 1)
+  on conflict (unico) do update set ultimo = now(), conteggio = public.battito.conteggio + 1
+  returning ultimo;
+$$;
+revoke all on function public.battito() from public;
+grant execute on function public.battito() to anon, authenticated;
 
 -- ------------------------------------------------------------- foto (Storage)
 -- Bucket pubblico: le foto si vedono da tutti. Solo immagini, max 10 MB.

@@ -25,6 +25,7 @@ la modifica la vedono tutti. Non usano il database (solo le loro foto stanno nel
 
 1. Supabase → nuovo progetto (regione Europa).
 2. SQL Editor → incolla `supabase/setup.sql` → Run. In fondo deve uscire `tabelle 3 · password 1 · bucket 1`.
+   (Se il file era già stato lanciato prima dell'anti-pausa, rilanciarlo: non cancella nulla.)
 3. Project Settings → API → copiare **Project URL** e **anon public key** (mai la `service_role`).
 4. Migrazione foto e build:
    ```bash
@@ -77,6 +78,18 @@ pubblica per natura, la sicurezza la fanno le regole del database.
 - **Attenzione, embed con menu**: dopo il primo «Salva e pubblica» i contenuti mostrati sono quelli del
   database, non quelli scritti nel codice. Testi, prodotti e foto si cambiano dal menu; il codice
   su Wix si tocca solo per la grafica (stili, struttura).
+
+## Anti-pausa del piano gratuito
+
+Supabase mette in pausa i progetti gratuiti dopo 7 giorni senza attività. Per evitarlo:
+
+- `.github/workflows/tieni-sveglio-supabase.yml` ogni mattina chiama `battito()` (una piccola scrittura
+  nel database, creata da `setup.sql`). Costo zero: GitHub Actions è gratuito.
+- Le chiavi le prende da `kit/config.json`, oppure dai secrets del repository `SUPABASE_URL` e `SUPABASE_ANON`.
+- Funziona solo quando il file è sul branch principale (`main`) del repository.
+- Se Supabase non risponde, il controllo fallisce e GitHub manda un'email: si entra in Supabase e si
+  preme **Restore project**. Prova manuale: GitHub → Actions → *Tieni sveglio Supabase* → **Run workflow**.
+- Anche se Supabase fosse in pausa, il sito non si rompe: gli embed mostrano i contenuti scritti nel codice.
 
 ## Operazioni utili (SQL Editor)
 
