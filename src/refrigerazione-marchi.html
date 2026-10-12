@@ -170,7 +170,7 @@ body {
 
   animation:
     fc-marchi-scroll
-    calc(34s * var(--fc-k, 1))
+    34s
     linear
     infinite;
 
@@ -333,7 +333,7 @@ body {
   }
 
   .fc-marquee-track {
-    animation-duration: calc(29s * var(--fc-k, 1));
+    animation-duration: 29s;
   }
 
   .fc-logo {
@@ -413,7 +413,7 @@ body {
 
 
   .fc-marquee-track {
-    animation-duration: calc(24s * var(--fc-k, 1));
+    animation-duration: 24s;
   }
 
 
@@ -440,66 +440,300 @@ body {
 </style>
 </head>
 
+
 <body>
 
 <section class="fc-marchi">
-  <div class="fc-marchi-inner" id="fc-testi"></div>
-  <div class="fc-marquee">
-    <div class="fc-marquee-track" id="fc-track"></div>
+
+  <div class="fc-marchi-inner">
+
+    <h2>Marchi scelti con esperienza</h2>
+
+    <p class="fc-marchi-intro">
+      Nella refrigerazione non esiste un’unica soluzione adatta a tutto.
+      In base al tipo di impianto e alle esigenze del cliente ci affidiamo
+      a marchi e fornitori specializzati che negli anni ci hanno dato
+      i migliori riscontri in termini di affidabilità, qualità,
+      disponibilità dei ricambi e gestione della garanzia.
+    </p>
+
+    <p class="fc-marchi-project">
+      A seconda del progetto lavoriamo con
+      <strong>
+        Everlasting, Kibernetik, Incold, Pastorfrigor, Eliwell e Rivacold.
+      </strong>
+    </p>
+
   </div>
+
+
+  <!-- =========================
+       CAROUSEL
+  ========================= -->
+
+  <div class="fc-marquee">
+
+    <div class="fc-marquee-track">
+
+
+      <!-- =========================
+           GRUPPO 1
+      ========================= -->
+
+      <div class="fc-marquee-group">
+
+
+        <!-- EVERLASTING -->
+
+        <div class="fc-logo logo-everlasting">
+
+          <img
+            src="https://www.caffinigroup.it/public/img/everlasting-193517.png"
+            alt="Everlasting"
+            onerror="this.classList.add('img-error');"
+          >
+
+          <span class="fc-logo-fallback">
+            EVERLASTING
+          </span>
+
+        </div>
+
+
+        <!-- KIBERNETIK -->
+
+        <div class="fc-logo logo-kibernetik">
+
+          <img
+            src="https://static.digitecgalaxus.ch/im/Files/6/1/0/2/8/6/5/OriginalLogo_4652_Kibernetik.png?impolicy=resize-crop&resizeHeight=70&resizeWidth=140"
+            alt="Kibernetik"
+            onerror="this.classList.add('img-error');"
+          >
+
+          <span class="fc-logo-fallback">
+            KIBERNETIK
+          </span>
+
+        </div>
+
+
+        <!-- INCOLD -->
+
+        <div class="fc-logo logo-incold">
+
+          <img
+            src="https://cdn.freebiesupply.com/logos/large/2x/incold-logo-png-transparent.png"
+            alt="Incold"
+            onerror="this.classList.add('img-error');"
+          >
+
+          <span class="fc-logo-fallback">
+            INCOLD
+          </span>
+
+        </div>
+
+
+        <!-- PASTORFRIGOR -->
+
+        <div class="fc-logo logo-pastorfrigor">
+
+          <img
+            src="https://www.pastorfrigor.it/pr-contenuto/uploads/2017/11/3.jpg"
+            alt="Pastorfrigor"
+            onerror="this.classList.add('img-error');"
+          >
+
+          <span class="fc-logo-fallback">
+            pastorfrigor
+          </span>
+
+        </div>
+
+
+        <!-- ELIWELL -->
+
+        <div class="fc-logo logo-eliwell">
+
+          <img
+            src="https://www.nexinstrument.com/assets/images/logo-manufacturer/Eliwell-logo_15196.png"
+            alt="Eliwell"
+            onerror="this.classList.add('img-error');"
+          >
+
+          <span class="fc-logo-fallback">
+            eliwell
+          </span>
+
+        </div>
+
+
+        <!-- RIVACOLD -->
+
+        <div class="fc-logo logo-rivacold">
+
+          <img
+            src="https://www.rivacold.com/media/userfiles/images/RIVACOLD%20logo_eng_20-11-15%283%29.jpg"
+            alt="Rivacold"
+            onerror="this.classList.add('img-error');"
+          >
+
+          <span class="fc-logo-fallback">
+            RIVACOLD
+          </span>
+
+        </div>
+
+      </div>
+
+
+
+      <!-- =========================
+           GRUPPO 2
+           COPIA PER LOOP
+      ========================= -->
+
+      <div
+        class="fc-marquee-group"
+        aria-hidden="true"
+      >
+
+
+        <!-- EVERLASTING -->
+
+        <div class="fc-logo logo-everlasting">
+
+          <img
+            src="https://www.caffinigroup.it/public/img/everlasting-193517.png"
+            alt=""
+            onerror="this.classList.add('img-error');"
+          >
+
+          <span class="fc-logo-fallback">
+            EVERLASTING
+          </span>
+
+        </div>
+
+
+        <!-- KIBERNETIK -->
+
+        <div class="fc-logo logo-kibernetik">
+
+          <img
+            src="https://static.digitecgalaxus.ch/im/Files/6/1/0/2/8/6/5/OriginalLogo_4652_Kibernetik.png?impolicy=resize-crop&resizeHeight=70&resizeWidth=140"
+            alt=""
+            onerror="this.classList.add('img-error');"
+          >
+
+          <span class="fc-logo-fallback">
+            KIBERNETIK
+          </span>
+
+        </div>
+
+
+        <!-- INCOLD -->
+
+        <div class="fc-logo logo-incold">
+
+          <img
+            src="https://cdn.freebiesupply.com/logos/large/2x/incold-logo-png-transparent.png"
+            alt=""
+            onerror="this.classList.add('img-error');"
+          >
+
+          <span class="fc-logo-fallback">
+            INCOLD
+          </span>
+
+        </div>
+
+
+        <!-- PASTORFRIGOR -->
+
+        <div class="fc-logo logo-pastorfrigor">
+
+          <img
+            src="https://www.pastorfrigor.it/pr-contenuto/uploads/2017/11/3.jpg"
+            alt=""
+            onerror="this.classList.add('img-error');"
+          >
+
+          <span class="fc-logo-fallback">
+            pastorfrigor
+          </span>
+
+        </div>
+
+
+        <!-- ELIWELL -->
+
+        <div class="fc-logo logo-eliwell">
+
+          <img
+            src="https://www.nexinstrument.com/assets/images/logo-manufacturer/Eliwell-logo_15196.png"
+            alt=""
+            onerror="this.classList.add('img-error');"
+          >
+
+          <span class="fc-logo-fallback">
+            eliwell
+          </span>
+
+        </div>
+
+
+        <!-- RIVACOLD -->
+
+        <div class="fc-logo logo-rivacold">
+
+          <img
+            src="https://www.rivacold.com/media/userfiles/images/RIVACOLD%20logo_eng_20-11-15%283%29.jpg"
+            alt=""
+            onerror="this.classList.add('img-error');"
+          >
+
+          <span class="fc-logo-fallback">
+            RIVACOLD
+          </span>
+
+        </div>
+
+
+      </div>
+
+    </div>
+
+  </div>
+
 </section>
 
-<!--FC-KIT-->
+
 <script>
-(function () {
-  var E = FCKit.esc;
-  var DATI = {
-    titolo: "Marchi scelti con esperienza",
-    intro: "Nella refrigerazione non esiste un’unica soluzione adatta a tutto. In base al tipo di impianto e alle esigenze del cliente ci affidiamo a marchi e fornitori specializzati che negli anni ci hanno dato i migliori riscontri in termini di affidabilità, qualità, disponibilità dei ricambi e gestione della garanzia.",
-    progetto: "A seconda del progetto lavoriamo con **Everlasting, Kibernetik, Incold, Pastorfrigor, Eliwell e Rivacold.**",
-    loghi: [
-      { nome: "Everlasting",  img: "https://www.caffinigroup.it/public/img/everlasting-193517.png", dim: "logo-everlasting", riserva: "EVERLASTING" },
-      { nome: "Kibernetik",   img: "https://static.digitecgalaxus.ch/im/Files/6/1/0/2/8/6/5/OriginalLogo_4652_Kibernetik.png?impolicy=resize-crop&resizeHeight=70&resizeWidth=140", dim: "logo-kibernetik", riserva: "KIBERNETIK" },
-      { nome: "Incold",       img: "https://cdn.freebiesupply.com/logos/large/2x/incold-logo-png-transparent.png", dim: "logo-incold", riserva: "INCOLD" },
-      { nome: "Pastorfrigor", img: "https://www.pastorfrigor.it/pr-contenuto/uploads/2017/11/3.jpg", dim: "logo-pastorfrigor", riserva: "pastorfrigor" },
-      { nome: "Eliwell",      img: "https://www.nexinstrument.com/assets/images/logo-manufacturer/Eliwell-logo_15196.png", dim: "logo-eliwell", riserva: "eliwell" },
-      { nome: "Rivacold",     img: "https://www.rivacold.com/media/userfiles/images/RIVACOLD%20logo_eng_20-11-15%283%29.jpg", dim: "logo-rivacold", riserva: "RIVACOLD" }
-    ]
-  };
-  var DIM = [["", "Standard (fino a 62 px di altezza)"], ["logo-kibernetik", "Basso (180×45)"], ["logo-everlasting", "Medio (180×55)"],
-             ["logo-eliwell", "Medio-alto (180×58)"], ["logo-rivacold", "Largo (190×58)"], ["logo-incold", "Alto (180×60)"]];
-  var SCHEMA = [
-    { t: "testo", k: "titolo", l: "Titolo" },
-    { t: "area", k: "intro", l: "Testo introduttivo", righe: 4 },
-    { t: "area", k: "progetto", l: "Frase sui marchi", righe: 2, aiuto: "Scrivi **testo** tra due asterischi doppi per il grassetto." },
-    { t: "lista", k: "loghi", l: "Loghi dei marchi", agg: "Aggiungi un marchio", titolo: "nome", miniatura: "img", min: 1,
-      aiuto: "I loghi scorrono in un ciclo continuo; la velocità si adatta da sola al numero di loghi.",
-      nuovo: { nome: "", img: "", dim: "", riserva: "" },
-      voce: { t: "gruppo", campi: [
-        { t: "testo", k: "nome", l: "Nome del marchio" },
-        { t: "img", k: "img", l: "Logo" },
-        { t: "sel", k: "dim", l: "Dimensione nel riquadro", opz: DIM },
-        { t: "testo", k: "riserva", l: "Testo di riserva", aiuto: "Compare al posto del logo se l'immagine non si carica." }
-      ] } }
-  ];
-  function render(d) {
-    var l = d.loghi || [];
-    document.getElementById("fc-testi").innerHTML =
-      "<h2>" + E(d.titolo) + '</h2><p class="fc-marchi-intro">' + E(d.intro) + "</p>" +
-      '<p class="fc-marchi-project">' + E(d.progetto).replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>") + "</p>";
-    var gruppo = function (copia) {
-      return '<div class="fc-marquee-group"' + (copia ? ' aria-hidden="true"' : "") + ">" + l.map(function (x) {
-        return '<div class="fc-logo' + (x.dim ? " " + E(x.dim) : "") + '"><img src="' + E(x.img) + '" alt="' + (copia ? "" : E(x.nome)) +
-               '" onerror="this.classList.add(\'img-error\');"><span class="fc-logo-fallback">' + E(x.riserva || x.nome) + "</span></div>";
-      }).join("") + "</div>";
-    };
-    var t = document.getElementById("fc-track");
-    t.innerHTML = gruppo(false) + gruppo(true);
-    t.style.setProperty("--fc-k", String(l.length / 6));
-  }
-  FCKit.avvia({ id: "refrigerazione-marchi", nome: "Refrigerazione · Marchi scelti con esperienza", dati: DATI, schema: SCHEMA,
-                render: render, ingranaggio: { pos: "br", tono: "scuro" } });
+
+(function() {
+
+  /*
+    Controllo semplice:
+    se un'immagine non viene caricata,
+    mostra automaticamente il nome del marchio.
+  */
+
+  var images = document.querySelectorAll('.fc-logo img');
+
+  images.forEach(function(img) {
+
+    img.addEventListener('error', function() {
+
+      img.classList.add('img-error');
+
+    });
+
+  });
+
 })();
+
 </script>
 
 </body>

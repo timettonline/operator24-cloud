@@ -215,53 +215,95 @@ body {
 
 <body>
 
-<div class="contenitore" id="fc-root"></div>
+<div class="contenitore">
 
-<!--FC-KIT-->
-<script>
-(function () {
-  var E = FCKit.esc;
+  <div class="introduzione">
 
-  /* Contenuti predefiniti (quelli attualmente online) */
-  var DATI = {
-    titolo: "Il nostro modo di lavorare parte da valori concreti",
-    intro: "Ogni impianto ha esigenze diverse, ma il nostro impegno rimane sempre lo stesso: offrire soluzioni affidabili, curate e pensate per durare nel tempo.",
-    valori: [
-      { titolo: "Competenza",   testo: "Crediamo nella competenza tecnica e analizziamo attentamente ogni situazione per individuare la soluzione più adatta alle reali esigenze del cliente." },
-      { titolo: "Precisione",   testo: "Lavoriamo con attenzione e cura in ogni fase, proponendo soltanto ciò che serve davvero e garantendo soluzioni pensate per durare nel tempo." },
-      { titolo: "Trasparenza",  testo: "Accompagniamo il cliente in ogni fase del lavoro, nel rispetto degli accordi e con un rapporto diretto e sempre chiaro." },
-      { titolo: "Affidabilità", testo: "Operiamo sia negli ambienti residenziali sia nelle attività professionali, mettendo al centro comfort, efficienza e continuità operativa." }
-    ],
-    chiusura: "Un servizio professionale, un rapporto diretto e soluzioni sulle quali poter contare."
-  };
+    <h2>
+      Il nostro modo di lavorare parte da valori concreti
+    </h2>
 
-  /* Cosa si può modificare dal menu impostazioni */
-  var SCHEMA = [
-    { t: "testo", k: "titolo", l: "Titolo" },
-    { t: "area",  k: "intro",  l: "Testo introduttivo" },
-    { t: "lista", k: "valori", l: "Valori", agg: "Aggiungi un valore", titolo: "titolo",
-      aiuto: "Il numero (01, 02…) nel pallino blu si aggiorna da solo.",
-      voce: { t: "gruppo", campi: [
-        { t: "testo", k: "titolo", l: "Nome del valore" },
-        { t: "area",  k: "testo",  l: "Descrizione" }
-      ] } },
-    { t: "area", k: "chiusura", l: "Frase di chiusura", righe: 2 }
-  ];
+    <p>
+      Ogni impianto ha esigenze diverse, ma il nostro impegno rimane sempre lo stesso:
+      offrire soluzioni affidabili, curate e pensate per durare nel tempo.
+    </p>
 
-  function render(d) {
-    var n = function (i) { return (i + 1 < 10 ? "0" : "") + (i + 1); };
-    document.getElementById("fc-root").innerHTML =
-      '<div class="introduzione"><h2>' + E(d.titolo) + '</h2><p>' + E(d.intro) + '</p></div>' +
-      '<div class="valori">' + (d.valori || []).map(function (v, i) {
-        return '<div class="valore"><div class="icona">' + n(i) + '</div><h3>' + E(v.titolo) + '</h3><p>' + E(v.testo) + '</p></div>';
-      }).join("") + '</div>' +
-      (d.chiusura ? '<div class="chiusura"><p><strong>' + E(d.chiusura) + '</strong></p></div>' : "");
-  }
+  </div>
 
-  FCKit.avvia({ id: "home-valori", nome: "Home · I nostri valori", dati: DATI, schema: SCHEMA, render: render,
-                ingranaggio: { pos: "br", tono: "scuro" } });
-})();
-</script>
+
+  <div class="valori">
+
+    <div class="valore">
+
+      <div class="icona">01</div>
+
+      <h3>Competenza</h3>
+
+      <p>
+        Crediamo nella competenza tecnica e analizziamo attentamente ogni situazione
+        per individuare la soluzione più adatta alle reali esigenze del cliente.
+      </p>
+
+    </div>
+
+
+    <div class="valore">
+
+      <div class="icona">02</div>
+
+      <h3>Precisione</h3>
+
+      <p>
+        Lavoriamo con attenzione e cura in ogni fase, proponendo soltanto ciò che
+        serve davvero e garantendo soluzioni pensate per durare nel tempo.
+      </p>
+
+    </div>
+
+
+    <div class="valore">
+
+      <div class="icona">03</div>
+
+      <h3>Trasparenza</h3>
+
+      <p>
+        Accompagniamo il cliente in ogni fase del lavoro, nel rispetto degli accordi
+        e con un rapporto diretto e sempre chiaro.
+      </p>
+
+    </div>
+
+
+    <div class="valore">
+
+      <div class="icona">04</div>
+
+      <h3>Affidabilità</h3>
+
+      <p>
+        Operiamo sia negli ambienti residenziali sia nelle attività professionali,
+        mettendo al centro comfort, efficienza e continuità operativa.
+      </p>
+
+    </div>
+
+  </div>
+
+
+  <!-- CHIUSURA -->
+
+  <div class="chiusura">
+
+    <p>
+      <strong>
+        Un servizio professionale, un rapporto diretto e soluzioni sulle quali poter contare.
+      </strong>
+    </p>
+
+  </div>
+
+</div>
 
 </body>
 </html>

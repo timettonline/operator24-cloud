@@ -127,40 +127,47 @@
 <body>
 
 <section class="fc-soluzioni">
-  <div class="fc-soluzioni-inner" id="fc-root"></div>
-</section>
 
-<!--FC-KIT-->
-<script>
-(function () {
-  var E = FCKit.esc;
-  var DATI = {
-    titolo: "Soluzioni per ogni ambiente",
-    intro: "Lavoriamo con privati, attività commerciali e aziende, progettando ogni impianto in base alle reali esigenze del cliente.",
-    schede: [
-      { titolo: "Privati", testo: "Comfort e benessere per la tua casa, con soluzioni progettate sulle tue esigenze." },
-      { titolo: "Attività commerciali", testo: "Soluzioni pensate per negozi, locali e spazi aperti al pubblico." },
-      { titolo: "Aziende", testo: "Impianti studiati per garantire efficienza, comfort e continuità operativa." }
-    ]
-  };
-  var SCHEMA = [
-    { t: "testo", k: "titolo", l: "Titolo" },
-    { t: "area", k: "intro", l: "Testo introduttivo" },
-    { t: "lista", k: "schede", l: "Colonne", agg: "Aggiungi una colonna", titolo: "titolo",
-      voce: { t: "gruppo", campi: [ { t: "testo", k: "titolo", l: "Titolo (in maiuscolo sul sito)" }, { t: "area", k: "testo", l: "Testo" } ] } }
-  ];
-  function render(d) {
-    document.getElementById("fc-root").innerHTML =
-      "<h2>" + E(d.titolo) + "</h2>" +
-      '<p class="fc-soluzioni-intro">' + E(d.intro) + "</p>" +
-      '<div class="fc-soluzioni-grid">' + (d.schede || []).map(function (s) {
-        return '<div class="fc-soluzioni-card"><h3>' + E(s.titolo) + "</h3><p>" + E(s.testo) + "</p></div>";
-      }).join("") + "</div>";
-  }
-  FCKit.avvia({ id: "clima-soluzioni", nome: "Climatizzazione · Soluzioni per ogni ambiente", dati: DATI, schema: SCHEMA,
-                render: render, ingranaggio: { pos: "br", tono: "scuro" } });
-})();
-</script>
+  <div class="fc-soluzioni-inner">
+
+    <h2>Soluzioni per ogni ambiente</h2>
+
+    <p class="fc-soluzioni-intro">
+      Lavoriamo con privati, attività commerciali e aziende,
+      progettando ogni impianto in base alle reali esigenze del cliente.
+    </p>
+
+    <div class="fc-soluzioni-grid">
+
+      <div class="fc-soluzioni-card">
+        <h3>Privati</h3>
+        <p>
+          Comfort e benessere per la tua casa,
+          con soluzioni progettate sulle tue esigenze.
+        </p>
+      </div>
+
+      <div class="fc-soluzioni-card">
+        <h3>Attività commerciali</h3>
+        <p>
+          Soluzioni pensate per negozi,
+          locali e spazi aperti al pubblico.
+        </p>
+      </div>
+
+      <div class="fc-soluzioni-card">
+        <h3>Aziende</h3>
+        <p>
+          Impianti studiati per garantire
+          efficienza, comfort e continuità operativa.
+        </p>
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
 
 </body>
 </html>

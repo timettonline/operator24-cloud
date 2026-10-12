@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /* ═══════════════════════════════════════════════════════════════════════════
    Build degli embed Frigo Control
-   - legge  src/*.html   (sorgenti degli embed, con il segnaposto <!--FC-KIT-->)
+   - legge  src/*.html   (sorgenti degli embed; con il segnaposto <!--FC-KIT--> hanno il menu, senza sono statici)
    - inserisce kit/fc-kit.js con URL/chiave Supabase e impronta della password
    - scrive embed/*.html (i file da incollare su Wix)
 
@@ -36,10 +36,11 @@ const files = fs.readdirSync(src).filter(f => f.endsWith(".html")).sort();
 let n = 0;
 for (const f of files) {
   const h = fs.readFileSync(path.join(src, f), "utf8");
-  if (!h.includes("<!--FC-KIT-->")) { console.warn("  ! " + f + ": manca <!--FC-KIT-->, saltato"); continue; }
-  const res = h.replace("<!--FC-KIT-->", "<script>\n" + kit + "\n</script>");
+  // senza segnaposto = embed statico (nessun menu impostazioni): copiato così com'è
+  const statico = !h.includes("<!--FC-KIT-->");
+  const res = statico ? h : h.replace("<!--FC-KIT-->", "<script>\n" + kit + "\n</script>");
   fs.writeFileSync(path.join(out, f), res);
   n++;
-  console.log("  ✓ " + f.padEnd(44) + (Buffer.byteLength(res) / 1024).toFixed(0).padStart(5) + " KB");
+  console.log("  ✓ " + f.padEnd(44) + (Buffer.byteLength(res) / 1024).toFixed(0).padStart(5) + " KB" + (statico ? "  (statico, senza menu)" : ""));
 }
 console.log(`\n${n} embed scritti in ${path.relative(ROOT, out) || "."}  ·  database: ${url ? url : "NON collegato (modalità locale)"}`);

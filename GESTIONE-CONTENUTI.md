@@ -1,21 +1,25 @@
 # Frigo Control · Embed modificabili del sito Wix
 
-Ogni embed del sito ha un **menu impostazioni** (ingranaggio discreto in un angolo):
-password → modulo di modifica → **Salva e pubblica** → la modifica la vedono subito tutti.
+15 embed hanno un **menu impostazioni** (ingranaggio discreto in basso a destra):
+password → modulo di modifica → **Salva e pubblica** → la modifica la vedono tutti.
 I contenuti stanno in **Supabase**, le foto nel bucket `media`.
+
+Gli altri 6 (interruttore, recensioni, valori, soluzioni, loghi clienti, marchi refrigerazione) sono
+**statici, senza menu**: si modificano nel codice dell'"Incorpora HTML" su Wix e, dopo **Pubblica**,
+la modifica la vedono tutti. Non usano il database (solo le loro foto stanno nel bucket `media`).
 
 ## Cartelle
 
 | Cartella | Contenuto |
 |---|---|
-| `src/` | I 21 embed **sorgente** (uno per file, con i contenuti predefiniti dentro). Si modificano qui. |
+| `src/` | I 21 embed **sorgente** (uno per file). Con `<!--FC-KIT-->` hanno il menu; senza sono statici e vengono copiati così come sono. |
 | `kit/fc-kit.js` | Il kit comune: ingranaggio, accesso, modulo generato dallo schema, caricamento foto, salvataggio. |
 | `kit/build.js` | Unisce kit + sorgenti + chiavi Supabase → `embed/` |
 | `kit/migra-immagini.js` | Porta tutte le foto su Supabase (dall'archivio locale) e aggiorna gli indirizzi in `src/` |
 | `embed/` | **I file da incollare su Wix** (generati: non modificarli a mano) |
 | `supabase/setup.sql` | Da lanciare una volta nel SQL Editor di un progetto Supabase nuovo |
 | `media/originali/` | Archivio di tutte le immagini usate (10web, loghi, foto team) + `_indice.json` |
-| `archivio-versioni-precedenti/` | I vecchi widget statici, superati da `src/` |
+| `archivio-versioni-precedenti/` | I vecchi widget statici, superati da `src/`; in `con-impostazioni/` le versioni con menu dei 6 embed statici, se un giorno servissero |
 
 ## Messa in funzione (una volta)
 
@@ -34,22 +38,22 @@ pubblica per natura, la sicurezza la fanno le regole del database.
 
 ## Gli embed
 
-| File in `embed/` | Pagina Wix | id nel database |
+| File in `embed/` | Pagina Wix | Menu impostazioni (id nel database) |
 |---|---|---|
-| `tutte-le-pagine-interruttore.html` | elemento comune a tutte le pagine | `interruttore` |
+| `tutte-le-pagine-interruttore.html` | elemento comune a tutte le pagine | — statico, senza menu |
 | `home-1-team.html` | Home (1) | `home-team` |
-| `home-2-recensioni.html` | Home (2) | `home-recensioni` |
-| `home-3-valori.html` | Home (3) | `home-valori` |
+| `home-2-recensioni.html` | Home (2) | — statico, senza menu |
+| `home-3-valori.html` | Home (3) | — statico, senza menu |
 | `chi-siamo-team.html` | Chi Siamo | `chi-siamo-team` |
 | `galleria-lavori.html` | Galleria | `galleria` |
-| `climatizzazione-1-soluzioni.html` | Climatizzazione (1) | `clima-soluzioni` |
-| `climatizzazione-2-clienti.html` | Climatizzazione (2) | `clima-clienti` |
+| `climatizzazione-1-soluzioni.html` | Climatizzazione (1) | — statico, senza menu |
+| `climatizzazione-2-clienti.html` | Climatizzazione (2) | — statico, senza menu |
 | `clima-a-parete.html` | Clima a parete | `clima-a-parete` |
 | `clima-a-cassette.html` | Clima a cassette | `clima-a-cassette` |
 | `clima-a-pavimento.html` | Clima a pavimento | `clima-a-pavimento` |
 | `clima-canalizzato.html` | Clima canalizzato | `clima-canalizzato` |
 | `murali.html` | Murali | `murali` |
-| `refrigerazione-marchi.html` | Refrigerazione | `refrigerazione-marchi` |
+| `refrigerazione-marchi.html` | Refrigerazione | — statico, senza menu |
 | `celle-frigorifere.html` | Celle frigorifere | `celle-frigorifere` |
 | `armadi-refrigerati.html` | Armadi refrigerati | `armadi-refrigerati` |
 | `armadi-stagionatura.html` | Armadi stagionatori | `armadi-stagionatura` |
@@ -68,8 +72,11 @@ pubblica per natura, la sicurezza la fanno le regole del database.
 - **Storico**: ogni salvataggio conserva la versione precedente (`contenuti_storico`); dal menu
   «Versioni» si riapre una versione o il contenuto originale.
 - **Foto**: ottimizzate nel browser (max 1600 px, WebP) e caricate nel bucket `media`.
-- **Embed bassi** (interruttore, recensioni, loghi): il menu si apre in una finestra separata;
-  se il browser non lo consente, si apre dentro l'embed.
+- **Embed bassi**: il menu si apre in una finestra separata; se il browser non lo consente, si apre
+  dentro l'embed.
+- **Attenzione, embed con menu**: dopo il primo «Salva e pubblica» i contenuti mostrati sono quelli del
+  database, non quelli scritti nel codice. Testi, prodotti e foto si cambiano dal menu; il codice
+  su Wix si tocca solo per la grafica (stili, struttura).
 
 ## Operazioni utili (SQL Editor)
 

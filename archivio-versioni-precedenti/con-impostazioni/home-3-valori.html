@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+
+<style>
+
+body {
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  font-family: Helvetica, Arial, sans-serif;
+  color: #ffffff;
+}
+
+.contenitore {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 30px;
+  box-sizing: border-box;
+}
+
+/* INTRODUZIONE */
+
+.introduzione {
+  max-width: 850px;
+  margin: 0 auto 50px;
+  text-align: center;
+}
+
+.introduzione h2 {
+  margin: 0 0 20px;
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: 30px;
+  font-weight: 600;
+  line-height: 1.25;
+  color: #ffffff;
+}
+
+.introduzione p {
+  margin: 0 auto;
+  max-width: 780px;
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.65;
+  color: #ffffff;
+}
+
+/* VALORI */
+
+.valori {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 40px;
+  max-width: 1050px;
+  margin: 0 auto 55px;
+}
+
+.valore {
+  position: relative;
+  text-align: left;
+}
+
+/* PALLINO BLU */
+
+.icona {
+  width: 48px;
+  height: 48px;
+  margin-bottom: 20px;
+  border-radius: 50%;
+
+  background: #2153D3;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+
+  color: #ffffff;
+
+  box-shadow: 0 4px 15px rgba(33, 83, 211, 0.25);
+}
+
+.valore h3 {
+  margin: 0 0 12px;
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: 19px;
+  font-weight: 600;
+  line-height: 1.3;
+  color: #ffffff;
+}
+
+.valore p {
+  margin: 0;
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.6;
+  color: #ffffff;
+}
+
+/* CHIUSURA */
+
+.chiusura {
+  width: 100%;
+  max-width: 850px;
+  margin: 0 auto;
+  padding-top: 35px;
+  box-sizing: border-box;
+
+  border-top: 1px solid rgba(255,255,255,0.25);
+
+  text-align: center;
+}
+
+.chiusura p {
+  margin: 0;
+  width: 100%;
+
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: 19px;
+  font-weight: 500;
+  line-height: 1.5;
+  color: #ffffff;
+
+  text-align: center;
+}
+
+.chiusura strong {
+  position: relative;
+  display: inline-block;
+  padding-left: 18px;
+
+  font-family: Helvetica, Arial, sans-serif;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.chiusura strong::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 5px;
+  width: 4px;
+  height: calc(100% - 10px);
+
+  background: #2153D3;
+  border-radius: 4px;
+}
+
+/* TABLET */
+
+@media (max-width: 900px) {
+
+  .contenitore {
+    padding: 0 25px;
+  }
+
+  .valori {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 40px 30px;
+  }
+
+}
+
+/* MOBILE */
+
+@media (max-width: 600px) {
+
+  .contenitore {
+    padding: 0 20px;
+  }
+
+  .introduzione {
+    margin-bottom: 40px;
+  }
+
+  .introduzione h2 {
+    font-size: 25px;
+  }
+
+  .introduzione p {
+    font-size: 16px;
+  }
+
+  .valori {
+    grid-template-columns: 1fr;
+    gap: 35px;
+  }
+
+  .valore h3 {
+    font-size: 19px;
+  }
+
+  .valore p {
+    font-size: 16px;
+  }
+
+  .chiusura {
+    margin-top: 10px;
+  }
+
+  .chiusura p {
+    font-size: 18px;
+  }
+
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="contenitore" id="fc-root"></div>
+
+<!--FC-KIT-->
+<script>
+(function () {
+  var E = FCKit.esc;
+
+  /* Contenuti predefiniti (quelli attualmente online) */
+  var DATI = {
+    titolo: "Il nostro modo di lavorare parte da valori concreti",
+    intro: "Ogni impianto ha esigenze diverse, ma il nostro impegno rimane sempre lo stesso: offrire soluzioni affidabili, curate e pensate per durare nel tempo.",
+    valori: [
+      { titolo: "Competenza",   testo: "Crediamo nella competenza tecnica e analizziamo attentamente ogni situazione per individuare la soluzione più adatta alle reali esigenze del cliente." },
+      { titolo: "Precisione",   testo: "Lavoriamo con attenzione e cura in ogni fase, proponendo soltanto ciò che serve davvero e garantendo soluzioni pensate per durare nel tempo." },
+      { titolo: "Trasparenza",  testo: "Accompagniamo il cliente in ogni fase del lavoro, nel rispetto degli accordi e con un rapporto diretto e sempre chiaro." },
+      { titolo: "Affidabilità", testo: "Operiamo sia negli ambienti residenziali sia nelle attività professionali, mettendo al centro comfort, efficienza e continuità operativa." }
+    ],
+    chiusura: "Un servizio professionale, un rapporto diretto e soluzioni sulle quali poter contare."
+  };
+
+  /* Cosa si può modificare dal menu impostazioni */
+  var SCHEMA = [
+    { t: "testo", k: "titolo", l: "Titolo" },
+    { t: "area",  k: "intro",  l: "Testo introduttivo" },
+    { t: "lista", k: "valori", l: "Valori", agg: "Aggiungi un valore", titolo: "titolo",
+      aiuto: "Il numero (01, 02…) nel pallino blu si aggiorna da solo.",
+      voce: { t: "gruppo", campi: [
+        { t: "testo", k: "titolo", l: "Nome del valore" },
+        { t: "area",  k: "testo",  l: "Descrizione" }
+      ] } },
+    { t: "area", k: "chiusura", l: "Frase di chiusura", righe: 2 }
+  ];
+
+  function render(d) {
+    var n = function (i) { return (i + 1 < 10 ? "0" : "") + (i + 1); };
+    document.getElementById("fc-root").innerHTML =
+      '<div class="introduzione"><h2>' + E(d.titolo) + '</h2><p>' + E(d.intro) + '</p></div>' +
+      '<div class="valori">' + (d.valori || []).map(function (v, i) {
+        return '<div class="valore"><div class="icona">' + n(i) + '</div><h3>' + E(v.titolo) + '</h3><p>' + E(v.testo) + '</p></div>';
+      }).join("") + '</div>' +
+      (d.chiusura ? '<div class="chiusura"><p><strong>' + E(d.chiusura) + '</strong></p></div>' : "");
+  }
+
+  FCKit.avvia({ id: "home-valori", nome: "Home · I nostri valori", dati: DATI, schema: SCHEMA, render: render,
+                ingranaggio: { pos: "br", tono: "scuro" } });
+})();
+</script>
+
+</body>
+</html>

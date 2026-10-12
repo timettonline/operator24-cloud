@@ -110,7 +110,7 @@
     .fc-marquee-track {
       display: flex;
       width: max-content;
-      animation: fc-scroll calc(32s * var(--fc-k, 1)) linear infinite;
+      animation: fc-scroll 32s linear infinite;
       will-change: transform;
     }
 
@@ -195,7 +195,7 @@
       }
 
       .fc-marquee-track {
-        animation-duration: calc(28s * var(--fc-k, 1));
+        animation-duration: 28s;
       }
     }
 
@@ -238,7 +238,7 @@
       }
 
       .fc-marquee-track {
-        animation-duration: calc(24s * var(--fc-k, 1));
+        animation-duration: 24s;
       }
 
       .fc-marquee::before,
@@ -261,56 +261,118 @@
 <body>
 
 <section class="fc-clienti">
-  <div class="fc-clienti-inner" id="fc-testi"></div>
-  <div class="fc-marquee">
-    <div class="fc-marquee-track" id="fc-track"></div>
-  </div>
-</section>
 
-<!--FC-KIT-->
-<script>
-(function () {
-  var E = FCKit.esc;
-  var DATI = {
-    titolo: "Aziende che ci hanno scelto",
-    intro: "La nostra esperienza nasce dalla capacità di progettare e gestire impianti per realtà con esigenze diverse.",
-    loghi: [
-      { nome: "Poretti & Gaggini SA", img: "https://bin.staticlocal.ch/logo-ad/93/937a1f015d0fa5522baef308f25cac059045cac0/upload1.jpg", dim: "" },
-      { nome: "Imerys Graphite & Carbon", img: "https://images.squarespace-cdn.com/content/v1/6593df3a3cae2759c637e94d/33049bd8-af10-4ce0-a658-2425d83cec59/13.png?format=2500w", dim: "" },
-      { nome: "Raiffeisen Schweiz", img: "https://upload.wikimedia.org/wikipedia/commons/9/98/Raiffeisen_Schweiz_Logo.svg", dim: "" },
-      { nome: "SAR360 Architettura", img: "https://media.licdn.com/dms/image/v2/D4E1BAQGyiowCLr69Tg/company-background_10000/company-background_10000/0/1658495896152/sar360_sagl_cover?e=2147483647&t=ngQ4o_Mhpoe57MD7IjrmXCDQkeCMlaWvQhViRl46tT4&v=beta", dim: "fc-sar360" },
-      { nome: "Autolinee Bleniesi SA", img: "https://images.seeklogo.com/logo-png/34/1/autolinee-bleniesi-logo-png_seeklogo-349107.png", dim: "" },
-      { nome: "Diamond SA", img: "https://www.flyelectronics.it/IMMAGINI/655Diamond_Manifaturies_Fly-Electronics.jpg", dim: "" }
-    ]
-  };
-  var SCHEMA = [
-    { t: "testo", k: "titolo", l: "Titolo" },
-    { t: "area", k: "intro", l: "Testo introduttivo" },
-    { t: "lista", k: "loghi", l: "Loghi dei clienti", agg: "Aggiungi un logo", titolo: "nome", miniatura: "img", min: 1,
-      aiuto: "I loghi scorrono in un ciclo continuo; la velocità si adatta da sola al numero di loghi.",
-      nuovo: { nome: "", img: "", dim: "" },
-      voce: { t: "gruppo", campi: [
-        { t: "testo", k: "nome", l: "Nome dell'azienda" },
-        { t: "img", k: "img", l: "Logo" },
-        { t: "sel", k: "dim", l: "Dimensione nel riquadro", opz: [["", "Standard"], ["fc-sar360", "Ridotta (per loghi molto larghi)"]] }
-      ] } }
-  ];
-  function render(d) {
-    var l = d.loghi || [];
-    document.getElementById("fc-testi").innerHTML = "<h2>" + E(d.titolo) + '</h2><p class="fc-clienti-intro">' + E(d.intro) + "</p>";
-    var gruppo = function (copia) {
-      return '<div class="fc-marquee-group"' + (copia ? ' aria-hidden="true"' : "") + ">" + l.map(function (x) {
-        return '<div class="fc-logo-box' + (x.dim ? " " + E(x.dim) : "") + '"><img src="' + E(x.img) + '" alt="' + (copia ? "" : E(x.nome)) + '"></div>';
-      }).join("") + "</div>";
-    };
-    var t = document.getElementById("fc-track");
-    t.innerHTML = gruppo(false) + gruppo(true);
-    t.style.setProperty("--fc-k", String(l.length / 6));
-  }
-  FCKit.avvia({ id: "clima-clienti", nome: "Climatizzazione · Aziende che ci hanno scelto", dati: DATI, schema: SCHEMA,
-                render: render, ingranaggio: { pos: "br", tono: "scuro" } });
-})();
-</script>
+  <div class="fc-clienti-inner">
+
+    <h2>Aziende che ci hanno scelto</h2>
+
+    <p class="fc-clienti-intro">
+      La nostra esperienza nasce dalla capacità di progettare e gestire
+      impianti per realtà con esigenze diverse.
+    </p>
+
+  </div>
+
+
+  <div class="fc-marquee">
+
+    <div class="fc-marquee-track">
+
+      <!-- PRIMO GRUPPO -->
+      <div class="fc-marquee-group">
+
+        <!-- PORETTI & GAGGINI -->
+        <div class="fc-logo-box">
+          <img
+            src="https://bin.staticlocal.ch/logo-ad/93/937a1f015d0fa5522baef308f25cac059045cac0/upload1.jpg"
+            alt="Poretti & Gaggini SA">
+        </div>
+
+        <!-- IMERYS -->
+        <div class="fc-logo-box">
+          <img
+            src="https://images.squarespace-cdn.com/content/v1/6593df3a3cae2759c637e94d/33049bd8-af10-4ce0-a658-2425d83cec59/13.png?format=2500w"
+            alt="Imerys Graphite & Carbon">
+        </div>
+
+        <!-- RAIFFEISEN -->
+        <div class="fc-logo-box">
+          <img
+            src="https://upload.wikimedia.org/wikipedia/commons/9/98/Raiffeisen_Schweiz_Logo.svg"
+            alt="Raiffeisen Schweiz">
+        </div>
+
+        <!-- SAR360 -->
+        <div class="fc-logo-box fc-sar360">
+          <img
+            src="https://media.licdn.com/dms/image/v2/D4E1BAQGyiowCLr69Tg/company-background_10000/company-background_10000/0/1658495896152/sar360_sagl_cover?e=2147483647&t=ngQ4o_Mhpoe57MD7IjrmXCDQkeCMlaWvQhViRl46tT4&v=beta"
+            alt="SAR360 Architettura">
+        </div>
+
+        <!-- AUTOLINEE BLENIESI -->
+        <div class="fc-logo-box">
+          <img
+            src="https://images.seeklogo.com/logo-png/34/1/autolinee-bleniesi-logo-png_seeklogo-349107.png"
+            alt="Autolinee Bleniesi SA">
+        </div>
+
+        <!-- DIAMOND -->
+        <div class="fc-logo-box">
+          <img
+            src="https://www.flyelectronics.it/IMMAGINI/655Diamond_Manifaturies_Fly-Electronics.jpg"
+            alt="Diamond SA">
+        </div>
+
+      </div>
+
+
+      <!-- SECONDO GRUPPO IDENTICO PER IL LOOP -->
+
+      <div class="fc-marquee-group">
+
+        <div class="fc-logo-box">
+          <img
+            src="https://bin.staticlocal.ch/logo-ad/93/937a1f015d0fa5522baef308f25cac059045cac0/upload1.jpg"
+            alt="Poretti & Gaggini SA">
+        </div>
+
+        <div class="fc-logo-box">
+          <img
+            src="https://images.squarespace-cdn.com/content/v1/6593df3a3cae2759c637e94d/33049bd8-af10-4ce0-a658-2425d83cec59/13.png?format=2500w"
+            alt="Imerys Graphite & Carbon">
+        </div>
+
+        <div class="fc-logo-box">
+          <img
+            src="https://upload.wikimedia.org/wikipedia/commons/9/98/Raiffeisen_Schweiz_Logo.svg"
+            alt="Raiffeisen Schweiz">
+        </div>
+
+        <div class="fc-logo-box fc-sar360">
+          <img
+            src="https://media.licdn.com/dms/image/v2/D4E1BAQGyiowCLr69Tg/company-background_10000/company-background_10000/0/1658495896152/sar360_sagl_cover?e=2147483647&t=ngQ4o_Mhpoe57MD7IjrmXCDQkeCMlaWvQhViRl46tT4&v=beta"
+            alt="SAR360 Architettura">
+        </div>
+
+        <div class="fc-logo-box">
+          <img
+            src="https://images.seeklogo.com/logo-png/34/1/autolinee-bleniesi-logo-png_seeklogo-349107.png"
+            alt="Autolinee Bleniesi SA">
+        </div>
+
+        <div class="fc-logo-box">
+          <img
+            src="https://www.flyelectronics.it/IMMAGINI/655Diamond_Manifaturies_Fly-Electronics.jpg"
+            alt="Diamond SA">
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
 
 </body>
 </html>

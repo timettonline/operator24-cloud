@@ -134,33 +134,41 @@ body {
 <body>
 
 <div class="toggle-container">
-  <div class="toggle-switch" id="fc-root"></div>
-</div>
 
-<!--FC-KIT-->
-<script>
-(function () {
-  var E = FCKit.esc;
-  var DATI = {
-    sinistra: { testo: "REFRIGERAZIONE",  link: "https://timettonline.wixsite.com/website-28/refrigerazione" },
-    destra:   { testo: "CLIMATIZZAZIONE", link: "https://timettonline.wixsite.com/website-28/climatizzazione-1" }
-  };
-  var SCHEMA = [
-    { t: "gruppo", k: "sinistra", l: "Voce a sinistra (evidenziata)", campi: [
-      { t: "testo", k: "testo", l: "Testo" }, { t: "link", k: "link", l: "Pagina di destinazione" } ] },
-    { t: "gruppo", k: "destra", l: "Voce a destra", aiuto: "Anche l'interruttore centrale porta a questa pagina.", campi: [
-      { t: "testo", k: "testo", l: "Testo" }, { t: "link", k: "link", l: "Pagina di destinazione" } ] }
-  ];
-  function render(d) {
-    document.getElementById("fc-root").innerHTML =
-      '<a href="' + E(d.sinistra.link) + '" class="toggle-link active">' + E(d.sinistra.testo) + "</a>" +
-      '<a href="' + E(d.destra.link) + '" class="toggle-button refrigerazione" aria-label="Vai a ' + E(d.destra.testo.toLowerCase()) + '"><span class="toggle-dot"></span></a>' +
-      '<a href="' + E(d.destra.link) + '" class="toggle-link">' + E(d.destra.testo) + "</a>";
-  }
-  FCKit.avvia({ id: "interruttore", nome: "Tutte le pagine · Interruttore Refrigerazione / Climatizzazione", dati: DATI,
-                schema: SCHEMA, render: render, ingranaggio: { pos: "br", tono: "scuro" } });
-})();
-</script>
+  <div class="toggle-switch">
+
+    <!-- REFRIGERAZIONE -->
+
+    <a
+      href="https://timettonline.wixsite.com/website-28/refrigerazione"
+      class="toggle-link active">
+      REFRIGERAZIONE
+    </a>
+
+
+    <!-- TOGGLE -->
+
+    <a
+      href="https://timettonline.wixsite.com/website-28/climatizzazione-1"
+      class="toggle-button refrigerazione"
+      aria-label="Vai alla climatizzazione">
+
+      <span class="toggle-dot"></span>
+
+    </a>
+
+
+    <!-- CLIMATIZZAZIONE -->
+
+    <a
+      href="https://timettonline.wixsite.com/website-28/climatizzazione-1"
+      class="toggle-link">
+      CLIMATIZZAZIONE
+    </a>
+
+  </div>
+
+</div>
 
 </body>
 </html>
