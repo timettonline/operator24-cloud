@@ -650,15 +650,21 @@
     if (stretto) {
       var w = null;
       try { w = window.open("", "fck_" + st.cfg.id, "width=1000,height=820,scrollbars=yes,resizable=yes"); } catch (e) {}
-      if (w && w.document) {
-        st.finestra = w;
-        var d = w.document;
-        d.open();
-        d.write('<!doctype html><html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Modifica · ' + esc(st.cfg.nome) + '</title></head><body class="fck-pop"></body></html>');
-        d.close();
-        stile(d);
-        Editor(st, d, d.body, function () { try { w.close(); } catch (e) {} st.finestra = null; });
-        return;
+      if (w) {
+        try {
+          /* se il browser non ci lascia scrivere nella finestra (iframe isolato), si ripiega sotto */
+          var d = w.document;
+          d.open();
+          d.write('<!doctype html><html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Modifica · ' + esc(st.cfg.nome) + '</title></head><body class="fck-pop"></body></html>');
+          d.close();
+          stile(d);
+          st.finestra = w;
+          Editor(st, d, d.body, function () { try { w.close(); } catch (e) {} st.finestra = null; });
+          return;
+        } catch (e) {
+          try { w.close(); } catch (e2) {}
+          st.finestra = null;
+        }
       }
     }
     var ov = document.createElement("div"); ov.className = "fck-ov";
