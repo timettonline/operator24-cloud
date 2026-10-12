@@ -1,0 +1,185 @@
+<!-- =====================================================================
+     Frigo Control Ticino — Armadi refrigerati (Everlasting) — APP A SCHERMATA FISSA
+     - App-shell: riempie l'elemento (larghezza x altezza) e NON cresce mai
+     - Home: 5 famiglie (Basic / Master / Classic / Professional / Roll-in)
+     - Ogni famiglia: selettore modelli + foto + specifiche (TN/BT, refrigerante,
+       capacita, dimensioni)
+     - Su Wix: Incorpora HTML -> imposta larghezza e altezza (consigliato ~680px)
+     ===================================================================== -->
+<div id="fc-app">
+  <style>
+  html,body{height:100%;margin:0;padding:0;overflow:hidden}
+  #fc-app *{box-sizing:border-box;margin:0;padding:0}
+  #fc-app{
+    --blu:#0a3d62;--blu2:#1e6091;--accent:#00a8e8;--grigio:#f4f6f8;--bordo:#e3e9ef;--testo:#22303a;--muto:#6b7b88;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    color:var(--testo);position:relative;height:100%;width:100%;overflow:hidden;
+    background:linear-gradient(180deg,#ffffff 0%,#eef4f8 100%);-webkit-tap-highlight-color:transparent;
+  }
+  #fc-app img{max-width:100%;display:block}
+  #fc-app h1,#fc-app h2,#fc-app h3,#fc-app h4,#fc-app h5{color:var(--blu);line-height:1.15}
+  #fc-app .pz{position:relative;overflow:hidden;border-radius:10px;background:#eef2f5}
+  #fc-app .pz img{width:100%;height:100%;object-fit:cover;-webkit-user-drag:none;user-select:none;pointer-events:none}
+  #fc-app .pz.ct img{object-fit:contain;background:#fff}
+  #fc-app .pz::after{content:"";position:absolute;inset:0;z-index:2}
+
+  #fc-app .view{position:absolute;top:0;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:1200px;display:none;flex-direction:column;padding:clamp(12px,2vw,22px);gap:10px}
+  #fc-app .view.on{display:flex;animation:fd .25s ease}
+  @keyframes fd{from{opacity:0}to{opacity:1}}
+
+  /* HOME */
+  #fc-app .kick{letter-spacing:.12em;text-transform:uppercase;font-size:.6rem;font-weight:800;color:var(--accent);text-align:center;flex:0 0 auto}
+  #fc-app .home h1{font-size:clamp(1rem,2.2vw,1.5rem);font-weight:800;text-align:center;flex:0 0 auto}
+  #fc-app .home .sub{text-align:center;color:var(--muto);font-size:.82rem;max-width:680px;margin:0 auto;flex:0 0 auto}
+  #fc-app .cards{flex:1;min-height:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;align-content:center;overflow-y:auto}
+  #fc-app .card{display:flex;flex-direction:column;border:1px solid var(--bordo);border-radius:14px;overflow:hidden;background:#fff;box-shadow:0 8px 22px rgba(10,61,98,.10);cursor:pointer;text-align:left;font:inherit;color:inherit;padding:0}
+  #fc-app .card:hover{box-shadow:0 14px 30px rgba(10,61,98,.18)}
+  #fc-app .card .ph{aspect-ratio:16/10;flex:0 0 auto}
+  #fc-app .card .bd{flex:0 0 auto;padding:10px 13px 12px}
+  #fc-app .badge{display:inline-block;font-size:.56rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;padding:3px 8px;border-radius:999px;color:#fff;background:linear-gradient(135deg,#0a3d62,#1e6091)}
+  #fc-app .card h3{font-size:.92rem;margin:6px 0 2px}
+  #fc-app .card p{font-size:.74rem;color:var(--muto)}
+  #fc-app .card .go{margin-top:5px;font-weight:700;color:var(--accent);font-size:.74rem}
+  #fc-app .foot{flex:0 0 auto;text-align:center;color:var(--muto);font-size:.7rem}
+
+  /* FAMIGLIA */
+  #fc-app .top{flex:0 0 auto;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  #fc-app .back{background:none;border:none;cursor:pointer;color:var(--blu);font-weight:700;font-size:.82rem;display:inline-flex;align-items:center;gap:6px;font-family:inherit;padding:2px 4px}
+  #fc-app .back:hover{color:var(--accent)}
+  #fc-app .top h2{font-size:clamp(.98rem,1.8vw,1.25rem)}
+  #fc-app .fdesc{flex:0 0 auto;font-size:.8rem;color:var(--muto);line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  #fc-app .modelbar{flex:0 0 auto;display:flex;gap:6px;overflow-x:auto;padding-bottom:3px;-webkit-overflow-scrolling:touch}
+  #fc-app .mchip{white-space:nowrap;border:1px solid var(--bordo);background:#fff;border-radius:999px;padding:6px 12px;font-size:.74rem;font-weight:700;color:var(--muto);cursor:pointer;font-family:inherit}
+  #fc-app .mchip.on{background:linear-gradient(135deg,var(--blu),var(--blu2));color:#fff;border-color:transparent}
+  #fc-app .fbody{flex:1;min-height:0;display:grid;grid-template-columns:1.05fr .95fr;gap:16px}
+  @media(max-width:640px){#fc-app .fbody{grid-template-columns:1fr;grid-template-rows:1fr auto;overflow-y:auto}}
+  #fc-app .gal{min-height:0;display:flex;flex-direction:column;gap:8px}
+  #fc-app .gal .main{flex:1;min-height:0}
+  #fc-app .gal .thumbs{flex:0 0 auto;display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
+  #fc-app .gal .thumbs .t{height:46px;border:2px solid transparent;border-radius:7px;overflow:hidden;cursor:pointer;padding:0;background:none}
+  #fc-app .gal .thumbs .t.on{border-color:var(--accent)}
+  #fc-app .gal .thumbs .t .pz,#fc-app .gal .thumbs .t img{height:100%;border-radius:0}
+  #fc-app .fspec{min-height:0;display:flex;flex-direction:column;justify-content:center;overflow:auto}
+  #fc-app .fspec h5{font-size:1rem;margin-bottom:8px}
+  #fc-app .frow{display:flex;justify-content:space-between;gap:14px;padding:9px 0;border-bottom:1px dashed var(--bordo);font-size:.86rem}
+  #fc-app .frow .l{color:var(--muto)}
+  #fc-app .frow .v{font-weight:700;color:var(--blu);text-align:right}
+  #fc-app .rollin{flex:1;min-height:0;display:flex;flex-direction:column;gap:12px}
+  #fc-app .rollin .img{flex:1;min-height:0}
+  #fc-app .rollin p{font-size:.9rem;color:var(--testo);line-height:1.5;flex:0 0 auto}
+  </style>
+
+  <div class="view home on" data-view="home">
+    <div class="kick">Frigo Control Ticino · Everlasting</div>
+    <h1>Armadi refrigerati professionali</h1>
+    <div class="sub">Armadi frigo per ristorazione e attività commerciali: robusti, efficienti e curati nei dettagli. Scegli la gamma.</div>
+    <div class="cards" id="cards"></div>
+    <div class="foot">Refrigerante R290 Green · TN e BT · Sopralluogo e assistenza in Ticino</div>
+  </div>
+
+  <div class="view" data-view="basic" id="v-basic"></div>
+  <div class="view" data-view="master" id="v-master"></div>
+  <div class="view" data-view="classic" id="v-classic"></div>
+  <div class="view" data-view="professional" id="v-professional"></div>
+  <div class="view" data-view="rollin" id="v-rollin"></div>
+
+  <script>
+  (function(){
+    var root=document.getElementById('fc-app');
+    if(root.dataset.init) return; root.dataset.init='1';
+    var U='https://frigocontrolch.10web.me/wp-content/uploads/';
+    function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+    function M(name,imgs,tn,bt,refr,cap,dim){return {name:name,imgs:imgs.map(function(u){return U+u;}),
+      specs:[['Temperatura TN',tn],['Temperatura BT',bt],['Refrigerante',refr],['Capacità',cap],['Dimensioni',dim]]};}
+
+    var FAM={
+      basic:{name:'Basic',card:U+'2025/09/basic-700-1.webp',
+        desc:'Affidabili e duraturi, dal design minimale e finiture essenziali. La loro forza è la semplicità: manutenzione, pulizia e sostituzione dell’unità monoblocco facili e rapide.',
+        models:[
+          M('Basic 700',['2025/09/basic-700-1.webp','2025/09/basic-700-2.webp'],'−2°C / +10°C','−10°C / −20°C','R290 Green','625 L','L 750 × P 815 × H 2080 mm'),
+          M('Basic 1500',['2025/09/basic-1500-1.webp','2025/09/basic-1500-2.webp'],'−2°C / +10°C','−10°C / −20°C','R290 Green','1365 L','L 1500 × P 815 × H 2080 mm')
+        ]},
+      master:{name:'Master',card:U+'2025/09/master-700-glass-1.webp',
+        desc:'Funzioni tecnologicamente avanzate, performance ed efficienza elevate. Totale personalizzazione interna ed esterna, design elegante: ideale per cucine e laboratori a vista.',
+        models:[
+          M('Master 700',['2025/09/master-700-1.webp','2025/09/master-700-2.webp'],'−2°C / +10°C','−10°C / −22°C','R290 Green','625 L','L 750 × P 850 × H 2080 mm'),
+          M('Master 700 Glass',['2025/09/master-700-glass-1.webp','2025/09/master-700-glass-2.webp'],'+2°C / +10°C','−10°C / −20°C','R290 Green','625 L','L 750 × P 850 × H 2080 mm'),
+          M('Master 1500 Glass',['2025/09/master-1500-glass-1.webp','2025/09/master-1500-glass-2.webp'],'−2°C / +10°C','−10°C / −22°C','R290 Green','1365 L','L 1500 × P 850 × H 2080 mm'),
+          M('Master 1500 Glass · TNV',['2025/09/master-1500-glass-11.webp','2025/09/master-1500-glass-22.webp'],'+2°C / +10°C','−10°C / −20°C','R290 Green','1365 L','L 1500 × P 850 × H 2080 mm')
+        ]},
+      classic:{name:'Classic',card:U+'2025/09/classic-600-1.webp',
+        desc:'Funzioni avanzate ed efficienza unica. Personalizzazione totale interna ed esterna, design elegante e finiture ricercate: indicato per cucine e laboratori a vista.',
+        models:[
+          M('Classic 600',['2025/09/classic-600-1.webp','2025/09/classic-600-2.webp'],'−2°C / +10°C','−10°C / −22°C','R290 Green · R452A · REM R452A-CO2','534 L','L 750 × P 735 × H 2080 mm'),
+          M('Classic 600 Glass',['2025/09/classic-600-glass-1.webp','2025/09/classic-600-glass-2.webp'],'+2°C / +10°C','−10°C / −20°C','R290 Green · R452A · REM R452A-CO2','534 L','L 750 × P 735 × H 2080 mm'),
+          M('Classic 1200',['2025/09/classic-1200-1.webp','2025/09/classic-1200-2.webp'],'−2°C / +10°C','−10°C / −22°C','R290 Green · R452A · REM R452A-CO2','1167 L','L 1500 × P 735 × H 2080 mm'),
+          M('Classic 1200 Glass',['2025/09/classic-1200-class-1.webp','2025/09/classic-1200-class-2.webp'],'+2°C / +10°C','−10°C / −20°C','R290 Green · R452A · REM R452A-CO2','1167 L','L 1500 × P 735 × H 2080 mm')
+        ]},
+      professional:{name:'Professional',card:U+'2025/09/professional-1500-1.webp',
+        desc:'Design elegante e finiture ricercate, ideali per cucine e laboratori a vista. Altamente efficienti; l’assenza dell’evaporatore in camera offre la massima capacità di carico. Personalizzabili con ampia gamma di optional.',
+        models:[
+          M('Professional 700',['2025/09/professional-700-1.webp','2025/09/professional-700-2.webp'],'−2°C / +10°C','−10°C / −22°C','R290 · R452A · REM R452A-CO2','625 L','L 750 × P 815-850 REM × H 2080 mm'),
+          M('Professional 700 Glass',['2025/09/professional-700-glass-1.webp','2025/09/professional-700-glass-2.webp'],'+2°C / +10°C','−10°C / −20°C','R290 Green · R452A · REM R452A-CO2','625 L','L 750 × P 815-850 REM × H 2080 mm'),
+          M('Professional 1500',['2025/09/professional-1500-1.webp','2025/09/professional-1500-2.webp'],'−2°C / +10°C','−10°C / −22°C','R290 Green · R452A · REM R452A-CO2','1365 L','L 1500 × P 815-850 REM × H 2080 mm'),
+          M('Professional 1500 Glass',['2025/09/professional-1500-glass-1.webp','2025/09/professional-1500-glass-2.webp'],'+2°C / +10°C','−10°C / −20°C','R290 Green · R452A · REM R452A-CO2','1365 L','L 1500 × P 815-850 REM × H 2080 mm'),
+          M('Professional 2300',['2025/09/profession-2300-1.webp','2025/09/profession-2300-2.webp'],'−2°C / +10°C','−10°C / −22°C','R290 Green · R452A','2102 L','L 2250 × P 815-850 REM × H 2080 mm'),
+          M('Professional 2300 Glass',['2025/09/professional-2300-glass-1.webp','2025/09/professional-2300-glass-2.webp'],'+2°C / +10°C','−10°C / −20°C','R290 Green · R452A','2102 L','L 2250 × P 815-850 REM × H 2080 mm')
+        ]},
+      rollin:{name:'Roll-in / Roll-through',card:U+'2025/08/armadi-refrigerati-carrelli-everlasting-ticino-600x250.webp',
+        desc:'Conservano e movimentano grandi quantità di prodotto grazie all’introduzione diretta di carrelli Gastronorm.',
+        banner:U+'2025/08/armadi-refrigerati-carrelli-everlasting-ticino-600x250.webp',
+        text:'Le serie ROLL-IN e ROLL-THROUGH permettono di conservare e movimentare una grande quantità di prodotto grazie all’introduzione diretta di carrelli Gastronorm. Disponibili in versione a una o due porte, oltre all’opzione passante (porte sul fronte e sul retro, per carico e scarico su lati opposti). Sono la soluzione ideale per grandi cucine — hotel, servizi di catering — e per comunità come mense e ospedali.',
+        models:[]}
+    };
+    var ORDER=['basic','master','classic','professional','rollin'];
+
+    /* home cards */
+    document.getElementById('cards').innerHTML=ORDER.map(function(k){var f=FAM[k];
+      return '<button class="card" type="button" data-open="'+k+'"><div class="ph pz"><img src="'+f.card+'" alt="'+esc(f.name)+'" loading="lazy"></div>'
+        +'<div class="bd"><span class="badge">Everlasting</span><h3>'+esc(f.name)+'</h3><p>'+(f.models.length?(f.models.length+' modelli disponibili'):'Roll-in / Roll-through')+'</p><div class="go">Scopri →</div></div></button>';
+    }).join('');
+
+    /* family views */
+    function renderFam(k){
+      var f=FAM[k];
+      if(!f.models.length){
+        return '<div class="top"><button class="back" type="button" data-back><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg> Indietro</button><span class="badge">Everlasting</span><h2>'+esc(f.name)+'</h2></div>'
+          +'<div class="rollin"><div class="img pz ct"><img src="'+f.banner+'" alt="'+esc(f.name)+'" loading="lazy"></div><p>'+esc(f.text)+'</p></div>';
+      }
+      var chips=f.models.map(function(m,i){return '<button class="mchip'+(i===0?' on':'')+'" type="button" data-i="'+i+'">'+esc(m.name)+'</button>';}).join('');
+      return '<div class="top"><button class="back" type="button" data-back><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg> Indietro</button><span class="badge">Everlasting</span><h2>'+esc(f.name)+'</h2></div>'
+        +'<div class="fdesc">'+esc(f.desc)+'</div>'
+        +'<div class="modelbar" data-fam="'+k+'">'+chips+'</div>'
+        +'<div class="fbody">'
+          +'<div class="gal"><div class="main pz ct"><img id="gm-'+k+'"></div><div class="thumbs" id="gt-'+k+'"></div></div>'
+          +'<div class="fspec"><h5 id="mn-'+k+'"></h5><div id="fs-'+k+'"></div></div>'
+        +'</div>';
+    }
+    ORDER.forEach(function(k){ document.getElementById('v-'+k).innerHTML=renderFam(k); });
+
+    var cur={}; // family -> {model, img}
+    function setModel(k,i){
+      var f=FAM[k]; if(!f.models.length) return; var m=f.models[i]; cur[k]={model:i,img:0};
+      document.getElementById('mn-'+k).textContent=m.name;
+      document.getElementById('fs-'+k).innerHTML=m.specs.map(function(s){return '<div class="frow"><span class="l">'+esc(s[0])+'</span><span class="v">'+esc(s[1])+'</span></div>';}).join('');
+      var gm=document.getElementById('gm-'+k); gm.src=m.imgs[0]; gm.alt=m.name;
+      document.getElementById('gt-'+k).innerHTML=m.imgs.map(function(u,j){return '<button class="t'+(j===0?' on':'')+'" type="button" data-img="'+j+'"><span class="pz"><img src="'+u+'" alt="'+esc(m.name)+'" loading="lazy"></span></button>';}).join('');
+      var bar=document.querySelector('.modelbar[data-fam="'+k+'"]');
+      if(bar) bar.querySelectorAll('.mchip').forEach(function(c,ci){c.classList.toggle('on',ci===i);});
+    }
+    ORDER.forEach(function(k){ if(FAM[k].models.length) setModel(k,0); });
+
+    function show(v){ root.querySelectorAll('.view').forEach(function(el){el.classList.toggle('on', el.getAttribute('data-view')===v);}); }
+    root.addEventListener('click',function(e){
+      var op=e.target.closest('[data-open]'); if(op){ show(op.getAttribute('data-open')); return; }
+      if(e.target.closest('[data-back]')){ show('home'); return; }
+      var mc=e.target.closest('.mchip'); if(mc){ var k=mc.closest('.modelbar').getAttribute('data-fam'); setModel(k,+mc.getAttribute('data-i')); return; }
+      var th=e.target.closest('.thumbs .t'); if(th){ var view=th.closest('.view'); var k=view.getAttribute('data-view'); var j=+th.getAttribute('data-img');
+        var m=FAM[k].models[cur[k].model]; var gm=document.getElementById('gm-'+k); gm.src=m.imgs[j]; gm.alt=m.name;
+        view.querySelectorAll('.thumbs .t').forEach(function(x){x.classList.remove('on');}); th.classList.add('on'); return; }
+    });
+    root.addEventListener('contextmenu',function(e){ if(e.target.closest('.pz,img')) e.preventDefault(); });
+    root.addEventListener('dragstart',function(e){ if(e.target.tagName==='IMG') e.preventDefault(); });
+  })();
+  </script>
+</div>

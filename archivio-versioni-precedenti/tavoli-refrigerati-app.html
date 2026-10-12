@@ -1,0 +1,194 @@
+<!-- =====================================================================
+     Frigo Control Ticino — Tavoli refrigerati e banchi pizza (Everlasting) — APP FISSA
+     - App-shell: riempie l'elemento e NON cresce mai
+     - Home: 5 famiglie (Basic / Professional / Saladette / Pizza / Banchi Pizza)
+     - Ogni famiglia: selettore modelli + foto + specifiche + dotazioni/accessori
+     - Su Wix: Incorpora HTML -> larghezza e altezza (consigliato ~680px)
+     ===================================================================== -->
+<div id="fc-app">
+  <style>
+  html,body{height:100%;margin:0;padding:0;overflow:hidden}
+  #fc-app *{box-sizing:border-box;margin:0;padding:0}
+  #fc-app{
+    --blu:#0a3d62;--blu2:#1e6091;--accent:#00a8e8;--grigio:#f4f6f8;--bordo:#e3e9ef;--testo:#22303a;--muto:#6b7b88;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    color:var(--testo);position:relative;height:100%;width:100%;overflow:hidden;
+    background:linear-gradient(180deg,#ffffff 0%,#eef4f8 100%);-webkit-tap-highlight-color:transparent;
+  }
+  #fc-app img{max-width:100%;display:block}
+  #fc-app h1,#fc-app h2,#fc-app h3,#fc-app h4,#fc-app h5,#fc-app h6{color:var(--blu);line-height:1.15}
+  #fc-app .pz{position:relative;overflow:hidden;border-radius:10px;background:#eef2f5}
+  #fc-app .pz img{width:100%;height:100%;object-fit:cover;-webkit-user-drag:none;user-select:none;pointer-events:none}
+  #fc-app .pz.ct img{object-fit:contain;background:#fff}
+  #fc-app .pz::after{content:"";position:absolute;inset:0;z-index:2}
+
+  #fc-app .view{position:absolute;top:0;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:1200px;display:none;flex-direction:column;padding:clamp(12px,2vw,22px);gap:10px}
+  #fc-app .view.on{display:flex;animation:fd .25s ease}
+  @keyframes fd{from{opacity:0}to{opacity:1}}
+
+  #fc-app .kick{letter-spacing:.12em;text-transform:uppercase;font-size:.6rem;font-weight:800;color:var(--accent);text-align:center;flex:0 0 auto}
+  #fc-app .home h1{font-size:clamp(1rem,2.2vw,1.5rem);font-weight:800;text-align:center;flex:0 0 auto}
+  #fc-app .home .sub{text-align:center;color:var(--muto);font-size:.82rem;max-width:700px;margin:0 auto;flex:0 0 auto}
+  #fc-app .cards{flex:1;min-height:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;align-content:center;overflow-y:auto}
+  #fc-app .card{display:flex;flex-direction:column;border:1px solid var(--bordo);border-radius:14px;overflow:hidden;background:#fff;box-shadow:0 8px 22px rgba(10,61,98,.10);cursor:pointer;text-align:left;font:inherit;color:inherit;padding:0}
+  #fc-app .card:hover{box-shadow:0 14px 30px rgba(10,61,98,.18)}
+  #fc-app .card .ph{aspect-ratio:4/3;flex:0 0 auto}
+  #fc-app .card .ph .pz{height:100%}
+  #fc-app .card .bd{flex:0 0 auto;padding:10px 13px 12px}
+  #fc-app .badge{display:inline-block;font-size:.56rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;padding:3px 8px;border-radius:999px;color:#fff;background:linear-gradient(135deg,#0a3d62,#1e6091)}
+  #fc-app .card h3{font-size:.92rem;margin:6px 0 2px}
+  #fc-app .card p{font-size:.74rem;color:var(--muto)}
+  #fc-app .card .go{margin-top:5px;font-weight:700;color:var(--accent);font-size:.74rem}
+  #fc-app .foot{flex:0 0 auto;text-align:center;color:var(--muto);font-size:.7rem}
+
+  #fc-app .top{flex:0 0 auto;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  #fc-app .back{background:none;border:none;cursor:pointer;color:var(--blu);font-weight:700;font-size:.82rem;display:inline-flex;align-items:center;gap:6px;font-family:inherit;padding:2px 4px}
+  #fc-app .back:hover{color:var(--accent)}
+  #fc-app .top h2{font-size:clamp(.98rem,1.8vw,1.25rem)}
+  #fc-app .fdesc{flex:0 0 auto;font-size:.8rem;color:var(--muto);line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  #fc-app .modelbar{flex:0 0 auto;display:flex;gap:6px;overflow-x:auto;padding-bottom:3px;-webkit-overflow-scrolling:touch}
+  #fc-app .mchip{white-space:nowrap;border:1px solid var(--bordo);background:#fff;border-radius:999px;padding:6px 12px;font-size:.74rem;font-weight:700;color:var(--muto);cursor:pointer;font-family:inherit}
+  #fc-app .mchip.on{background:linear-gradient(135deg,var(--blu),var(--blu2));color:#fff;border-color:transparent}
+  #fc-app .fbody{flex:1;min-height:0;display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:640px){#fc-app .fbody{grid-template-columns:1fr;grid-template-rows:1fr auto;overflow-y:auto}}
+  #fc-app .gal{min-height:0;display:flex;flex-direction:column;gap:8px}
+  #fc-app .gal .main{flex:1;min-height:0}
+  #fc-app .gal .thumbs{flex:0 0 auto;display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
+  #fc-app .gal .thumbs .t{height:44px;border:2px solid transparent;border-radius:7px;overflow:hidden;cursor:pointer;padding:0;background:none}
+  #fc-app .gal .thumbs .t.on{border-color:var(--accent)}
+  #fc-app .gal .thumbs .t .pz,#fc-app .gal .thumbs .t img{height:100%;border-radius:0}
+  #fc-app .fspec{min-height:0;display:flex;flex-direction:column;overflow:auto}
+  #fc-app .fspec h5{font-size:1rem;margin-bottom:6px}
+  #fc-app .frow{display:flex;justify-content:space-between;gap:14px;padding:7px 0;border-bottom:1px dashed var(--bordo);font-size:.82rem}
+  #fc-app .frow .l{color:var(--muto)}
+  #fc-app .frow .v{font-weight:700;color:var(--blu);text-align:right}
+  #fc-app .extra{margin-top:12px}
+  #fc-app .extra h6{font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muto);margin:10px 0 5px}
+  #fc-app .extra ul{list-style:none;display:grid;gap:4px}
+  #fc-app .extra li{display:flex;gap:7px;font-size:.79rem;align-items:flex-start}
+  #fc-app .extra li svg{flex:0 0 13px;margin-top:3px;color:var(--accent)}
+  </style>
+
+  <div class="view home on" data-view="home">
+    <div class="kick">Frigo Control Ticino · Everlasting</div>
+    <h1>Tavoli refrigerati e banchi pizza</h1>
+    <div class="sub">Tavoli frigo ventilati e banchi pizza professionali: allestimento interno e layout esterno personalizzabili, con funzioni avanzate e design elegante.</div>
+    <div class="cards" id="cards"></div>
+    <div class="foot">Refrigerante R290 / R452A · Acciaio inox · Sopralluogo e assistenza in Ticino</div>
+  </div>
+
+  <div class="view" data-view="basic" id="v-basic"></div>
+  <div class="view" data-view="professional" id="v-professional"></div>
+  <div class="view" data-view="saladette" id="v-saladette"></div>
+  <div class="view" data-view="pizza" id="v-pizza"></div>
+  <div class="view" data-view="banchi" id="v-banchi"></div>
+
+  <script>
+  (function(){
+    var root=document.getElementById('fc-app');
+    if(root.dataset.init) return; root.dataset.init='1';
+    var U='https://frigocontrolch.10web.me/wp-content/uploads/2025/10/';
+    var CK='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>';
+    function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+    function dims3(L,P){return [['Dim. senza piano (S)','L '+L+' × P '+P+' × H 810 mm'],['Dim. con piano (P)','L '+L+' × P '+P+' × H 850 mm'],['Dim. con alzatina (A)','L '+L+' × P '+P+' × H 950 mm']];}
+    function M(name,imgs,rows){return {name:name,imgs:imgs.map(function(u){return U+u;}),rows:rows};}
+
+    var FAM={
+      basic:{name:'Basic',card:U+'122.webp',
+        desc:'“Qualità semplificata”: affidabili e resistenti nel tempo, dal design e finiture essenziali, con manutenzione e pulizia facili.',
+        dot:['nr 1 griglia plastificata GN/1 con guide inox (per ciascuna porta)'],
+        acc:['Cassettiera 1/2 in sostituzione di una porta','Cassetti interni (h 75 / 150 mm)','Ruote'],
+        models:[
+          M('Basic 85',['122.webp','123.webp'],[['Temperatura TN','0 / +10 °C'],['Temperatura BT','−10 / −20 °C'],['Refrigerante','R290 Green']].concat(dims3('853','700'))),
+          M('Basic 130',['116.webp','117.webp'],[['Temperatura TN','0 / +10 °C'],['Temperatura BT','−10 / −20 °C'],['Refrigerante','R290 Green']].concat(dims3('1306','700'))),
+          M('Basic 175',['118.webp','119.webp'],[['Temperatura TN','0 / +10 °C'],['Temperatura BT','−10 / −20 °C'],['Refrigerante','R290 Green']].concat(dims3('1759','700'))),
+          M('Basic 221',['120-2.webp','121-1.webp'],[['Temperatura TN','0 / +10 °C'],['Refrigerante','R290 Green']].concat(dims3('2212','700')))
+        ]},
+      professional:{name:'Professional',card:U+'124.webp',
+        desc:'Altamente efficienti; l’assenza dell’evaporatore in camera offre la massima capacità di carico. Design elegante, personalizzabili con molti optional: ideali per cucine e laboratori a vista.',
+        dot:['nr 1 griglia plastificata con guide inox per ciascuna porta'],
+        acc:['Lampada UVC germicida','Porte a vetro con illuminazione interna LED','Ruote','Chiusura con chiave per porte e cassetti','Cassetti interni su guide (h 75 / 150 mm)'],
+        models:[
+          M('Professional 130',['124.webp','125.webp'],[['Temperatura TN','−2 / +10 °C'],['Refrigerante','R290 Green / R452A (non disp. UE)']].concat(dims3('1306','600'))),
+          M('Professional 175',['126.webp','127.webp'],[['Temperatura TN','−2 / +10 °C'],['Refrigerante','R290 Green / R452A (non disp. UE)']].concat(dims3('1759','600'))),
+          M('Professional 111 REM',['128.webp','129.webp'],[['Temperatura TN','−2 / +10 °C'],['Refrigerante','R452A - CO2']].concat(dims3('1116','600'))),
+          M('Professional 156 REM',['130.webp','131.webp'],[['Temperatura TN','−2 / +10 °C'],['Refrigerante','R452A - CO2']].concat(dims3('1569','600')))
+        ]},
+      saladette:{name:'Saladette',card:U+'132.webp',
+        desc:'Saladette refrigerate per conservazione ed esposizione: ingredienti sempre a portata di mano e freschi più a lungo, in cucina o in sala.',
+        dot:['nr 1 griglia plastificata GN/1 con guide inox per ciascuna porta','Vaschette Gastronorm non incluse'],
+        acc:['Lampada UVC germicida','Ruote','Traversino inox per supporto vaschette GN','Cassetti interni su guide (h 75 / 150 mm)'],
+        models:[
+          M('Saladette 2',['132.webp','133.webp'],[['Temperatura TN','−2 / +10 °C'],['Refrigerante','R290 Green / R452A'],['Dimensioni','L 1306 × P 700 × H 850 mm']]),
+          M('Saladette 3',['134.webp','135.webp'],[['Temperatura TN','−2 / +10 °C'],['Refrigerante','R290 Green / R452A'],['Dimensioni','L 1759 × P 700 × H 850 mm']]),
+          M('Saladette 4',['136.webp','137.webp'],[['Temperatura TN','−2 / +10 °C'],['Refrigerante','R290 Green / R452A'],['Dimensioni','L 2212 × P 700 × H 850 mm']])
+        ]},
+      pizza:{name:'Pizza',card:U+'138.webp',
+        desc:'Tavoli pizza totalmente personalizzabili (cassettiera neutra, piano in granito, vetrina refrigerata). Disponibili anche con unità condensatrice remota.',
+        dot:['nr 1 coppia di guide inox ad “L” e nr 1 griglia plastificata per ciascuna porta'],
+        acc:['Cassetti interni (h 75 / 150 mm)','Telaio estraibile per vaschette pizza','Vaschette in plastica per impasto pizza'],
+        models:[
+          M('PZ 92',['138.webp','139.webp'],[['Temperatura','−2 / +10 °C'],['Refrigerante','R290 Green / R452A'],['Dimensioni','L 928 × P 750 × H 810 mm']]),
+          M('PZ 145',['140.webp','141.webp'],[['Temperatura','−2 / +10 °C'],['Refrigerante','R290 Green / R452A'],['Dimensioni','L 1456 × P 750 × H 810 mm']]),
+          M('PZ 198',['142.webp','143.webp'],[['Temperatura','−2 / +10 °C'],['Refrigerante','R290 Green / R452A'],['Dimensioni','L 1984 × P 750 × H 810 mm']]),
+          M('PZ 251',['144.webp','145.webp'],[['Temperatura','−2 / +10 °C'],['Refrigerante','R290 Green / R452A'],['Dimensioni','L 2512 × P 750 × H 810 mm']])
+        ]},
+      banchi:{name:'Banchi Professional Pizza',card:U+'ita-10079.webp.webp',
+        desc:'Banco pizza composto da 4 elementi: tavolo pizza refrigerato (anche REM), cassetti non refrigerati, piano di lavoro in granito (alzatina 180 mm, prof. 800 mm, spessore 30 mm) e vetrina refrigerata (vetro curvo o piano). Ogni elemento è acquistabile anche separatamente.',
+        dot:['nr 1 coppia di guide inox ad “L” e nr 1 griglia plastificata per ciascuna porta'],
+        acc:['Cassetti interni (h 75 / 150 mm)','Telaio estraibile per vaschette pizza','Vaschette in plastica per impasto pizza'],
+        models:[
+          M('Professional PZ 92',['ita-10079.webp.webp','ita-15640.webp.webp','ita-15641.webp.webp','ita-16502.webp.webp'],[['Temperatura','−2 / +10 °C'],['Refrigerante','R290 Green / R452A'],['Dimensioni','L 1472 × P 800 × H 1390 mm']]),
+          M('Professional PZ 145',['ita-10116.webp','ita-15644-600x600.webp','ita-15645-600x600.webp','ita-16503.webp'],[['Temperatura','−2 / +10 °C'],['Refrigerante','R290 Green / R452A'],['Dimensioni','L 1472 × P 800 × H 1390 mm']]),
+          M('Professional PZ 251',['ita-10406.webp','ita-15654.webp','ita-15655.webp','ita-16508.webp'],[['Temperatura','−2 / +10 °C'],['Refrigerante','R290 Green / R452A'],['Dimensioni','L 2530 × P 800 × H 1390 mm']])
+        ]}
+    };
+    var ORDER=['basic','professional','saladette','pizza','banchi'];
+
+    document.getElementById('cards').innerHTML=ORDER.map(function(k){var f=FAM[k];
+      return '<button class="card" type="button" data-open="'+k+'"><div class="ph"><div class="pz ct"><img src="'+f.card+'" alt="'+esc(f.name)+'" loading="lazy"></div></div>'
+        +'<div class="bd"><span class="badge">Everlasting</span><h3>'+esc(f.name)+'</h3><p>'+f.models.length+' modelli</p><div class="go">Scopri →</div></div></button>';
+    }).join('');
+
+    function renderFam(k){
+      var f=FAM[k];
+      var chips=f.models.map(function(m,i){return '<button class="mchip'+(i===0?' on':'')+'" type="button" data-i="'+i+'">'+esc(m.name)+'</button>';}).join('');
+      var extra='<div class="extra"><h6>Dotazioni standard</h6><ul>'+f.dot.map(function(x){return '<li>'+CK+'<span>'+esc(x)+'</span></li>';}).join('')
+        +'</ul><h6>Accessori a richiesta</h6><ul>'+f.acc.map(function(x){return '<li>'+CK+'<span>'+esc(x)+'</span></li>';}).join('')+'</ul></div>';
+      return '<div class="top"><button class="back" type="button" data-back><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg> Indietro</button><span class="badge">Everlasting</span><h2>'+esc(f.name)+'</h2></div>'
+        +'<div class="fdesc">'+esc(f.desc)+'</div>'
+        +'<div class="modelbar" data-fam="'+k+'">'+chips+'</div>'
+        +'<div class="fbody">'
+          +'<div class="gal"><div class="main pz ct"><img id="gm-'+k+'"></div><div class="thumbs" id="gt-'+k+'"></div></div>'
+          +'<div class="fspec"><h5 id="mn-'+k+'"></h5><div id="fs-'+k+'"></div>'+extra+'</div>'
+        +'</div>';
+    }
+    ORDER.forEach(function(k){ document.getElementById('v-'+k).innerHTML=renderFam(k); });
+
+    var cur={};
+    function setModel(k,i){
+      var f=FAM[k],m=f.models[i]; cur[k]={model:i};
+      document.getElementById('mn-'+k).textContent=m.name;
+      document.getElementById('fs-'+k).innerHTML=m.rows.map(function(s){return '<div class="frow"><span class="l">'+esc(s[0])+'</span><span class="v">'+esc(s[1])+'</span></div>';}).join('');
+      var gm=document.getElementById('gm-'+k); gm.src=m.imgs[0]; gm.alt=m.name;
+      document.getElementById('gt-'+k).innerHTML=m.imgs.map(function(u,j){return '<button class="t'+(j===0?' on':'')+'" type="button" data-img="'+j+'"><span class="pz"><img src="'+u+'" alt="'+esc(m.name)+'" loading="lazy"></span></button>';}).join('');
+      var bar=document.querySelector('.modelbar[data-fam="'+k+'"]');
+      if(bar) bar.querySelectorAll('.mchip').forEach(function(c,ci){c.classList.toggle('on',ci===i);});
+      var fs=document.getElementById('fs-'+k); if(fs&&fs.parentNode) fs.parentNode.scrollTop=0;
+    }
+    ORDER.forEach(function(k){ setModel(k,0); });
+
+    function show(v){ root.querySelectorAll('.view').forEach(function(el){el.classList.toggle('on', el.getAttribute('data-view')===v);}); }
+    root.addEventListener('click',function(e){
+      var op=e.target.closest('[data-open]'); if(op){ var v=op.getAttribute('data-open'); show(v); setModel(v,0); return; }
+      if(e.target.closest('[data-back]')){ show('home'); return; }
+      var mc=e.target.closest('.mchip'); if(mc){ var k=mc.closest('.modelbar').getAttribute('data-fam'); setModel(k,+mc.getAttribute('data-i')); return; }
+      var th=e.target.closest('.thumbs .t'); if(th){ var view=th.closest('.view'); var k=view.getAttribute('data-view'); var j=+th.getAttribute('data-img');
+        var m=FAM[k].models[cur[k].model]; var gm=document.getElementById('gm-'+k); gm.src=m.imgs[j]; gm.alt=m.name;
+        view.querySelectorAll('.thumbs .t').forEach(function(x){x.classList.remove('on');}); th.classList.add('on'); return; }
+    });
+    root.addEventListener('contextmenu',function(e){ if(e.target.closest('.pz,img')) e.preventDefault(); });
+    root.addEventListener('dragstart',function(e){ if(e.target.tagName==='IMG') e.preventDefault(); });
+  })();
+  </script>
+</div>

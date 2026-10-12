@@ -1,0 +1,739 @@
+<!-- =====================================================================
+     Frigo Control Ticino — Tavoli refrigerati e banchi pizza (Everlasting) — APP FISSA
+     - App-shell: riempie l'elemento e NON cresce mai
+     - Home: 5 famiglie (Basic / Professional / Saladette / Pizza / Banchi Pizza)
+     - Ogni famiglia: selettore modelli + foto + specifiche + dotazioni/accessori
+     - Su Wix: Incorpora HTML -> larghezza e altezza (consigliato ~680px)
+     ===================================================================== -->
+<div id="fc-app">
+  <style>
+  html,body{height:100%;margin:0;padding:0;overflow:hidden}
+  #fc-app *{box-sizing:border-box;margin:0;padding:0}
+  #fc-app{
+    --blu:#0a3d62;--blu2:#1e6091;--accent:#00a8e8;--grigio:#f4f6f8;--bordo:#e3e9ef;--testo:#22303a;--muto:#6b7b88;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    color:var(--testo);position:relative;height:100%;width:100%;overflow:hidden;
+    background:linear-gradient(180deg,#ffffff 0%,#eef4f8 100%);-webkit-tap-highlight-color:transparent;
+  }
+  #fc-app img{max-width:100%;display:block}
+  #fc-app h1,#fc-app h2,#fc-app h3,#fc-app h4,#fc-app h5,#fc-app h6{color:var(--blu);line-height:1.15}
+  #fc-app .pz{position:relative;overflow:hidden;border-radius:10px;background:#eef2f5}
+  #fc-app .pz img{width:100%;height:100%;object-fit:cover;-webkit-user-drag:none;user-select:none;pointer-events:none}
+  #fc-app .pz.ct img{object-fit:contain;background:#fff}
+  #fc-app .pz::after{content:"";position:absolute;inset:0;z-index:2}
+
+  #fc-app .view{position:absolute;top:0;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:1200px;display:none;flex-direction:column;padding:clamp(12px,2vw,22px);gap:10px}
+  #fc-app .view.on{display:flex;animation:fd .25s ease}
+  @keyframes fd{from{opacity:0}to{opacity:1}}
+
+  #fc-app .kick{letter-spacing:.12em;text-transform:uppercase;font-size:.6rem;font-weight:800;color:var(--accent);text-align:center;flex:0 0 auto}
+  #fc-app .home h1{font-size:clamp(1rem,2.2vw,1.5rem);font-weight:800;text-align:center;flex:0 0 auto}
+  #fc-app .home .sub{text-align:center;color:var(--muto);font-size:.82rem;max-width:700px;margin:0 auto;flex:0 0 auto}
+  #fc-app .cards{flex:1;min-height:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;align-content:center;overflow-y:auto}
+  #fc-app .card{display:flex;flex-direction:column;border:1px solid var(--bordo);border-radius:14px;overflow:hidden;background:#fff;box-shadow:0 8px 22px rgba(10,61,98,.10);cursor:pointer;text-align:left;font:inherit;color:inherit;padding:0}
+  #fc-app .card:hover{box-shadow:0 14px 30px rgba(10,61,98,.18)}
+  #fc-app .card .ph{aspect-ratio:4/3;flex:0 0 auto}
+  #fc-app .card .ph .pz{height:100%}
+  #fc-app .card .bd{flex:0 0 auto;padding:10px 13px 12px}
+  #fc-app .badge{display:inline-block;font-size:.56rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;padding:3px 8px;border-radius:999px;color:#fff;background:linear-gradient(135deg,#0a3d62,#1e6091)}
+  #fc-app .card h3{font-size:.92rem;margin:6px 0 2px}
+  #fc-app .card p{font-size:.74rem;color:var(--muto)}
+  #fc-app .card .go{margin-top:5px;font-weight:700;color:var(--accent);font-size:.74rem}
+  #fc-app .foot{flex:0 0 auto;text-align:center;color:var(--muto);font-size:.7rem}
+
+  #fc-app .top{flex:0 0 auto;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  #fc-app .back{background:none;border:none;cursor:pointer;color:var(--blu);font-weight:700;font-size:.82rem;display:inline-flex;align-items:center;gap:6px;font-family:inherit;padding:2px 4px}
+  #fc-app .back:hover{color:var(--accent)}
+  #fc-app .top h2{font-size:clamp(.98rem,1.8vw,1.25rem)}
+  #fc-app .fdesc{flex:0 0 auto;font-size:.8rem;color:var(--muto);line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  #fc-app .modelbar{flex:0 0 auto;display:flex;gap:6px;overflow-x:auto;padding-bottom:3px;-webkit-overflow-scrolling:touch}
+  #fc-app .mchip{white-space:nowrap;border:1px solid var(--bordo);background:#fff;border-radius:999px;padding:6px 12px;font-size:.74rem;font-weight:700;color:var(--muto);cursor:pointer;font-family:inherit}
+  #fc-app .mchip.on{background:linear-gradient(135deg,var(--blu),var(--blu2));color:#fff;border-color:transparent}
+  #fc-app .fbody{flex:1;min-height:0;display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:640px){#fc-app .fbody{grid-template-columns:1fr;grid-template-rows:1fr auto;overflow-y:auto}}
+  #fc-app .gal{min-height:0;display:flex;flex-direction:column;gap:8px}
+  #fc-app .gal .main{flex:1;min-height:0}
+  #fc-app .gal .thumbs{flex:0 0 auto;display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
+  #fc-app .gal .thumbs .t{height:44px;border:2px solid transparent;border-radius:7px;overflow:hidden;cursor:pointer;padding:0;background:none}
+  #fc-app .gal .thumbs .t.on{border-color:var(--accent)}
+  #fc-app .gal .thumbs .t .pz,#fc-app .gal .thumbs .t img{height:100%;border-radius:0}
+  #fc-app .fspec{min-height:0;display:flex;flex-direction:column;overflow:auto}
+  #fc-app .fspec h5{font-size:1rem;margin-bottom:6px}
+  #fc-app .frow{display:flex;justify-content:space-between;gap:14px;padding:7px 0;border-bottom:1px dashed var(--bordo);font-size:.82rem}
+  #fc-app .frow .l{color:var(--muto)}
+  #fc-app .frow .v{font-weight:700;color:var(--blu);text-align:right}
+  #fc-app .extra{margin-top:12px}
+  #fc-app .extra h6{font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muto);margin:10px 0 5px}
+  #fc-app .extra ul{list-style:none;display:grid;gap:4px}
+  #fc-app .extra li{display:flex;gap:7px;font-size:.79rem;align-items:flex-start}
+  #fc-app .extra li svg{flex:0 0 13px;margin-top:3px;color:var(--accent)}
+  </style>
+
+  <div class="view home on" data-view="home">
+    <div class="kick" id="fc-kick"></div>
+    <h1 id="fc-titolo"></h1>
+    <div class="sub" id="fc-sub"></div>
+    <div class="cards" id="cards"></div>
+    <div class="foot" id="fc-foot"></div>
+  </div>
+
+  <!--FC-KIT-->
+  <script>
+  (function(){
+    var root=document.getElementById('fc-app');
+    if(root.dataset.init) return; root.dataset.init='1';
+    var CK="<svg width=\"13\" height=\"13\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M20 6L9 17l-5-5\"/></svg>";
+    function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+    /* Contenuti predefiniti (quelli attualmente online) */
+    var DATI={
+ "home": {
+  "kick": "Frigo Control Ticino · Everlasting",
+  "titolo": "Tavoli refrigerati e banchi pizza",
+  "sub": "Tavoli frigo ventilati e banchi pizza professionali: allestimento interno e layout esterno personalizzabili, con funzioni avanzate e design elegante.",
+  "foot": "Refrigerante R290 / R452A · Acciaio inox · Sopralluogo e assistenza in Ticino",
+  "badge": "Everlasting",
+  "titoloDot": "Dotazioni standard",
+  "titoloAcc": "Accessori a richiesta"
+ },
+ "famiglie": [
+  {
+   "name": "Basic",
+   "card": "https://dgvrlpubiuqxsvkjtrdh.supabase.co/storage/v1/object/public/media/hq/frigocontrolch.10web.me/wp-content/uploads/2025/10/122.webp",
+   "desc": "“Qualità semplificata”: affidabili e resistenti nel tempo, dal design e finiture essenziali, con manutenzione e pulizia facili.",
+   "dot": [
+    "nr 1 griglia plastificata GN/1 con guide inox (per ciascuna porta)"
+   ],
+   "acc": [
+    "Cassettiera 1/2 in sostituzione di una porta",
+    "Cassetti interni (h 75 / 150 mm)",
+    "Ruote"
+   ],
+   "models": [
+    {
+     "name": "Basic 85",
+     "imgs": [
+      "https://dgvrlpubiuqxsvkjtrdh.supabase.co/storage/v1/object/public/media/hq/frigocontrolch.10web.me/wp-content/uploads/2025/10/122.webp",
+      "https://dgvrlpubiuqxsvkjtrdh.supabase.co/storage/v1/object/public/media/hq/frigocontrolch.10web.me/wp-content/uploads/2025/10/123.webp"
+     ],
+     "rows": [
+      {
+       "l": "Temperatura TN",
+       "v": "0 / +10 °C"
+      },
+      {
+       "l": "Temperatura BT",
+       "v": "−10 / −20 °C"
+      },
+      {
+       "l": "Refrigerante",
+       "v": "R290 Green"
+      },
+      {
+       "l": "Dim. senza piano (S)",
+       "v": "L 853 × P 700 × H 810 mm"
+      },
+      {
+       "l": "Dim. con piano (P)",
+       "v": "L 853 × P 700 × H 850 mm"
+      },
+      {
+       "l": "Dim. con alzatina (A)",
+       "v": "L 853 × P 700 × H 950 mm"
+      }
+     ]
+    },
+    {
+     "name": "Basic 130",
+     "imgs": [
+      "https://dgvrlpubiuqxsvkjtrdh.supabase.co/storage/v1/object/public/media/hq/frigocontrolch.10web.me/wp-content/uploads/2025/10/116.webp",
+      "https://dgvrlpubiuqxsvkjtrdh.supabase.co/storage/v1/object/public/media/hq/frigocontrolch.10web.me/wp-content/uploads/2025/10/117.webp"
+     ],
+     "rows": [
+      {
+       "l": "Temperatura TN",
+       "v": "0 / +10 °C"
+      },
+      {
+       "l": "Temperatura BT",
+       "v": "−10 / −20 °C"
+      },
+      {
+       "l": "Refrigerante",
+       "v": "R290 Green"
+      },
+      {
+       "l": "Dim. senza piano (S)",
+       "v": "L 1306 × P 700 × H 810 mm"
+      },
+      {
+       "l": "Dim. con piano (P)",
+       "v": "L 1306 × P 700 × H 850 mm"
+      },
+      {
+       "l": "Dim. con alzatina (A)",
+       "v": "L 1306 × P 700 × H 950 mm"
+      }
+     ]
+    },
+    {
+     "name": "Basic 175",
+     "imgs": [
+      "https://dgvrlpubiuqxsvkjtrdh.supabase.co/storage/v1/object/public/media/hq/frigocontrolch.10web.me/wp-content/uploads/2025/10/118.webp",
+      "https://dgvrlpubiuqxsvkjtrdh.supabase.co/storage/v1/object/public/media/hq/frigocontrolch.10web.me/wp-content/uploads/2025/10/119.webp"
+     ],
+     "rows": [
+      {
+       "l": "Temperatura TN",
+       "v": "0 / +10 °C"
+      },
+      {
+       "l": "Temperatura BT",
+       "v": "−10 / −20 °C"
+      },
+      {
+       "l": "Refrigerante",
+       "v": "R290 Green"
+      },
+      {
+       "l": "Dim. senza piano (S)",
+       "v": "L 1759 × P 700 × H 810 mm"
+      },
+      {
+       "l": "Dim. con piano (P)",
+       "v": "L 1759 × P 700 × H 850 mm"
+      },
+      {
+       "l": "Dim. con alzatina (A)",
+       "v": "L 1759 × P 700 × H 950 mm"
+      }
+     ]
+    },
+    {
+     "name": "Basic 221",
+     "imgs": [
+      "https://dgvrlpubiuqxsvkjtrdh.supabase.co/storage/v1/object/public/media/hq/frigocontrolch.10web.me/wp-content/uploads/2025/10/120-2.webp",
+      "https://dgvrlpubiuqxsvkjtrdh.supabase.co/storage/v1/object/public/media/hq/frigocontrolch.10web.me/wp-content/uploads/2025/10/121-1.webp"
+     ],
+     "rows": [
+      {
+       "l": "Temperatura TN",
+       "v": "0 / +10 °C"
+      },
+      {
+       "l": "Refrigerante",
+       "v": "R290 Green"
+      },
+      {
+       "l": "Dim. senza piano (S)",
+       "v": "L 2212 × P 700 × H 810 mm"
+      },
+      {
+       "l": "Dim. con piano (P)",
+       "v": "L 2212 × P 700 × H 850 mm"
+      },
+      {
+       "l": "Dim. con alzatina (A)",
+       "v": "L 2212 × P 700 × H 950 mm"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "Professional",
+   "card": "https://dgvrlpubiuqxsvkjtrdh.supabase.co/storage/v1/object/public/media/hq/frigocontrolch.10web.me/wp-content/uploads/2025/10/124.webp",
+   "desc": "Altamente efficienti; l’assenza dell’evaporatore in camera offre la massima capacità di carico. Design elegante, personalizzabili con molti optional: ideali per cucine e laboratori a vista.",
+   "dot": [
+    "nr 1 griglia plastificata con guide inox per ciascuna porta"
+   ],
+   "acc": [
+    "Lampada UVC germicida",
+    "Porte a vetro con illuminazione interna LED",
+    "Ruote",
+    "Chiusura con chiave per porte e cassetti",
+    "Cassetti interni su guide (h 75 / 150 mm)"
+   ],
+   "models": [
+    {
+     "name": "Professional 130",
+     "imgs": [
+      "https://dgvrlpubiuqxsvkjtrdh.supabase.co/storage/v1/object/public/media/hq/frigocontrolch.10web.me/wp-content/uploads/2025/10/124.webp",
+      "https://dgvrlpubiuqxsvkjtrdh.supabase.co/storage/v1/object/public/media/hq/frigocontrolch.10web.me/wp-content/uploads/2025/10/125.webp"
+     ],
+     "rows": [
+      {
+       "l": "Temperatura TN",
+       "v": "−2 / +10 °C"
+      },
+      {
+       "l": "Refrigerante",
+       "v": "R290 Green / R452A (non disp. UE)"
+      },
+      {
+       "l": "Dim. senza piano (S)",
+       "v": "L 1306 × P 600 × H 810 mm"
+      },
+      {
+       "l": "Dim. con piano (P)",
+       "v": "L 1306 × P 600 × H 850 mm"
+      },
+      {
+       "l": "Dim. con alzatina (A)",
+       "v": "L 1306 × P 600 × H 950 mm"
+      }
+     ]
+    },
+    {
+     "name": "Professional 175",
+     "imgs": [
+      "https://dgvrlpubiuqxsvkjtrdh.supabase.co/storage/v1/object/public/media/hq/frigocontrolch.10web.me/wp-content/uploads/2025/10/126.webp",
+      "https://dgvrlpubiuqxsvkjtrdh.supabase.co/storage/v1/object/public/media/hq/frigocontrolch.10web.me/wp-content/uploads/2025/10/127.webp"
+     ],
+     "rows": [
+      {
+       "l": "Temperatura TN",
+       "v": "−2 / +10 °C"
+      },
+      {
+       "l": "Refrigerante",
+       "v": "R290 Green / R452A (non disp. UE)"
+      },
+      {
+       "l": "Dim. senza piano (S)",
+       "v": "L 1759 × P 600 × H 810 mm"
+      },
+      {
+       "l": "Dim. con piano (P)",
+       "v": "L 1759 × P 600 × H 850 mm"
+      },
+      {
+       "l": "Dim. con alzatina (A)",
+       "v": "L 1759 × P 600 × H 950 mm"
+      }
+     ]
+    },
+    {
+     "name": "Professional 111 REM",
+     "imgs": [
+      "https://dgvrlpubiuqxsvkjtrdh.supabase.co/storage/v1/object/public/media/hq/frigocontrolch.10web.me/wp-content/uploads/2025/10/128.webp",
+      "https://dgvrlpubiuqxsvkjtrdh.supabase.co/storage/v1/object/public/media/hq/frigocontrolch.10web.me/wp-content/uploads/2025/10/129.webp"
+     ],
+     "rows": [
+      {
+       "l": "Temperatura TN",
+       "v": "−2 / +10 °C"
+      },
+      {
+       "l": "Refrigerante",
+       "v": "R452A - CO2"
+      },
+      {
+       "l": "Dim. senza piano (S)",
+       "v": "L 1116 × P 600 × H 810 mm"
+      },
+      {
+       "l": "Dim. con piano (P)",
+       "v": "L 1116 × P 600 × H 850 mm"
+      },
+      {
+       "l": "Dim. con alzatina (A)",
+       "v": "L 1116 × P 600 × H 950 mm"
+      }
+     ]
+    },
+    {
+     "name": "Professional 156 REM",
+     "imgs": [
+      "https://dgvrlpubiuqxsvkjtrdh.supabase.co/storage/v1/object/public/media/hq/frigocontrolch.10web.me/wp-content/uploads/2025/10/130.webp",
+      "https://dgvrlpubiuqxsvkjtrdh.supabase.co/storage/v1/object/public/media/hq/frigocontrolch.10web.me/wp-content/uploads/2025/10/131.webp"
+     ],
+     "rows": [
+      {
+       "l": "Temperatura TN",
+       "v": "−2 / +10 °C"
+      },
+      {
+       "l": "Refrigerante",
+       "v": "R452A - CO2"
+      },
+      {
+       "l": "Dim. senza piano (S)",
+       "v": "L 1569 × P 600 × H 810 mm"
+      },
+      {
+       "l": "Dim. con piano (P)",
+       "v": "L 1569 × P 600 × H 850 mm"
+      },
+      {
+       "l": "Dim. con alzatina (A)",
+       "v": "L 1569 × P 600 × H 950 mm"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "Saladette",
+   "card": "https://dgvrlpubiuqxsvkjtrdh.supabase.co/storage/v1/object/public/media/hq/frigocontrolch.10web.me/wp-content/uploads/2025/10/132.webp",
+   "desc": "Saladette refrigerate per conservazione ed esposizione: ingredienti sempre a portata di mano e freschi più a lungo, in cucina o in sala.",
+   "dot": [
+    "nr 1 griglia plastificata GN/1 con guide inox per ciascuna porta",
+    "Vaschette Gastronorm non incluse"
+   ],
+   "acc": [
+    "Lampada UVC germicida",
+    "Ruote",
+    "Traversino inox per supporto vaschette GN",
+    "Cassetti interni su guide (h 75 / 150 mm)"
+   ],
+   "models": [
+    {
+     "name": "Saladette 2",
+     "imgs": [
+      "https://dgvrlpubiuqxsvkjtrdh.supabase.co/storage/v1/object/public/media/hq/frigocontrolch.10web.me/wp-content/uploads/2025/10/132.webp",
+      "https://dgvrlpubiuqxsvkjtrdh.supabase.co/storage/v1/object/public/media/hq/frigocontrolch.10web.me/wp-content/uploads/2025/10/133.webp"
+     ],
+     "rows": [
+      {
+       "l": "Temperatura TN",
+       "v": "−2 / +10 °C"
+      },
+      {
+       "l": "Refrigerante",
+       "v": "R290 Green / R452A"
+      },
+      {
+       "l": "Dimensioni",
+       "v": "L 1306 × P 700 × H 850 mm"
+      }
+     ]
+    },
+    {
+     "name": "Saladette 3",
+     "imgs": [
+      "https://dgvrlpubiuqxsvkjtrdh.supabase.co/storage/v1/object/public/media/hq/frigocontrolch.10web.me/wp-content/uploads/2025/10/134.webp",
+      "https://dgvrlpubiuqxsvkjtrdh.supabase.co/storage/v1/object/public/media/hq/frigocontrolch.10web.me/wp-content/uploads/2025/10/135.webp"
+     ],
+     "rows": [
+      {
+       "l": "Temperatura TN",
+       "v": "−2 / +10 °C"
+      },
+      {
+       "l": "Refrigerante",
+       "v": "R290 Green / R452A"
+      },
+      {
+       "l": "Dimensioni",
+       "v": "L 1759 × P 700 × H 850 mm"
+      }
+     ]
+    },
+    {
+     "name": "Saladette 4",
+     "imgs": [
+      "https://dgvrlpubiuqxsvkjtrdh.supabase.co/storage/v1/object/public/media/hq/frigocontrolch.10web.me/wp-content/uploads/2025/10/136.webp",
+      "https://dgvrlpubiuqxsvkjtrdh.supabase.co/storage/v1/object/public/media/hq/frigocontrolch.10web.me/wp-content/uploads/2025/10/137.webp"
+     ],
+     "rows": [
+      {
+       "l": "Temperatura TN",
+       "v": "−2 / +10 °C"
+      },
+      {
+       "l": "Refrigerante",
+       "v": "R290 Green / R452A"
+      },
+      {
+       "l": "Dimensioni",
+       "v": "L 2212 × P 700 × H 850 mm"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "Pizza",
+   "card": "https://dgvrlpubiuqxsvkjtrdh.supabase.co/storage/v1/object/public/media/hq/frigocontrolch.10web.me/wp-content/uploads/2025/10/138.webp",
+   "desc": "Tavoli pizza totalmente personalizzabili (cassettiera neutra, piano in granito, vetrina refrigerata). Disponibili anche con unità condensatrice remota.",
+   "dot": [
+    "nr 1 coppia di guide inox ad “L” e nr 1 griglia plastificata per ciascuna porta"
+   ],
+   "acc": [
+    "Cassetti interni (h 75 / 150 mm)",
+    "Telaio estraibile per vaschette pizza",
+    "Vaschette in plastica per impasto pizza"
+   ],
+   "models": [
+    {
+     "name": "PZ 92",
+     "imgs": [
+      "https://dgvrlpubiuqxsvkjtrdh.supabase.co/storage/v1/object/public/media/hq/frigocontrolch.10web.me/wp-content/uploads/2025/10/138.webp",
+      "https://dgvrlpubiuqxsvkjtrdh.supabase.co/storage/v1/object/public/media/hq/frigocontrolch.10web.me/wp-content/uploads/2025/10/139.webp"
+     ],
+     "rows": [
+      {
+       "l": "Temperatura",
+       "v": "−2 / +10 °C"
+      },
+      {
+       "l": "Refrigerante",
+       "v": "R290 Green / R452A"
+      },
+      {
+       "l": "Dimensioni",
+       "v": "L 928 × P 750 × H 810 mm"
+      }
+     ]
+    },
+    {
+     "name": "PZ 145",
+     "imgs": [
+      "https://dgvrlpubiuqxsvkjtrdh.supabase.co/storage/v1/object/public/media/hq/frigocontrolch.10web.me/wp-content/uploads/2025/10/140.webp",
+      "https://dgvrlpubiuqxsvkjtrdh.supabase.co/storage/v1/object/public/media/hq/frigocontrolch.10web.me/wp-content/uploads/2025/10/141.webp"
+     ],
+     "rows": [
+      {
+       "l": "Temperatura",
+       "v": "−2 / +10 °C"
+      },
+      {
+       "l": "Refrigerante",
+       "v": "R290 Green / R452A"
+      },
+      {
+       "l": "Dimensioni",
+       "v": "L 1456 × P 750 × H 810 mm"
+      }
+     ]
+    },
+    {
+     "name": "PZ 198",
+     "imgs": [
+      "https://dgvrlpubiuqxsvkjtrdh.supabase.co/storage/v1/object/public/media/hq/frigocontrolch.10web.me/wp-content/uploads/2025/10/142.webp",
+      "https://dgvrlpubiuqxsvkjtrdh.supabase.co/storage/v1/object/public/media/hq/frigocontrolch.10web.me/wp-content/uploads/2025/10/143.webp"
+     ],
+     "rows": [
+      {
+       "l": "Temperatura",
+       "v": "−2 / +10 °C"
+      },
+      {
+       "l": "Refrigerante",
+       "v": "R290 Green / R452A"
+      },
+      {
+       "l": "Dimensioni",
+       "v": "L 1984 × P 750 × H 810 mm"
+      }
+     ]
+    },
+    {
+     "name": "PZ 251",
+     "imgs": [
+      "https://dgvrlpubiuqxsvkjtrdh.supabase.co/storage/v1/object/public/media/hq/frigocontrolch.10web.me/wp-content/uploads/2025/10/144.webp",
+      "https://dgvrlpubiuqxsvkjtrdh.supabase.co/storage/v1/object/public/media/hq/frigocontrolch.10web.me/wp-content/uploads/2025/10/145.webp"
+     ],
+     "rows": [
+      {
+       "l": "Temperatura",
+       "v": "−2 / +10 °C"
+      },
+      {
+       "l": "Refrigerante",
+       "v": "R290 Green / R452A"
+      },
+      {
+       "l": "Dimensioni",
+       "v": "L 2512 × P 750 × H 810 mm"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "Banchi Professional Pizza",
+   "card": "https://dgvrlpubiuqxsvkjtrdh.supabase.co/storage/v1/object/public/media/hq/frigocontrolch.10web.me/wp-content/uploads/2025/10/ita-10079.webp.webp",
+   "desc": "Banco pizza composto da 4 elementi: tavolo pizza refrigerato (anche REM), cassetti non refrigerati, piano di lavoro in granito (alzatina 180 mm, prof. 800 mm, spessore 30 mm) e vetrina refrigerata (vetro curvo o piano). Ogni elemento è acquistabile anche separatamente.",
+   "dot": [
+    "nr 1 coppia di guide inox ad “L” e nr 1 griglia plastificata per ciascuna porta"
+   ],
+   "acc": [
+    "Cassetti interni (h 75 / 150 mm)",
+    "Telaio estraibile per vaschette pizza",
+    "Vaschette in plastica per impasto pizza"
+   ],
+   "models": [
+    {
+     "name": "Professional PZ 92",
+     "imgs": [
+      "https://dgvrlpubiuqxsvkjtrdh.supabase.co/storage/v1/object/public/media/hq/frigocontrolch.10web.me/wp-content/uploads/2025/10/ita-10079.webp.webp",
+      "https://dgvrlpubiuqxsvkjtrdh.supabase.co/storage/v1/object/public/media/hq/frigocontrolch.10web.me/wp-content/uploads/2025/10/ita-15640.webp.webp",
+      "https://dgvrlpubiuqxsvkjtrdh.supabase.co/storage/v1/object/public/media/hq/frigocontrolch.10web.me/wp-content/uploads/2025/10/ita-15641.webp.webp",
+      "https://dgvrlpubiuqxsvkjtrdh.supabase.co/storage/v1/object/public/media/hq/frigocontrolch.10web.me/wp-content/uploads/2025/10/ita-16502.webp.webp"
+     ],
+     "rows": [
+      {
+       "l": "Temperatura",
+       "v": "−2 / +10 °C"
+      },
+      {
+       "l": "Refrigerante",
+       "v": "R290 Green / R452A"
+      },
+      {
+       "l": "Dimensioni",
+       "v": "L 1472 × P 800 × H 1390 mm"
+      }
+     ]
+    },
+    {
+     "name": "Professional PZ 145",
+     "imgs": [
+      "https://dgvrlpubiuqxsvkjtrdh.supabase.co/storage/v1/object/public/media/hq/frigocontrolch.10web.me/wp-content/uploads/2025/10/ita-10116.webp",
+      "https://dgvrlpubiuqxsvkjtrdh.supabase.co/storage/v1/object/public/media/hq/frigocontrolch.10web.me/wp-content/uploads/2025/10/ita-15644-600x600.webp",
+      "https://dgvrlpubiuqxsvkjtrdh.supabase.co/storage/v1/object/public/media/hq/frigocontrolch.10web.me/wp-content/uploads/2025/10/ita-15645-600x600.webp",
+      "https://dgvrlpubiuqxsvkjtrdh.supabase.co/storage/v1/object/public/media/hq/frigocontrolch.10web.me/wp-content/uploads/2025/10/ita-16503.webp"
+     ],
+     "rows": [
+      {
+       "l": "Temperatura",
+       "v": "−2 / +10 °C"
+      },
+      {
+       "l": "Refrigerante",
+       "v": "R290 Green / R452A"
+      },
+      {
+       "l": "Dimensioni",
+       "v": "L 1472 × P 800 × H 1390 mm"
+      }
+     ]
+    },
+    {
+     "name": "Professional PZ 251",
+     "imgs": [
+      "https://dgvrlpubiuqxsvkjtrdh.supabase.co/storage/v1/object/public/media/hq/frigocontrolch.10web.me/wp-content/uploads/2025/10/ita-10406.webp",
+      "https://dgvrlpubiuqxsvkjtrdh.supabase.co/storage/v1/object/public/media/hq/frigocontrolch.10web.me/wp-content/uploads/2025/10/ita-15654.webp",
+      "https://dgvrlpubiuqxsvkjtrdh.supabase.co/storage/v1/object/public/media/hq/frigocontrolch.10web.me/wp-content/uploads/2025/10/ita-15655.webp",
+      "https://dgvrlpubiuqxsvkjtrdh.supabase.co/storage/v1/object/public/media/hq/frigocontrolch.10web.me/wp-content/uploads/2025/10/ita-16508.webp"
+     ],
+     "rows": [
+      {
+       "l": "Temperatura",
+       "v": "−2 / +10 °C"
+      },
+      {
+       "l": "Refrigerante",
+       "v": "R290 Green / R452A"
+      },
+      {
+       "l": "Dimensioni",
+       "v": "L 2530 × P 800 × H 1390 mm"
+      }
+     ]
+    }
+   ]
+  }
+ ]
+};
+
+    /* Cosa si può modificare dal menu impostazioni */
+    var SCHEMA=[
+      {t:'gruppo',k:'home',l:'Schermata iniziale',campi:[
+        {t:'testo',k:'kick',l:'Scritta piccola in alto'},
+        {t:'testo',k:'titolo',l:'Titolo'},
+        {t:'area',k:'sub',l:'Sottotitolo'},
+        {t:'testo',k:'foot',l:'Riga in fondo'},
+        {t:'testo',k:'badge',l:'Etichetta del marchio',aiuto:'La scritta piccola mostrata su ogni card e in cima a ogni gamma (es. Everlasting).'},
+        {t:'testo',k:'titoloDot',l:'Titolo della lista "Dotazioni standard"'},
+        {t:'testo',k:'titoloAcc',l:'Titolo della lista "Accessori a richiesta"'}]},
+      {t:'lista',k:'famiglie',l:'Gamme (una card ciascuna)',agg:'Aggiungi una gamma',titolo:'name',miniatura:'card',min:1,
+        nuovo:{name:'',card:'',desc:'',dot:[''],acc:[''],models:[{name:'',imgs:[''],rows:[{l:'Temperatura TN',v:''},{l:'Refrigerante',v:''},{l:'Dimensioni',v:''}]}]},
+        voce:{t:'gruppo',campi:[
+          {t:'testo',k:'name',l:'Nome della gamma'},
+          {t:'img',k:'card',l:'Foto della card'},
+          {t:'area',k:'desc',l:'Descrizione della gamma'},
+          {t:'lista',k:'dot',l:'Dotazioni standard',agg:'Aggiungi una dotazione',voce:{t:'testo',l:'Dotazione'},
+            aiuto:'Cosa è sempre incluso. Vale per tutti i modelli della gamma.'},
+          {t:'lista',k:'acc',l:'Accessori a richiesta',agg:'Aggiungi un accessorio',voce:{t:'testo',l:'Accessorio'},
+            aiuto:'Optional disponibili su richiesta. Vale per tutti i modelli della gamma.'},
+          {t:'lista',k:'models',l:'Modelli',agg:'Aggiungi un modello',titolo:'name',min:1,miniatura:function(m){return m&&m.imgs&&m.imgs[0];},
+            nuovo:{name:'',imgs:[''],rows:[{l:'Temperatura TN',v:''},{l:'Refrigerante',v:''},{l:'Dimensioni',v:''}]},
+            voce:{t:'gruppo',campi:[
+              {t:'testo',k:'name',l:'Nome del modello'},
+              {t:'lista',k:'imgs',l:'Foto',agg:'Aggiungi una foto',min:1,voce:{t:'img',l:'Foto'},aiuto:'La prima è quella principale.'},
+              {t:'lista',k:'rows',l:'Caratteristiche tecniche',agg:'Aggiungi una riga',titolo:function(s){return (s.l||'')+(s.v?': '+s.v:'');},
+                nuovo:{l:'',v:''},voce:{t:'gruppo',campi:[{t:'testo',k:'l',l:'Voce'},{t:'testo',k:'v',l:'Valore'}]}}
+            ]}}
+        ]}}
+    ];
+
+    var FAM={}, ORDER=[], cur={}, H={};
+
+    function renderFam(k){
+      var f=FAM[k];
+      var chips=f.models.map(function(m,i){return '<button class="mchip'+(i===0?' on':'')+'" type="button" data-i="'+i+'">'+esc(m.name)+'</button>';}).join('');
+      var extra='<div class="extra"><h6>'+esc(H.titoloDot)+'</h6><ul>'+f.dot.map(function(x){return '<li>'+CK+'<span>'+esc(x)+'</span></li>';}).join('')
+        +'</ul><h6>'+esc(H.titoloAcc)+'</h6><ul>'+f.acc.map(function(x){return '<li>'+CK+'<span>'+esc(x)+'</span></li>';}).join('')+'</ul></div>';
+      return '<div class="top"><button class="back" type="button" data-back><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg> Indietro</button><span class="badge">'+esc(H.badge)+'</span><h2>'+esc(f.name)+'</h2></div>'
+        +'<div class="fdesc">'+esc(f.desc)+'</div>'
+        +'<div class="modelbar" data-fam="'+k+'">'+chips+'</div>'
+        +'<div class="fbody">'
+          +'<div class="gal"><div class="main pz ct"><img id="gm-'+k+'"></div><div class="thumbs" id="gt-'+k+'"></div></div>'
+          +'<div class="fspec"><h5 id="mn-'+k+'"></h5><div id="fs-'+k+'"></div>'+extra+'</div>'
+        +'</div>';
+    }
+
+    function setModel(k,i){
+      var f=FAM[k]; if(!f||!f.models.length) return; var m=f.models[i]; cur[k]={model:i};
+      document.getElementById('mn-'+k).textContent=m.name;
+      document.getElementById('fs-'+k).innerHTML=m.rows.map(function(s){return '<div class="frow"><span class="l">'+esc(s.l)+'</span><span class="v">'+esc(s.v)+'</span></div>';}).join('');
+      var gm=document.getElementById('gm-'+k); gm.src=m.imgs[0]||''; gm.alt=m.name;
+      document.getElementById('gt-'+k).innerHTML=m.imgs.map(function(u,j){return '<button class="t'+(j===0?' on':'')+'" type="button" data-img="'+j+'"><span class="pz"><img src="'+u+'" alt="'+esc(m.name)+'" loading="lazy"></span></button>';}).join('');
+      var bar=document.querySelector('.modelbar[data-fam="'+k+'"]');
+      if(bar) bar.querySelectorAll('.mchip').forEach(function(c,ci){c.classList.toggle('on',ci===i);});
+      var fs=document.getElementById('fs-'+k); if(fs&&fs.parentNode) fs.parentNode.scrollTop=0;
+    }
+
+    /* disegna tutto a partire dai dati */
+    function render(d){
+      FAM={}; ORDER=[]; cur={}; H=d.home;
+      d.famiglie.forEach(function(f,i){ var k='f'+i; FAM[k]=f; ORDER.push(k); });
+      document.getElementById('fc-kick').textContent=H.kick;
+      document.getElementById('fc-titolo').textContent=H.titolo;
+      document.getElementById('fc-sub').textContent=H.sub;
+      document.getElementById('fc-foot').textContent=H.foot;
+      /* home cards */
+      document.getElementById('cards').innerHTML=ORDER.map(function(k){var f=FAM[k];
+        return '<button class="card" type="button" data-open="'+k+'"><div class="ph"><div class="pz ct"><img src="'+f.card+'" alt="'+esc(f.name)+'" loading="lazy"></div></div>'
+          +'<div class="bd"><span class="badge">'+esc(H.badge)+'</span><h3>'+esc(f.name)+'</h3><p>'+f.models.length+' modelli</p><div class="go">Scopri →</div></div></button>';
+      }).join('');
+      /* viste delle gamme */
+      root.querySelectorAll('.view:not(.home)').forEach(function(v){v.remove();});
+      var fine=root.querySelector('script');
+      ORDER.forEach(function(k){
+        var v=document.createElement('div'); v.className='view'; v.setAttribute('data-view',k); v.id='v-'+k;
+        v.innerHTML=renderFam(k); root.insertBefore(v,fine);
+      });
+      ORDER.forEach(function(k){ setModel(k,0); });
+      show('home');
+    }
+
+    function show(v){ root.querySelectorAll('.view').forEach(function(el){el.classList.toggle('on', el.getAttribute('data-view')===v);}); }
+    root.addEventListener('click',function(e){
+      var op=e.target.closest('[data-open]'); if(op){ var v=op.getAttribute('data-open'); show(v); setModel(v,0); return; }
+      if(e.target.closest('[data-back]')){ show('home'); return; }
+      var mc=e.target.closest('.mchip'); if(mc){ var k=mc.closest('.modelbar').getAttribute('data-fam'); setModel(k,+mc.getAttribute('data-i')); return; }
+      var th=e.target.closest('.thumbs .t'); if(th){ var view=th.closest('.view'); var k=view.getAttribute('data-view'); var j=+th.getAttribute('data-img');
+        var m=FAM[k].models[cur[k].model]; var gm=document.getElementById('gm-'+k); gm.src=m.imgs[j]; gm.alt=m.name;
+        view.querySelectorAll('.thumbs .t').forEach(function(x){x.classList.remove('on');}); th.classList.add('on'); return; }
+    });
+    root.addEventListener('contextmenu',function(e){ if(e.target.closest('.pz,img')) e.preventDefault(); });
+    root.addEventListener('dragstart',function(e){ if(e.target.tagName==='IMG') e.preventDefault(); });
+
+    FCKit.avvia({id:'tavoli-refrigerati',nome:'Tavoli refrigerati e banchi',dati:DATI,schema:SCHEMA,render:render,ingranaggio:{pos:'br',tono:'chiaro'}});
+  })();
+  </script>
+</div>

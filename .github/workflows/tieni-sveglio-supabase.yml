@@ -1,0 +1,58 @@
+# Tiene sveglio il progetto Supabase di Frigo Control (piano gratuito).
+# Supabase mette in pausa i progetti gratuiti dopo 7 giorni senza attività:
+# ogni mattina questo controllo chiama battito() (vedi supabase/setup.sql).
+# Se Supabase non risponde il controllo fallisce e GitHub manda un'email.
+# Le chiavi le prende da kit/config.json (o dai secrets SUPABASE_URL / SUPABASE_ANON).
+name: Tieni sveglio Supabase
+
+on:
+  schedule:
+    - cron: "17 5 * * *"   # ogni giorno alle 05:17 UTC
+  workflow_dispatch:        # avvio manuale: Actions → Tieni sveglio Supabase → Run workflow
+
+permissions:
+  contents: read
+  actions: write
+
+jobs:
+  battito:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Chiama battito() su Supabase
+        env:
+          SB_URL: ${{ secrets.SUPABASE_URL }}
+          SB_ANON: ${{ secrets.SUPABASE_ANON }}
+        run: |
+          if [ -z "$SB_URL" ] && [ -f kit/config.json ]; then
+            SB_URL=$(jq -r '.url // empty' kit/config.json)
+            SB_ANON=$(jq -r '.anon // empty' kit/config.json)
+          fi
+          if [ -z "$SB_URL" ] || [ -z "$SB_ANON" ]; then
+            echo "::warning::Chiavi Supabase non ancora configurate: niente da fare."
+            exit 0
+          fi
+          for t in 1 2 3; do
+            rm -f risposta.txt
+            code=$(curl -s -o risposta.txt -w '%{http_code}' -X POST "${SB_URL%/}/rest/v1/rpc/battito" \
+              -H "apikey: $SB_ANON" -H "Authorization: Bearer $SB_ANON" \
+              -H "Content-Type: application/json" -d '{}' || true)
+            if [ "$code" = "200" ]; then echo "Supabase sveglio: $(cat risposta.txt)"; exit 0; fi
+            echo "Tentativo $t: HTTP $code $(head -c 300 risposta.txt 2>/dev/null)"
+            sleep 20
+          done
+          echo "::error::Supabase non risponde, forse è in pausa: riattivalo dal pannello Supabase (Restore project)."
+          exit 1
+
+      # GitHub disattiva i controlli programmati dei repository pubblici dopo
+      # 60 giorni senza commit: riattivarlo a ogni giro lo tiene acceso.
+      - name: Tieni attivo questo controllo
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          curl -s -o /dev/null -w 'riattivazione: HTTP %{http_code}\n' -X PUT \
+            -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${{ github.repository }}/actions/workflows/tieni-sveglio-supabase.yml/enable"

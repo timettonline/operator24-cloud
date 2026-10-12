@@ -1,0 +1,386 @@
+<!-- =====================================================================
+     Frigo Control Ticino — Climatizzatori canalizzati — APP A SCHERMATA FISSA
+     - App-shell: riempie l'elemento (larghezza x altezza) e NON cresce mai
+     - Prodotto unico (SEZ-M): scheda diretta con TAB (Panoramica/Dettagli/Scheda tecnica)
+     - Ogni tab occupa lo STESSO box fisso, niente scroll di pagina
+     - Su Wix: Incorpora HTML -> imposta larghezza e altezza (consigliato ~680px)
+     ===================================================================== -->
+<div id="fc-app">
+  <style>
+  html,body{height:100%;margin:0;padding:0;overflow:hidden}
+  #fc-app *{box-sizing:border-box;margin:0;padding:0}
+  #fc-app{
+    --blu:#0a3d62;--blu2:#1e6091;--accent:#00a8e8;--grigio:#f4f6f8;--bordo:#e3e9ef;--testo:#22303a;--muto:#6b7b88;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    color:var(--testo);position:relative;height:100%;width:100%;overflow:hidden;
+    background:linear-gradient(180deg,#ffffff 0%,#eef4f8 100%);-webkit-tap-highlight-color:transparent;
+  }
+  #fc-app img{max-width:100%;display:block}
+  #fc-app h1,#fc-app h2,#fc-app h3,#fc-app h4{color:var(--blu);line-height:1.15}
+  #fc-app .pz{position:relative;overflow:hidden;border-radius:10px;background:#eef2f5}
+  #fc-app .pz img{width:100%;height:100%;object-fit:cover;-webkit-user-drag:none;user-select:none;pointer-events:none}
+  #fc-app .pz.ct img{object-fit:contain;background:#fff}
+  #fc-app .pz::after{content:"";position:absolute;inset:0;z-index:2}
+
+  #fc-app .shell{position:absolute;top:0;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:1200px;display:flex;flex-direction:column;padding:clamp(12px,2vw,22px);gap:10px}
+
+  #fc-app .top{flex:0 0 auto;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+  #fc-app .top .kick{width:100%;letter-spacing:.12em;text-transform:uppercase;font-size:.6rem;font-weight:800;color:var(--accent)}
+  #fc-app .badge{display:inline-block;font-size:.58rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;padding:4px 9px;border-radius:999px;color:#fff;background:linear-gradient(135deg,#0a3d62,#1e6091);align-self:center}
+  #fc-app .top h2{font-size:clamp(1rem,2vw,1.4rem)}
+  #fc-app .top .mod{color:var(--muto);font-weight:600;font-size:.78rem}
+  #fc-app .tabs{flex:0 0 auto;display:flex;gap:6px;border-bottom:1px solid var(--bordo)}
+  #fc-app .tab{background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;font:inherit;color:var(--muto);font-weight:700;font-size:.8rem;padding:7px 10px;margin-bottom:-1px}
+  #fc-app .tab.on{color:var(--blu);border-bottom-color:var(--accent)}
+  #fc-app .stage{flex:1;min-height:0;position:relative}
+  #fc-app .pane{position:absolute;inset:0;display:none;overflow:auto;-webkit-overflow-scrolling:touch}
+  #fc-app .pane.on{display:block}
+
+  #fc-app .pano{height:100%;display:grid;grid-template-columns:1.05fr .95fr;gap:16px}
+  @media(max-width:640px){#fc-app .pano{grid-template-columns:1fr;grid-template-rows:1fr auto}}
+  #fc-app .gal{min-height:0;display:flex;flex-direction:column;gap:8px}
+  #fc-app .gal .main{flex:1;min-height:0}
+  #fc-app .gal .thumbs{flex:0 0 auto;display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
+  #fc-app .gal .thumbs .t{height:42px;border:2px solid transparent;border-radius:7px;overflow:hidden;cursor:pointer;padding:0;background:none}
+  #fc-app .gal .thumbs .t.on{border-color:var(--accent)}
+  #fc-app .gal .thumbs .t .pz,#fc-app .gal .thumbs .t img{height:100%;border-radius:0}
+  #fc-app .side{min-height:0;display:flex;flex-direction:column;justify-content:center;overflow:hidden}
+  #fc-app .side .intro{font-size:.85rem;color:var(--testo);margin-bottom:12px}
+  #fc-app .side h4{font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muto);margin-bottom:8px}
+  #fc-app .spec{list-style:none;display:grid;gap:7px;margin-bottom:14px}
+  #fc-app .spec li{display:flex;gap:8px;align-items:flex-start;font-size:.86rem}
+  #fc-app .spec li svg{flex:0 0 15px;margin-top:2px;color:var(--accent)}
+  #fc-app .chips{display:flex;flex-wrap:wrap;gap:7px}
+  #fc-app .chip{display:inline-flex;align-items:center;gap:5px;background:var(--grigio);border:1px solid var(--bordo);color:var(--blu);border-radius:999px;padding:4px 9px;font-size:.68rem;font-weight:600}
+  #fc-app .chip svg{color:var(--accent)}
+
+  #fc-app .feats{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  @media(max-width:640px){#fc-app .feats{grid-template-columns:1fr}}
+  #fc-app .fcard{border:1px solid var(--bordo);border-radius:11px;background:#fff;box-shadow:0 6px 16px rgba(10,61,98,.08);padding:12px 14px}
+  #fc-app .fcard h5{font-size:.86rem;color:var(--blu);margin-bottom:4px;display:flex;gap:6px;align-items:center}
+  #fc-app .fcard h5 svg{color:var(--accent);flex:0 0 auto}
+  #fc-app .fcard p{font-size:.76rem;color:var(--muto);line-height:1.4}
+
+  #fc-app .tec{display:flex;flex-direction:column;gap:10px}
+  #fc-app .tec .tbox{background:linear-gradient(135deg,var(--blu),var(--blu2));color:#fff;border-radius:10px;padding:12px 14px;font-size:.8rem;line-height:1.5}
+  #fc-app .tec .tbox b{color:#bfe9ff}
+  #fc-app .tec .twrap{overflow:auto;border:1px solid var(--bordo);border-radius:10px;background:#fff}
+  #fc-app table.tt{border-collapse:collapse;width:100%;min-width:640px;font-size:.72rem}
+  #fc-app table.tt th,#fc-app table.tt td{border:1px solid var(--bordo);padding:6px 8px;text-align:center}
+  #fc-app table.tt thead th{background:var(--blu);color:#fff}
+  #fc-app table.tt tbody th{background:var(--grigio);color:var(--blu);text-align:left;white-space:nowrap}
+  #fc-app table.tt tr.grp th{background:var(--blu2);color:#fff;text-align:left}
+  #fc-app .tec .tmulti{font-size:.82rem;color:var(--testo)}
+  #fc-app .tec .tmulti b{color:var(--blu)}
+  #fc-app .tec .note{font-size:.7rem;color:var(--muto)}
+  </style>
+
+  <div class="shell">
+    <div class="top">
+      <div class="kick" id="fc-kick"></div>
+      <span class="badge" id="fc-badge"></span>
+      <h2 id="fc-titolo"></h2>
+      <span class="mod" id="fc-mod"></span>
+    </div>
+    <div class="tabs">
+      <button class="tab on" data-tab="0">Panoramica</button>
+      <button class="tab" data-tab="1">Dettagli</button>
+      <button class="tab" data-tab="2">Scheda tecnica</button>
+    </div>
+    <div class="stage" id="stage"></div>
+  </div>
+
+  <!--FC-KIT-->
+  <script>
+  (function(){
+    var root=document.getElementById('fc-app');
+    if(root.dataset.init) return; root.dataset.init='1';
+    var CK='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>';
+    var P={leaf:'<path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6"/>',
+      remote:'<rect x="7" y="2" width="10" height="20" rx="3"/><circle cx="12" cy="12" r="1.5"/>',
+      air:'<path d="M17.7 7.7A2.5 2.5 0 1 1 19.5 12H2"/><path d="M9.6 4.6A2 2 0 1 1 11 8H2"/><path d="M12.6 19.4A2 2 0 1 0 14 16H2"/>',
+      vol:'<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>',
+      therm:'<path d="M14 4v10.54a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0Z"/>',
+      wind:'<path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"/>',
+      shield:'<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/>',
+      wifi:'<path d="M5 13a10 10 0 0 1 14 0"/><path d="M8.5 16.5a5 5 0 0 1 7 0"/><path d="M2 8.82a15 15 0 0 1 20 0"/><line x1="12" y1="20" x2="12.01" y2="20"/>',
+      grid:'<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/>',
+      ruler:'<rect x="2" y="7" width="20" height="10" rx="1"/><path d="M6 7v3M10 7v4M14 7v3M18 7v4"/>',
+      plug:'<path d="M9 2v6M15 2v6M7 8h10v3a5 5 0 0 1-10 0V8ZM12 16v6"/>'};
+    function sv(p){return '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+p+'</svg>';}
+    function ic(t){t=t.toLowerCase();
+      return sv(/r32|refriger/.test(t)?P.leaf:/wi-fi|wifi|melcloud/.test(t)?P.wifi:/remoto|controllo|remote/.test(t)?P.remote:/purific|aria|air|filtro|plasma/.test(t)?P.air:/raffresc|riscald/.test(t)?P.therm:/silenz/.test(t)?P.vol:P.leaf);}
+    function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+    function grassetto(s){return esc(s).replace(/\*\*([^*]+)\*\*/g,'<b>$1</b>');}
+
+    /* Contenuti predefiniti (quelli attualmente online) */
+    var DATI={
+ "kick": "Frigo Control Ticino · Mitsubishi Electric",
+ "badge": "Canalizzato",
+ "titolo": "Climatizzatore canalizzato SEZ-M",
+ "mod": "Serie SEZ-M",
+ "intro": "Impianto potente ma invisibile, nascosto nel controsoffitto: gestisce più locali da un’unica macchina, per il massimo comfort senza ingombri.",
+ "gallery": [
+  {
+   "s": "https://dgvrlpubiuqxsvkjtrdh.supabase.co/storage/v1/object/public/media/hq/frigocontrolch.10web.me/wp-content/uploads/2025/08/climatizzatore-canalizzato-sez-m-soggiorno-moderno-frigo-control-ticino.webp",
+   "c": "In soggiorno moderno, discreto ed elegante"
+  },
+  {
+   "s": "https://dgvrlpubiuqxsvkjtrdh.supabase.co/storage/v1/object/public/media/hq/frigocontrolch.10web.me/wp-content/uploads/2025/08/climatizzatore-canalizzato-sez-m-soffitto-moderno-frigo-control-ticino.webp",
+   "c": "Installazione a soffitto"
+  },
+  {
+   "s": "https://dgvrlpubiuqxsvkjtrdh.supabase.co/storage/v1/object/public/media/hq/frigocontrolch.10web.me/wp-content/uploads/2025/08/climatizzatore-canalizzato-sez-m-griglie-soffitto-frigo-control-ticino.webp",
+   "c": "Griglie integrate a soffitto"
+  },
+  {
+   "s": "https://dgvrlpubiuqxsvkjtrdh.supabase.co/storage/v1/object/public/media/hq/frigocontrolch.10web.me/wp-content/uploads/2025/08/climatizzatore-canalizzato-sez-m-unita-interna-frigo-control-ticino.webp",
+   "c": "Unità interna canalizzata"
+  }
+ ],
+ "spec": [
+  "Gas refrigerante R32 a basso impatto",
+  "Dimensioni super compatte",
+  "Buona efficienza energetica stagionale",
+  "Silenziosità e comfort",
+  "Connettibilità espansa",
+  "Portata d’aria regolabile",
+  "Filtro Plasma Quad Connect opzionale",
+  "Controllo Wi-Fi MELCloud opzionale"
+ ],
+ "chips": [
+  "Gas R32",
+  "Raffrescamento/Riscaldamento",
+  "Silenziosità"
+ ],
+ "feats": [
+  {
+   "i": "ruler",
+   "t": "Dimensioni super compatte",
+   "p": "Altezza 200 mm e profondità 700 mm per tutta la gamma: si installa anche in controsoffitti particolarmente angusti."
+  },
+  {
+   "i": "vol",
+   "t": "Silenziosità & comfort",
+   "p": "Emissioni sonore ridotte al minimo grazie alla cura nella progettazione e nei dettagli costruttivi, per il massimo comfort acustico."
+  },
+  {
+   "i": "therm",
+   "t": "Buona efficienza energetica",
+   "p": "Unità ad alta efficienza con DC inverter: classe “A+” o superiore con unità esterne PUZ, “A” o superiore con unità esterne SUZ."
+  },
+  {
+   "i": "plug",
+   "t": "Connettibilità espansa",
+   "p": "Ampia compatibilità con le unità esterne, per adattarsi a numerose configurazioni d’impianto."
+  },
+  {
+   "i": "wind",
+   "t": "Portata d’aria regolabile",
+   "p": "La portata d’aria è regolabile per adattarsi alle canalizzazioni e ottimizzare la diffusione nei diversi locali."
+  },
+  {
+   "i": "air",
+   "t": "Filtro Plasma Quad Connect (opzionale)",
+   "p": "Filtrazione attiva: inibisce fino al 99% di virus, batteri, muffe e PM2.5, fino al 98% di allergeni/pollini e 99,7% di acari/polveri. Richiede accessorio dedicato."
+  },
+  {
+   "i": "air",
+   "t": "Tecnologia Plasma Quad",
+   "p": "Filtrazione attiva Mitsubishi Electric: abbatte il 99% di virus/batteri/muffe, il 98% di allergeni, il 97% di acari/polveri e il 99% del PM2.5, catturando anche gli odori."
+  },
+  {
+   "i": "grid",
+   "t": "Applicazioni commerciali",
+   "p": "Configurazione dedicata per uffici, negozi e ambienti lavorativi: una soluzione ottimale e versatile per ogni esigenza."
+  }
+ ],
+ "tecBox": "Gas **R32** · unità DC inverter · portata d’aria regolabile · sistema **monosplit** o **multisplit**.",
+ "tabella": {
+  "intestazioni": [
+   "Unità interna",
+   "SEZ-M25",
+   "SEZ-M35",
+   "SEZ-M50",
+   "SEZ-M60",
+   "SEZ-M71"
+  ],
+  "righe": [
+   {
+    "celle": [
+     "Unità esterna",
+     "SUZ-M25VA",
+     "SUZ-M35VA",
+     "SUZ-M50VA",
+     "SUZ-M60VA",
+     "SUZ-M71VA"
+    ]
+   },
+   {
+    "gruppo": "Raffrescamento (EN14825)"
+   },
+   {
+    "celle": [
+     "Potenza (kW)",
+     "2,5",
+     "3,5",
+     "5,0",
+     "6,1",
+     "7,1"
+    ]
+   },
+   {
+    "celle": [
+     "SEER",
+     "5,3",
+     "5,9",
+     "6,0",
+     "5,5",
+     "5,5"
+    ]
+   },
+   {
+    "celle": [
+     "Efficienza*",
+     "A",
+     "A+",
+     "A+",
+     "A",
+     "A"
+    ]
+   },
+   {
+    "celle": [
+     "Pressione sonora (dB)",
+     "23-26-30",
+     "23-27-31",
+     "30-34-37",
+     "30-34-38",
+     "30-35-40"
+    ]
+   },
+   {
+    "gruppo": "Riscaldamento (EN14825)"
+   },
+   {
+    "celle": [
+     "Potenza (kW)",
+     "2,0",
+     "2,3",
+     "3,8",
+     "4,1",
+     "5,2"
+    ]
+   },
+   {
+    "celle": [
+     "SCOP",
+     "3,8",
+     "4,1",
+     "4,0",
+     "4,2",
+     "3,9"
+    ]
+   },
+   {
+    "celle": [
+     "Efficienza*",
+     "A",
+     "A+",
+     "A+",
+     "A+",
+     "A"
+    ]
+   },
+   {
+    "celle": [
+     "Pressione sonora (dB)",
+     "23-26-30",
+     "23-27-31",
+     "30-34-37",
+     "30-34-38",
+     "30-35-40"
+    ]
+   }
+  ]
+ },
+ "multi": [
+  "MXZ",
+  "MXZ HYPER HEATING",
+  "PUMY-SP"
+ ],
+ "nota": "*Classi di efficienza energetica da A+++ a D."
+};
+
+    var ICONE=[["leaf","Foglia (ecologia)"],["remote","Telecomando"],["air","Aria / filtrazione"],["vol","Silenziosità"],["therm","Temperatura"],["wind","Flusso d’aria"],["shield","Protezione"],["wifi","Wi-Fi"],["grid","Griglia / pannello"],["ruler","Dimensioni"],["plug","Alimentazione"]];
+    var SCHEMA=[
+      {t:'testo',k:'kick',l:'Scritta piccola in alto'},
+      {t:'testo',k:'badge',l:'Etichetta'},
+      {t:'testo',k:'titolo',l:'Titolo'},
+      {t:'testo',k:'mod',l:'Serie / modello'},
+      {t:'area',k:'intro',l:'Testo introduttivo (scheda Panoramica)'},
+      {t:'lista',k:'gallery',l:'Galleria foto',agg:'Aggiungi una foto',titolo:'c',miniatura:'s',min:1,nuovo:{s:'',c:''},
+        voce:{t:'gruppo',campi:[{t:'img',k:'s',l:'Foto'},{t:'testo',k:'c',l:'Didascalia'}]}},
+      {t:'lista',k:'spec',l:'Caratteristiche principali (elenco con ✓)',agg:'Aggiungi una caratteristica',voce:{t:'testo'}},
+      {t:'lista',k:'chips',l:'Etichette (pillole sotto l’elenco)',agg:'Aggiungi un’etichetta',voce:{t:'testo'},aiuto:'L’icona di ogni etichetta viene scelta in automatico in base al testo.'},
+      {t:'lista',k:'feats',l:'Dettagli (scheda Dettagli)',agg:'Aggiungi un dettaglio',titolo:'t',nuovo:{i:'leaf',t:'',p:''},
+        voce:{t:'gruppo',campi:[{t:'sel',k:'i',l:'Icona',opz:ICONE},{t:'testo',k:'t',l:'Titolo'},{t:'area',k:'p',l:'Testo'}]}},
+      {t:'gruppo',l:'Scheda tecnica',campi:[
+        {t:'area',k:'tecBox',l:'Riquadro blu',righe:2,aiuto:'Scrivi **testo** per il grassetto.'},
+        {t:'tabella',k:'tabella',l:'Tabella tecnica',aiuto:'Le righe titolo fanno da intestazione di gruppo; le celle con «—», «solo multi» o «Multisplit» appaiono in grigio.'},
+        {t:'lista',k:'multi',l:'Sistemi multisplit',agg:'Aggiungi un sistema',voce:{t:'testo'},aiuto:'Se la lista è vuota la riga non compare.'},
+        {t:'area',k:'nota',l:'Nota in fondo',righe:2}]}
+    ];
+
+    var GAL=[];
+    var GRIGIO=/^(—|-|solo multi|multisplit)$/i;
+    function tabellaHTML(tb){
+      var n=tb.intestazioni.length;
+      return '<table class="tt"><thead><tr>'+tb.intestazioni.map(function(c){return '<th>'+esc(c)+'</th>';}).join('')+'</tr></thead><tbody>'
+        +tb.righe.map(function(r){
+          if(r.gruppo!==undefined) return '<tr class="grp"><th colspan="'+n+'">'+esc(r.gruppo)+'</th></tr>';
+          var c=r.celle||[]; var s='<tr><th>'+esc(c[0]==null?'':c[0])+'</th>';
+          for(var i=1;i<n;i++){ var v=c[i]==null?'':String(c[i]); s+='<td'+(GRIGIO.test(v.trim())?' class="na"':'')+'>'+esc(v)+'</td>'; }
+          return s+'</tr>';
+        }).join('')+'</tbody></table>';
+    }
+    function render(D){
+      GAL=D.gallery;
+      document.getElementById('fc-kick').textContent=D.kick;
+      document.getElementById('fc-badge').textContent=D.badge;
+      document.getElementById('fc-titolo').textContent=D.titolo;
+      document.getElementById('fc-mod').textContent=D.mod;
+      var thumbs=D.gallery.map(function(g,i){return '<button type="button" class="t'+(i===0?' on':'')+'" data-i="'+i+'"><span class="pz"><img src="'+g.s+'" alt="'+esc(g.c)+'" loading="lazy"></span></button>';}).join('');
+      var spec=D.spec.map(function(s){return '<li>'+CK+'<span>'+esc(s)+'</span></li>';}).join('');
+      var chips=D.chips.map(function(c){return '<span class="chip">'+ic(c)+esc(c)+'</span>';}).join('');
+      var feats=D.feats.map(function(f){return '<div class="fcard"><h5>'+sv(P[f.i]||P.leaf)+esc(f.t)+'</h5><p>'+esc(f.p)+'</p></div>';}).join('');
+      var tb=D.tabella||{intestazioni:[],righe:[]}, mu=D.multi||[];
+      var tec='<div class="tbox">'+grassetto(D.tecBox)+'</div>'+(tb.righe&&tb.righe.length?('<div class="twrap">'+tabellaHTML(tb)+'</div>'):'')
+        +(mu.length?('<div class="tmulti"><b>Sistema multisplit:</b> '+mu.map(esc).join(' · ')+'</div>'):'')
+        +'<div class="note">'+esc(D.nota)+'</div>';
+      var g0=D.gallery[0]||{s:'',c:''};
+      document.getElementById('stage').innerHTML=''
+        +'<div class="pane on" data-pane="0"><div class="pano">'
+          +'<div class="gal"><div class="main pz ct"><img id="mainimg" src="'+g0.s+'" alt="'+esc(g0.c)+'"></div><div class="thumbs" id="thumbs">'+thumbs+'</div></div>'
+          +'<div class="side"><div class="intro">'+esc(D.intro)+'</div><h4>Caratteristiche principali</h4><ul class="spec">'+spec+'</ul><div class="chips">'+chips+'</div></div>'
+        +'</div></div>'
+        +'<div class="pane" data-pane="1"><div class="feats">'+feats+'</div></div>'
+        +'<div class="pane" data-pane="2"><div class="tec">'+tec+'</div></div>';
+      root.querySelectorAll('.tab').forEach(function(x,i){x.classList.toggle('on',i===0);});
+    }
+
+    root.addEventListener('click',function(e){
+      var tb=e.target.closest('.tab'); if(tb){ var i=tb.getAttribute('data-tab');
+        root.querySelectorAll('.tab').forEach(function(x){x.classList.toggle('on',x===tb);});
+        root.querySelectorAll('.pane').forEach(function(p){p.classList.toggle('on',p.getAttribute('data-pane')===i);}); return; }
+      var th=e.target.closest('.thumbs .t'); if(th){ var idx=+th.getAttribute('data-i'); var g=GAL[idx];
+        var m=document.getElementById('mainimg'); m.src=g.s; m.alt=g.c;
+        document.querySelectorAll('.thumbs .t').forEach(function(x){x.classList.remove('on');}); th.classList.add('on'); return; }
+    });
+    root.addEventListener('contextmenu',function(e){ if(e.target.closest('.pz,img')) e.preventDefault(); });
+    root.addEventListener('dragstart',function(e){ if(e.target.tagName==='IMG') e.preventDefault(); });
+
+    FCKit.avvia({id:'clima-canalizzato',nome:'Climatizzatore canalizzato',dati:DATI,schema:SCHEMA,render:render,ingranaggio:{pos:'br',tono:'chiaro'}});
+  })();
+  </script>
+</div>

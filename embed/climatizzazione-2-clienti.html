@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      background: #080a24;
+      font-family: Helvetica, Arial, sans-serif;
+      color: #ffffff;
+      overflow: hidden;
+    }
+
+    .fc-clienti {
+      width: 100%;
+      background:
+        radial-gradient(
+          circle at 20% 40%,
+          rgba(23, 92, 255, 0.16),
+          transparent 38%
+        ),
+        radial-gradient(
+          circle at 80% 60%,
+          rgba(50, 70, 180, 0.12),
+          transparent 42%
+        ),
+        #080a24;
+
+      padding: 65px 0 70px;
+      text-align: center;
+      overflow: hidden;
+    }
+
+    .fc-clienti-inner {
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    /* TITOLO */
+
+    .fc-clienti h2 {
+      margin: 0 20px 14px;
+      font-family: Helvetica, Arial, sans-serif;
+      font-size: 20px;
+      line-height: 1.3;
+      font-weight: 600;
+      color: #ffffff;
+    }
+
+    /* TESTO */
+
+    .fc-clienti-intro {
+      max-width: 760px;
+      margin: 0 auto 42px;
+      padding: 0 20px;
+
+      font-family: Helvetica, Arial, sans-serif;
+      font-size: 15px;
+      line-height: 1.55;
+      font-weight: 400;
+      color: #eeeeee;
+    }
+
+    /* CONTENITORE MARQUEE */
+
+    .fc-marquee {
+      width: 100%;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .fc-marquee::before,
+    .fc-marquee::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 110px;
+      z-index: 3;
+      pointer-events: none;
+    }
+
+    .fc-marquee::before {
+      left: 0;
+      background: linear-gradient(
+        90deg,
+        #080a24 0%,
+        rgba(8, 10, 36, 0) 100%
+      );
+    }
+
+    .fc-marquee::after {
+      right: 0;
+      background: linear-gradient(
+        270deg,
+        #080a24 0%,
+        rgba(8, 10, 36, 0) 100%
+      );
+    }
+
+    .fc-marquee-track {
+      display: flex;
+      width: max-content;
+      animation: fc-scroll 32s linear infinite;
+      will-change: transform;
+    }
+
+    .fc-marquee-group {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      padding-right: 24px;
+    }
+
+    /* SINGOLO LOGO */
+
+    .fc-logo-box {
+      width: 220px;
+      height: 95px;
+
+      flex: 0 0 220px;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      padding: 15px 22px;
+
+      background: #ffffff;
+      border-radius: 10px;
+
+      box-shadow:
+        0 8px 30px rgba(0, 0, 0, 0.16);
+
+      overflow: hidden;
+    }
+
+    .fc-logo-box img {
+      display: block;
+      width: auto;
+      max-width: 100%;
+      max-height: 62px;
+      object-fit: contain;
+    }
+
+    /* SAR360 */
+
+    .fc-logo-box.fc-sar360 img {
+      max-width: 175px;
+      max-height: 56px;
+    }
+
+    /* ANIMAZIONE */
+
+    @keyframes fc-scroll {
+      from {
+        transform: translateX(0);
+      }
+
+      to {
+        transform: translateX(-50%);
+      }
+    }
+
+    /* TABLET */
+
+    @media (max-width: 900px) {
+
+      .fc-clienti {
+        padding: 55px 0 60px;
+      }
+
+      .fc-logo-box {
+        width: 190px;
+        height: 88px;
+        flex-basis: 190px;
+      }
+
+      .fc-logo-box img {
+        max-height: 54px;
+      }
+
+      .fc-marquee-group {
+        gap: 18px;
+        padding-right: 18px;
+      }
+
+      .fc-marquee-track {
+        animation-duration: 28s;
+      }
+    }
+
+    /* MOBILE */
+
+    @media (max-width: 600px) {
+
+      .fc-clienti {
+        padding: 50px 0 55px;
+      }
+
+      .fc-clienti h2 {
+        font-size: 19px;
+      }
+
+      .fc-clienti-intro {
+        font-size: 14px;
+        margin-bottom: 32px;
+      }
+
+      .fc-logo-box {
+        width: 160px;
+        height: 78px;
+        flex-basis: 160px;
+        padding: 12px 16px;
+      }
+
+      .fc-logo-box img {
+        max-height: 45px;
+      }
+
+      .fc-logo-box.fc-sar360 img {
+        max-width: 135px;
+        max-height: 44px;
+      }
+
+      .fc-marquee-group {
+        gap: 14px;
+        padding-right: 14px;
+      }
+
+      .fc-marquee-track {
+        animation-duration: 24s;
+      }
+
+      .fc-marquee::before,
+      .fc-marquee::after {
+        width: 55px;
+      }
+    }
+
+    /* ACCESSIBILITÀ */
+
+    @media (prefers-reduced-motion: reduce) {
+
+      .fc-marquee-track {
+        animation: none;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<section class="fc-clienti">
+
+  <div class="fc-clienti-inner">
+
+    <h2>Aziende che ci hanno scelto</h2>
+
+    <p class="fc-clienti-intro">
+      La nostra esperienza nasce dalla capacità di progettare e gestire
+      impianti per realtà con esigenze diverse.
+    </p>
+
+  </div>
+
+
+  <div class="fc-marquee">
+
+    <div class="fc-marquee-track">
+
+      <!-- PRIMO GRUPPO -->
+      <div class="fc-marquee-group">
+
+        <!-- PORETTI & GAGGINI -->
+        <div class="fc-logo-box">
+          <img
+            src="https://dgvrlpubiuqxsvkjtrdh.supabase.co/storage/v1/object/public/media/sito/bin.staticlocal.ch/logo-ad/93/937a1f015d0fa5522baef308f25cac059045cac0/upload1.jpg"
+            alt="Poretti & Gaggini SA">
+        </div>
+
+        <!-- IMERYS -->
+        <div class="fc-logo-box">
+          <img
+            src="https://dgvrlpubiuqxsvkjtrdh.supabase.co/storage/v1/object/public/media/sito/images.squarespace-cdn.com/content/v1/6593df3a3cae2759c637e94d/33049bd8-af10-4ce0-a658-2425d83cec59/13.png"
+            alt="Imerys Graphite & Carbon">
+        </div>
+
+        <!-- RAIFFEISEN -->
+        <div class="fc-logo-box">
+          <img
+            src="https://dgvrlpubiuqxsvkjtrdh.supabase.co/storage/v1/object/public/media/sito/upload.wikimedia.org/wikipedia/commons/9/98/Raiffeisen_Schweiz_Logo.svg"
+            alt="Raiffeisen Schweiz">
+        </div>
+
+        <!-- SAR360 -->
+        <div class="fc-logo-box fc-sar360">
+          <img
+            src="https://dgvrlpubiuqxsvkjtrdh.supabase.co/storage/v1/object/public/media/sito/media.licdn.com/dms/image/v2/D4E1BAQGyiowCLr69Tg/company-background_10000/company-background_10000/0/1658495896152/sar360_sagl_cover.jpg"
+            alt="SAR360 Architettura">
+        </div>
+
+        <!-- AUTOLINEE BLENIESI -->
+        <div class="fc-logo-box">
+          <img
+            src="https://dgvrlpubiuqxsvkjtrdh.supabase.co/storage/v1/object/public/media/sito/images.seeklogo.com/logo-png/34/1/autolinee-bleniesi-logo-png_seeklogo-349107.png"
+            alt="Autolinee Bleniesi SA">
+        </div>
+
+        <!-- DIAMOND -->
+        <div class="fc-logo-box">
+          <img
+            src="https://dgvrlpubiuqxsvkjtrdh.supabase.co/storage/v1/object/public/media/sito/www.flyelectronics.it/IMMAGINI/655Diamond_Manifaturies_Fly-Electronics.jpg"
+            alt="Diamond SA">
+        </div>
+
+      </div>
+
+
+      <!-- SECONDO GRUPPO IDENTICO PER IL LOOP -->
+
+      <div class="fc-marquee-group">
+
+        <div class="fc-logo-box">
+          <img
+            src="https://dgvrlpubiuqxsvkjtrdh.supabase.co/storage/v1/object/public/media/sito/bin.staticlocal.ch/logo-ad/93/937a1f015d0fa5522baef308f25cac059045cac0/upload1.jpg"
+            alt="Poretti & Gaggini SA">
+        </div>
+
+        <div class="fc-logo-box">
+          <img
+            src="https://dgvrlpubiuqxsvkjtrdh.supabase.co/storage/v1/object/public/media/sito/images.squarespace-cdn.com/content/v1/6593df3a3cae2759c637e94d/33049bd8-af10-4ce0-a658-2425d83cec59/13.png"
+            alt="Imerys Graphite & Carbon">
+        </div>
+
+        <div class="fc-logo-box">
+          <img
+            src="https://dgvrlpubiuqxsvkjtrdh.supabase.co/storage/v1/object/public/media/sito/upload.wikimedia.org/wikipedia/commons/9/98/Raiffeisen_Schweiz_Logo.svg"
+            alt="Raiffeisen Schweiz">
+        </div>
+
+        <div class="fc-logo-box fc-sar360">
+          <img
+            src="https://dgvrlpubiuqxsvkjtrdh.supabase.co/storage/v1/object/public/media/sito/media.licdn.com/dms/image/v2/D4E1BAQGyiowCLr69Tg/company-background_10000/company-background_10000/0/1658495896152/sar360_sagl_cover.jpg"
+            alt="SAR360 Architettura">
+        </div>
+
+        <div class="fc-logo-box">
+          <img
+            src="https://dgvrlpubiuqxsvkjtrdh.supabase.co/storage/v1/object/public/media/sito/images.seeklogo.com/logo-png/34/1/autolinee-bleniesi-logo-png_seeklogo-349107.png"
+            alt="Autolinee Bleniesi SA">
+        </div>
+
+        <div class="fc-logo-box">
+          <img
+            src="https://dgvrlpubiuqxsvkjtrdh.supabase.co/storage/v1/object/public/media/sito/www.flyelectronics.it/IMMAGINI/655Diamond_Manifaturies_Fly-Electronics.jpg"
+            alt="Diamond SA">
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+</body>
+</html>

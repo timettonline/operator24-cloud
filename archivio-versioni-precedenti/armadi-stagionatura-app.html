@@ -1,0 +1,160 @@
+<!-- =====================================================================
+     Frigo Control Ticino — Armadi stagionatura e frollatura (MEATico) — APP FISSA
+     - App-shell: riempie l'elemento e NON cresce mai
+     - Home: 5 linee (All in one / Meat / Meat panorama / Storage / Wine)
+     - Ogni linea: foto + specifiche + tab "Dimensioni & capacita"
+     - Su Wix: Incorpora HTML -> larghezza e altezza (consigliato ~680px)
+     ===================================================================== -->
+<div id="fc-app">
+  <style>
+  html,body{height:100%;margin:0;padding:0;overflow:hidden}
+  #fc-app *{box-sizing:border-box;margin:0;padding:0}
+  #fc-app{
+    --blu:#0a3d62;--blu2:#1e6091;--accent:#00a8e8;--grigio:#f4f6f8;--bordo:#e3e9ef;--testo:#22303a;--muto:#6b7b88;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    color:var(--testo);position:relative;height:100%;width:100%;overflow:hidden;
+    background:linear-gradient(180deg,#ffffff 0%,#eef4f8 100%);-webkit-tap-highlight-color:transparent;
+  }
+  #fc-app img{max-width:100%;display:block}
+  #fc-app h1,#fc-app h2,#fc-app h3,#fc-app h4,#fc-app h5{color:var(--blu);line-height:1.15}
+  #fc-app .pz{position:relative;overflow:hidden;border-radius:10px;background:#eef2f5}
+  #fc-app .pz img{width:100%;height:100%;object-fit:cover;-webkit-user-drag:none;user-select:none;pointer-events:none}
+  #fc-app .pz.ct img{object-fit:contain;background:#fff}
+  #fc-app .pz::after{content:"";position:absolute;inset:0;z-index:2}
+
+  #fc-app .view{position:absolute;top:0;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:1200px;display:none;flex-direction:column;padding:clamp(12px,2vw,22px);gap:10px}
+  #fc-app .view.on{display:flex;animation:fd .25s ease}
+  @keyframes fd{from{opacity:0}to{opacity:1}}
+
+  #fc-app .kick{letter-spacing:.12em;text-transform:uppercase;font-size:.6rem;font-weight:800;color:var(--accent);text-align:center;flex:0 0 auto}
+  #fc-app .home h1{font-size:clamp(1rem,2.2vw,1.5rem);font-weight:800;text-align:center;flex:0 0 auto}
+  #fc-app .home .sub{text-align:center;color:var(--muto);font-size:.82rem;max-width:700px;margin:0 auto;flex:0 0 auto}
+  #fc-app .cards{flex:1;min-height:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;align-content:center;overflow-y:auto}
+  #fc-app .card{display:flex;flex-direction:column;border:1px solid var(--bordo);border-radius:14px;overflow:hidden;background:#fff;box-shadow:0 8px 22px rgba(10,61,98,.10);cursor:pointer;text-align:left;font:inherit;color:inherit;padding:0}
+  #fc-app .card:hover{box-shadow:0 14px 30px rgba(10,61,98,.18)}
+  #fc-app .card .ph{aspect-ratio:4/3;flex:0 0 auto}
+  #fc-app .card .ph .pz{height:100%}
+  #fc-app .card .bd{flex:0 0 auto;padding:10px 13px 12px}
+  #fc-app .badge{display:inline-block;font-size:.56rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;padding:3px 8px;border-radius:999px;color:#fff;background:linear-gradient(135deg,#0a3d62,#1e6091)}
+  #fc-app .card h3{font-size:.92rem;margin:6px 0 2px}
+  #fc-app .card p{font-size:.74rem;color:var(--muto)}
+  #fc-app .card .go{margin-top:5px;font-weight:700;color:var(--accent);font-size:.74rem}
+  #fc-app .foot{flex:0 0 auto;text-align:center;color:var(--muto);font-size:.7rem}
+
+  #fc-app .top{flex:0 0 auto;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  #fc-app .back{background:none;border:none;cursor:pointer;color:var(--blu);font-weight:700;font-size:.82rem;display:inline-flex;align-items:center;gap:6px;font-family:inherit;padding:2px 4px}
+  #fc-app .back:hover{color:var(--accent)}
+  #fc-app .top h2{font-size:clamp(.98rem,1.8vw,1.25rem)}
+  #fc-app .top .mod{color:var(--muto);font-weight:600;font-size:.75rem}
+  #fc-app .tabs{flex:0 0 auto;display:flex;gap:6px;border-bottom:1px solid var(--bordo)}
+  #fc-app .tab{background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;font:inherit;color:var(--muto);font-weight:700;font-size:.8rem;padding:7px 10px;margin-bottom:-1px}
+  #fc-app .tab.on{color:var(--blu);border-bottom-color:var(--accent)}
+  #fc-app .stage{flex:1;min-height:0;position:relative}
+  #fc-app .pane{position:absolute;inset:0;display:none;overflow:auto;-webkit-overflow-scrolling:touch}
+  #fc-app .pane.on{display:block}
+
+  #fc-app .pano{height:100%;display:grid;grid-template-columns:.8fr 1.2fr;gap:16px}
+  @media(max-width:640px){#fc-app .pano{grid-template-columns:1fr;grid-template-rows:1fr auto}}
+  #fc-app .gal .main{height:100%}
+  #fc-app .side{min-height:0;display:flex;flex-direction:column;justify-content:center;overflow:auto}
+  #fc-app .side .funz{display:inline-block;background:var(--grigio);border:1px solid var(--bordo);color:var(--blu);border-radius:8px;padding:5px 10px;font-size:.76rem;font-weight:700;margin-bottom:12px;align-self:flex-start}
+  #fc-app .frow{display:flex;justify-content:space-between;gap:14px;padding:8px 0;border-bottom:1px dashed var(--bordo);font-size:.86rem}
+  #fc-app .frow .l{color:var(--muto)}
+  #fc-app .frow .v{font-weight:700;color:var(--blu);text-align:right}
+  #fc-app .allest{margin-top:10px;font-size:.78rem;color:var(--muto);line-height:1.4}
+
+  #fc-app .dwrap{overflow:auto;border:1px solid var(--bordo);border-radius:10px;background:#fff}
+  #fc-app table.dt{border-collapse:collapse;width:100%;min-width:420px;font-size:.8rem}
+  #fc-app table.dt th,#fc-app table.dt td{border:1px solid var(--bordo);padding:8px 10px;text-align:left;vertical-align:top}
+  #fc-app table.dt thead th{background:var(--blu);color:#fff}
+  #fc-app table.dt tbody th{background:var(--grigio);color:var(--blu);white-space:nowrap}
+  #fc-app .note{font-size:.72rem;color:var(--muto);margin-top:8px}
+  </style>
+
+  <div class="view home on" data-view="home">
+    <div class="kick">Frigo Control Ticino · MEATico</div>
+    <h1>Armadi stagionatura e frollatura</h1>
+    <div class="sub">Stagiona e frolla salumi, carne, formaggi e conserva vino con gli armadi MEATico, per un prodotto artigianale di qualità superiore.</div>
+    <div class="cards" id="cards"></div>
+    <div class="foot">Refrigerante R290 / R452A · Allestimenti in acciaio inox · Sopralluogo e assistenza in Ticino</div>
+  </div>
+
+  <div class="view" data-view="allinone" id="v-allinone"></div>
+  <div class="view" data-view="meat" id="v-meat"></div>
+  <div class="view" data-view="panorama" id="v-panorama"></div>
+  <div class="view" data-view="storage" id="v-storage"></div>
+  <div class="view" data-view="wine" id="v-wine"></div>
+
+  <script>
+  (function(){
+    var root=document.getElementById('fc-app');
+    if(root.dataset.init) return; root.dataset.init='1';
+    var U='https://frigocontrolch.10web.me/wp-content/uploads/2025/08/';
+    function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+    var D={
+      allinone:{name:'All in one',funz:'Stagionatura & affinamento — Salumi / Formaggi',img:U+'armadio-stagionatura-frollatura-all-in-one-meatico-ticino-338x600.webp',
+        intro:'Stagiona e affina salumi e formaggi in un unico armadio, per ottenere prodotti artigianali di qualità superiore.',
+        specs:[['Temperatura','0 / +30 °C'],['Porta','Cieca o vetro'],['Umidità','40% – 95%'],['Ventilazione','Alta / Bassa'],['Refrigerante','R290 / R452A']],
+        sizes:[['Mod. 700','L 750 × D 850 × H 2080 mm','Salumi 100 kg · Formaggi 100 kg'],['Mod. 1500','L 1500 × D 850 × H 2080 mm','Salumi 200 kg · Formaggi 200 kg']],
+        allest:'Allestimento interno: guide inox, barre in acciaio inox, ganci per salumi o griglie inox.'},
+      meat:{name:'Meat',funz:'Frollatura — Carne',img:U+'armadio-frollatura-meat-meatico-ticino-338x600.webp',
+        intro:'Frollatura professionale della carne, con lampada germicida UVC a LED di serie.',
+        specs:[['Temperatura','0 / +10 °C'],['Porta','Cieca o vetro'],['Umidità','40% – 90%'],['Ventilazione','Alta / Bassa'],['Lampada UVC LED','Di serie'],['Refrigerante','R290 / R452A']],
+        sizes:[['Mod. 150','L 600 × D 600 × H 910 mm','Carne 35 kg'],['Mod. 400','L 600 × D 600 × H 1935 mm','Carne 80 kg'],['Mod. 700','L 750 × D 850 × H 2080 mm','Carne 150 kg'],['Mod. 1500','L 1500 × D 850 × H 2080 mm','Carne 300 kg']],
+        allest:'Allestimento interno: guide inox, griglie inox, ganciera per carne con ganci.'},
+      panorama:{name:'Meat panorama',funz:'Frollatura — Carne · fronte e retro vetrati',img:U+'Armadio-MEATICO-Meat-Panorama-per-frollatura-carne-con-doppia-porta-in-Ticino-338x600.webp',
+        intro:'Frollatura della carne con doppia porta: fronte e retro vetrati, ideale come vetrina espositiva. Lampada germicida UVC a LED di serie.',
+        specs:[['Temperatura','0 / +10 °C'],['Umidità','40% – 90%'],['Ventilazione','Alta / Bassa'],['Lampada UVC LED','Di serie'],['Vetratura','Fronte e retro vetrati'],['Refrigerante','R290 / R452A']],
+        sizes:[['Mod. 700','L 750 × D 850 × H 2080 mm','Carne 150 kg'],['Mod. 1500','L 1500 × D 850 × H 2080 mm','Carne 300 kg']],
+        allest:'Allestimento interno: guide inox, griglie inox, ganciera per carne con ganci.'},
+      storage:{name:'Storage',funz:'Conservazione — Carne · fronte e retro vetrati',img:U+'ti-mando-1-foto-della-categoria-generale-Armadi-stagionatura-e-frollatura-categoria-338x600.webp',
+        intro:'Conservazione della carne con ripiani espositivi, fronte e retro vetrati. Lampada germicida UVC a LED di serie.',
+        specs:[['Temperatura','0 / +10 °C'],['Ventilazione','Alta / Bassa'],['Lampada UVC LED','Di serie'],['Vetratura','Fronte e retro vetrati'],['Refrigerante','R290 / R452A']],
+        sizes:[['Mod. 400','L 600 × D 600 × H 1935 mm','Carne 80 kg'],['Mod. 700','L 750 × D 850 × H 2080 mm','Carne 150 kg'],['Mod. 1500','L 1500 × D 850 × H 2080 mm','Carne 300 kg']],
+        allest:'Allestimento interno: guide inox, griglie inox.'},
+      wine:{name:'Wine',funz:'Conservazione — Vino · fronte e retro vetrati',img:U+'armadio-refrigerato-vino-wine-meatico-ticino-338x600.webp',
+        intro:'Conservazione professionale del vino, con fronte e retro vetrati per una perfetta esposizione delle bottiglie.',
+        specs:[['Temperatura','+2 / +20 °C'],['Ventilazione','Alta / Bassa'],['Vetratura','Fronte e retro vetrati'],['Refrigerante','R290 / R452A']],
+        sizes:[['Mod. 400','L 600 × D 600 × H 1935 mm','max 75 bottiglie'],['Mod. 700','L 750 × D 850 × H 2080 mm','max 168 bottiglie'],['Mod. 1500','L 1500 × D 850 × H 2080 mm','max 336 bottiglie']],
+        allest:'Allestimento interno dedicato alla conservazione del vino.'}
+    };
+    var ORDER=['allinone','meat','panorama','storage','wine'];
+
+    document.getElementById('cards').innerHTML=ORDER.map(function(k){var d=D[k];
+      return '<button class="card" type="button" data-open="'+k+'"><div class="ph"><div class="pz ct"><img src="'+d.img+'" alt="'+esc(d.name)+'" loading="lazy"></div></div>'
+        +'<div class="bd"><span class="badge">MEATico</span><h3>'+esc(d.name)+'</h3><p>'+esc(d.funz.split(' — ')[0])+'</p><div class="go">Scopri →</div></div></button>';
+    }).join('');
+
+    function render(k){
+      var d=D[k];
+      var rows=d.specs.map(function(s){return '<div class="frow"><span class="l">'+esc(s[0])+'</span><span class="v">'+esc(s[1])+'</span></div>';}).join('');
+      var dt='<div class="dwrap"><table class="dt"><thead><tr><th>Modello</th><th>Dimensioni</th><th>Capacità</th></tr></thead><tbody>'
+        +d.sizes.map(function(s){return '<tr><th>'+esc(s[0])+'</th><td>'+esc(s[1])+'</td><td>'+esc(s[2])+'</td></tr>';}).join('')
+        +'</tbody></table></div><div class="note">Refrigerante R290 / R452A · '+esc(d.allest)+'</div>';
+      return '<div class="top"><button class="back" type="button" data-back><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg> Indietro</button><span class="badge">MEATico</span><h2>'+esc(d.name)+'</h2></div>'
+        +'<div class="tabs"><button class="tab on" data-tab="0">Panoramica</button><button class="tab" data-tab="1">Dimensioni &amp; capacità</button></div>'
+        +'<div class="stage">'
+          +'<div class="pane on" data-pane="0"><div class="pano">'
+            +'<div class="gal"><div class="main pz ct"><img src="'+d.img+'" alt="'+esc(d.name)+'"></div></div>'
+            +'<div class="side"><span class="funz">'+esc(d.funz)+'</span><div style="font-size:.85rem;margin-bottom:10px">'+esc(d.intro)+'</div>'+rows+'<div class="allest">'+esc(d.allest)+'</div></div>'
+          +'</div></div>'
+          +'<div class="pane" data-pane="1">'+dt+'</div>'
+        +'</div>';
+    }
+    ORDER.forEach(function(k){ document.getElementById('v-'+k).innerHTML=render(k); });
+
+    function show(v){ root.querySelectorAll('.view').forEach(function(el){el.classList.toggle('on', el.getAttribute('data-view')===v);}); }
+    root.addEventListener('click',function(e){
+      var op=e.target.closest('[data-open]'); if(op){ var v=op.getAttribute('data-open'); show(v);
+        var vw=document.getElementById('v-'+v); if(vw){ vw.querySelectorAll('.tab').forEach(function(x,xi){x.classList.toggle('on',xi===0);}); vw.querySelectorAll('.pane').forEach(function(pp){pp.classList.toggle('on',pp.getAttribute('data-pane')==='0');}); } return; }
+      if(e.target.closest('[data-back]')){ show('home'); return; }
+      var tb=e.target.closest('.tab'); if(tb){ var wrap=tb.closest('.view'); var i=tb.getAttribute('data-tab');
+        wrap.querySelectorAll('.tab').forEach(function(x){x.classList.toggle('on',x===tb);});
+        wrap.querySelectorAll('.pane').forEach(function(p){p.classList.toggle('on',p.getAttribute('data-pane')===i);}); return; }
+    });
+    root.addEventListener('contextmenu',function(e){ if(e.target.closest('.pz,img')) e.preventDefault(); });
+    root.addEventListener('dragstart',function(e){ if(e.target.tagName==='IMG') e.preventDefault(); });
+  })();
+  </script>
+</div>

@@ -1,0 +1,292 @@
+<!-- =====================================================================
+     Frigo Control Ticino — Celle frigorifere (INCOLD) — APP FISSA
+     - App-shell: riempie l'elemento e NON cresce mai
+     - Home: 7 famiglie (Modulari / Multi / Pannelli / Porte / Scaffalature / Impianti / Progetti speciali)
+     - Ogni famiglia: selettore modelli + foto + descrizione + caratteristiche + tabella tecnica
+       (+ sezioni pavimenti / finiture / highlights dove presenti)
+     - Su Wix: Incorpora HTML -> larghezza e altezza (consigliato ~700px)
+     ===================================================================== -->
+<div id="fc-app">
+  <style>
+  html,body{height:100%;margin:0;padding:0;overflow:hidden}
+  #fc-app *{box-sizing:border-box;margin:0;padding:0}
+  #fc-app{
+    --blu:#0a3d62;--blu2:#1e6091;--accent:#00a8e8;--grigio:#f4f6f8;--bordo:#e3e9ef;--testo:#22303a;--muto:#6b7b88;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    color:var(--testo);position:relative;height:100%;width:100%;overflow:hidden;
+    background:linear-gradient(180deg,#ffffff 0%,#eef4f8 100%);-webkit-tap-highlight-color:transparent;
+  }
+  #fc-app img{max-width:100%;display:block}
+  #fc-app h1,#fc-app h2,#fc-app h3,#fc-app h4,#fc-app h5,#fc-app h6{color:var(--blu);line-height:1.15}
+  #fc-app .pz{position:relative;overflow:hidden;border-radius:10px;background:#eef2f5}
+  #fc-app .pz img{width:100%;height:100%;object-fit:cover;-webkit-user-drag:none;user-select:none;pointer-events:none}
+  #fc-app .pz.ct img{object-fit:contain;background:#fff}
+  #fc-app .pz::after{content:"";position:absolute;inset:0;z-index:2}
+
+  #fc-app .view{position:absolute;top:0;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:1200px;display:none;flex-direction:column;padding:clamp(12px,2vw,22px);gap:10px}
+  #fc-app .view.on{display:flex;animation:fd .25s ease}
+  @keyframes fd{from{opacity:0}to{opacity:1}}
+
+  #fc-app .kick{letter-spacing:.12em;text-transform:uppercase;font-size:.6rem;font-weight:800;color:var(--accent);text-align:center;flex:0 0 auto}
+  #fc-app .home h1{font-size:clamp(1rem,2.2vw,1.5rem);font-weight:800;text-align:center;flex:0 0 auto}
+  #fc-app .home .sub{text-align:center;color:var(--muto);font-size:.82rem;max-width:760px;margin:0 auto;flex:0 0 auto}
+  #fc-app .cards{flex:1;min-height:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;align-content:center;overflow-y:auto}
+  #fc-app .card{display:flex;flex-direction:column;border:1px solid var(--bordo);border-radius:14px;overflow:hidden;background:#fff;box-shadow:0 8px 22px rgba(10,61,98,.10);cursor:pointer;text-align:left;font:inherit;color:inherit;padding:0}
+  #fc-app .card:hover{box-shadow:0 14px 30px rgba(10,61,98,.18)}
+  #fc-app .card .ph{aspect-ratio:4/3;flex:0 0 auto}
+  #fc-app .card .ph .pz{height:100%}
+  #fc-app .card .bd{flex:0 0 auto;padding:10px 13px 12px}
+  #fc-app .badge{display:inline-block;font-size:.56rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;padding:3px 8px;border-radius:999px;color:#fff;background:linear-gradient(135deg,#0a3d62,#1e6091)}
+  #fc-app .card h3{font-size:.9rem;margin:6px 0 2px}
+  #fc-app .card p{font-size:.73rem;color:var(--muto)}
+  #fc-app .card .go{margin-top:5px;font-weight:700;color:var(--accent);font-size:.74rem}
+  #fc-app .foot{flex:0 0 auto;text-align:center;color:var(--muto);font-size:.7rem}
+
+  #fc-app .top{flex:0 0 auto;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  #fc-app .back{background:none;border:none;cursor:pointer;color:var(--blu);font-weight:700;font-size:.82rem;display:inline-flex;align-items:center;gap:6px;font-family:inherit;padding:2px 4px}
+  #fc-app .back:hover{color:var(--accent)}
+  #fc-app .top h2{font-size:clamp(.98rem,1.8vw,1.25rem)}
+  #fc-app .fdesc{flex:0 0 auto;font-size:.8rem;color:var(--muto);line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  #fc-app .modelbar{flex:0 0 auto;display:flex;gap:6px;overflow-x:auto;padding-bottom:3px;-webkit-overflow-scrolling:touch}
+  #fc-app .mchip{white-space:nowrap;border:1px solid var(--bordo);background:#fff;border-radius:999px;padding:6px 12px;font-size:.74rem;font-weight:700;color:var(--muto);cursor:pointer;font-family:inherit}
+  #fc-app .mchip.on{background:linear-gradient(135deg,var(--blu),var(--blu2));color:#fff;border-color:transparent}
+  #fc-app .fbody{flex:1;min-height:0;display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:640px){#fc-app .fbody{grid-template-columns:1fr;grid-template-rows:minmax(150px,40%) 1fr;overflow:hidden}}
+  #fc-app .gal{min-height:0;display:flex;flex-direction:column;gap:8px}
+  #fc-app .gal .main{flex:1;min-height:0}
+  #fc-app .gal .thumbs{flex:0 0 auto;display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
+  #fc-app .gal .thumbs.hide{display:none}
+  #fc-app .gal .thumbs .t{height:44px;border:2px solid transparent;border-radius:7px;overflow:hidden;cursor:pointer;padding:0;background:none}
+  #fc-app .gal .thumbs .t.on{border-color:var(--accent)}
+  #fc-app .gal .thumbs .t .pz,#fc-app .gal .thumbs .t img{height:100%;border-radius:0}
+  #fc-app .fspec{min-height:0;display:flex;flex-direction:column;overflow:auto}
+  #fc-app .fspec h5{font-size:1rem;margin-bottom:6px}
+  #fc-app .mtext{font-size:.82rem;line-height:1.5;color:var(--testo);margin-bottom:8px}
+  #fc-app .frow{display:flex;justify-content:space-between;gap:14px;padding:7px 0;border-bottom:1px dashed var(--bordo);font-size:.8rem}
+  #fc-app .frow .l{color:var(--muto)}
+  #fc-app .frow .v{font-weight:700;color:var(--blu);text-align:right}
+  #fc-app h6.eyer{font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muto);margin:12px 0 6px}
+  #fc-app .carat{list-style:none;display:grid;gap:4px}
+  #fc-app .carat li{display:flex;gap:7px;font-size:.79rem;align-items:flex-start;line-height:1.35}
+  #fc-app .carat li svg{flex:0 0 13px;margin-top:3px;color:var(--accent)}
+  #fc-app .seclist{list-style:none;display:grid;gap:9px;margin-bottom:4px}
+  #fc-app .secitem{display:flex;gap:9px;align-items:flex-start}
+  #fc-app .secitem .thumb{flex:0 0 46px;width:46px;height:46px;border-radius:8px}
+  #fc-app .secitem .sectxt{font-size:.76rem;line-height:1.35;color:var(--muto)}
+  #fc-app .secitem .sectxt b{display:block;color:var(--blu);font-size:.8rem;margin-bottom:1px}
+  </style>
+
+  <div class="view home on" data-view="home">
+    <div class="kick">Frigo Control Ticino · INCOLD</div>
+    <h1>Celle frigorifere</h1>
+    <div class="sub">Gli armadi e le celle frigorifere INCOLD sono modulari o su misura: la soluzione perfetta per la conservazione refrigerata anche negli ambienti più difficili.</div>
+    <div class="cards" id="cards"></div>
+    <div class="foot">INCOLD · Celle su misura · Temperature positive e negative · Sopralluogo e assistenza in Ticino</div>
+  </div>
+
+  <div class="view" data-view="modulari" id="v-modulari"></div>
+  <div class="view" data-view="multi" id="v-multi"></div>
+  <div class="view" data-view="pannelli" id="v-pannelli"></div>
+  <div class="view" data-view="porte" id="v-porte"></div>
+  <div class="view" data-view="scaffalature" id="v-scaffalature"></div>
+  <div class="view" data-view="impianti" id="v-impianti"></div>
+  <div class="view" data-view="speciali" id="v-speciali"></div>
+
+  <script>
+  (function(){
+    var root=document.getElementById('fc-app');
+    if(root.dataset.init) return; root.dataset.init='1';
+    var U='https://frigocontrolch.10web.me/wp-content/uploads/';
+    var CK='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>';
+    function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+    function M(name,imgs,o){o=o||{};return {name:name,imgs:imgs.map(function(u){return U+u;}),text:o.text||'',carat:o.carat||[],spec:o.spec||[]};}
+    function S(title,items){return {title:title,items:items.map(function(it){return {img:U+it[0],name:it[1],desc:it[2]};})};}
+
+    var FAM={
+      modulari:{name:'Celle Modulari',card:U+'2025/08/cella-frigorifera-incold-ticino-600x451.webp',tag:'Evosystem componibile',
+        desc:'Celle frigorifere componibili a montaggio rapido con aggancio diretto dei pannelli verticali ed orizzontali, modulari o su misura.',
+        models:[
+          M('Evosystem 80-100-160',['2025/08/cella-modulare-incold-esploso-ticino-600x600.webp','2025/08/cella-modulare-incold-2-porte-ticino-600x600.webp','2025/08/cella-modulare-incold-1-porta-ticino-600x600.webp','2025/08/modularita-celle-frigorifere-incold-ticino-600x450.webp'],{
+            text:'Gamma di celle componibili a montaggio rapido. Finitura sanitaria integrata con profilo arrotondato nella giunzione tra pareti, pavimenti e soffitti.',
+            carat:["Pannelli d'angolo orizzontali e verticali","No angolari","Disponibili anche nella versione senza pavimento","Celle certificate CE secondo la norma EN 14509","Battente monolitico semi-incassato"],
+            spec:[['Altezze interne','2020 · 2220 · 2420 · 2620 · 2820 · 3020 · 3220 mm'],['Spessori TN','80 mm'],['Spessori BT','100 · 160 mm'],['Modulo','200 mm'],['Isolamento','PUR 41 kg/m³ · λ 0,023 W/mK']]
+          })
+        ],
+        sections:[
+          S('Pavimenti e portate',[
+            ['2025/10/Pavimenti-P100.webp','P 100 STANDARD','Lamiera di acciaio zinco-plastificata grigia, antisdrucciolo R9 (DIN 51130-04).'],
+            ['2025/10/Pavimenti-P100.webp','P 100 IX','Lamiera di acciaio inox AISI 304, antisdrucciolo R12 (DIN 51130-04).'],
+            ['2025/10/Pavimenti-P240F.webp','P 250 F','Laminato stratificato fenolico ruvido marrone, antisdrucciolo R10 (DIN 51130-04).']
+          ]),
+          S('Finiture disponibili',[
+            ['2025/10/Finiture_PR.webp','PR · Lamiera preverniciata','Zincata preverniciata 30 µ, bianco RAL 9010, atossica.'],
+            ['2025/10/Finiture-IX.webp','IX · Lamiera inox (option)','INOX AISI 304, finitura scotch brite con pellicola protettiva.'],
+            ['2025/10/incold-zero.webp','INCOLD ZERO (option)','Acciaio zincato plastificato con film PVC antibatterico, 120 µ.']
+          ])
+        ]},
+
+      multi:{name:'Celle Multi',card:U+'2025/08/celle-frigorifere-multi-modulari-ticino-600x450.webp',tag:'4 sistemi modulari',
+        desc:'Gamma di armadi e celle modulari ed estensibili, con profili angolari perimetrali arrotondati per composizioni semplici o complesse, sempre agganciate e facili da pulire.',
+        models:[
+          M('MULTI CUBED 60-80-100-120-140',['2025/10/Celle-frigorifere-modulari_multi-cubed-600x450.webp','2025/10/Esploso-celle-frigorifere-modulari_multi-cubed_-600x450.webp'],{
+            carat:["Angolari verticali ed orizzontali in lamiera con poliuretano interno","No cappucci d'angolo","Angolari verticali terra-soffitto","Montaggio rapido","Disponibili anche senza pavimento","Vasta gamma di angolari per composizioni complesse","Certificate CE secondo la norma EN 14509"],
+            spec:[['Altezze interne','2030 · 2230 · 2430 · 2630 · 2830 · 3030 · 3230 mm'],['Spessori TN','60 · 80 mm'],['Spessori BT','100 · 120 · 140 mm'],['Modulo','100 · 200 mm'],['Isolamento','PUR 41 kg/m³ · λ 0,023 W/mK']]
+          }),
+          M('MULTI L 60-80-100-140',['2025/10/2.Celle-frigorifere-modulari_multi-600x450.webp','2025/10/2.Esploso_multisystem-600x450.webp'],{
+            carat:["Angolari orizzontali e verticali in lamiera con poliuretano interno","Cappucci d'angolo","Disponibili anche senza pavimento","Vasta gamma di angolari per composizioni complesse","Certificate CE secondo la norma EN 14509"],
+            spec:[['Altezze interne','2030 · 2230 · 2430 · 2630 · 2830 · 3030 · 3230 mm'],['Spessori TN','60 · 80 mm'],['Spessori BT','100 · 140 mm'],['Modulo','100 · 200 mm'],['Isolamento','PUR 41 kg/m³ · λ 0,023 W/mK']]
+          }),
+          M('MULTI PVC 60-80-100',['2025/10/Esploso_multisystem-600x450.webp'],{
+            carat:["Angolari orizzontali e verticali in PVC bianco","Cappucci d'angolo","Disponibili anche senza pavimento","Vasta gamma di angolari per composizioni complesse","Certificate CE secondo la norma EN 14509"],
+            spec:[['Altezze interne','2030 · 2230 · 2430 · 2630 · 2830 · 3030 · 3230 mm'],['Spessori TN','60 · 80 mm'],['Spessori BT','100 mm'],['Modulo','100 · 200 mm'],['Isolamento','PUR 41 kg/m³ · λ 0,023 W/mK']]
+          }),
+          M('MULTICABINET 60-100',['2025/10/Armadi-Multi-cabinet-600x600.webp','2025/10/coppia-armadi-frigoriferi-Multi-cabinet-600x600.webp','2025/10/Modularita-multicabinet-600x600.webp'],{
+            carat:["Angolari verticali ed orizzontali in lamiera con poliuretano interno · terra-soffitto","Angoli interni arrotondati","Compartimentabili con divisori modulari verticali","Porte ad unica anta o sportelli sovrapposti","Pareti, soffitto e pavimento in lamiera preverniciata bianco RAL 9010","Isolamento in poliuretano iniettato, esente da CFC"],
+            spec:[['Altezze interne','2030 · 2230 · 2430 mm'],['Spessori TN','60 mm'],['Spessori BT','100 mm'],['Modulo','800 mm'],['Isolamento','PUR 41 kg/m³ · λ 0,023 W/mK']]
+          })
+        ],
+        sections:[
+          S('Pavimenti e portate',[
+            ['2025/10/Pavimenti-P100-1-1.webp','P 100 STANDARD','Acciaio zinco-plastificato grigio, antisdrucciolo R9 (DIN 51130-04).'],
+            ['2025/10/Pavimenti-P100IX.webp','P 100 IX','Acciaio inox AISI 304, antisdrucciolo R12 (DIN 51130-04).'],
+            ['2025/10/Pavimenti-P240F.webp','P 250 F','Laminato fenolico ruvido marrone, antisdrucciolo R10 (DIN 51130-04).'],
+            ['2025/10/Pavimenti-P400FR.webp','P 400 FR','Laminato fenolico ruvido marrone R10, con struttura interna integrata nella schiuma.'],
+            ['2025/10/PAVIMENTI_06.webp','P 350 IX','Inox AISI 304 micro-mandorlato R11, con piastra di distribuzione carico integrata.'],
+            ['2025/10/PAVIMENTI_07.webp','P 400 IXR','Inox AISI 304 micro-mandorlato R11, piastra su struttura interna integrata nella schiuma.']
+          ]),
+          S('Finiture disponibili',[
+            ['2025/10/Finiture_PR.webp','Lamiera preverniciata','Zincata preverniciata 30 µ, bianco RAL 9010, atossica.'],
+            ['2025/10/Finiture-IX.webp','Lamiera inox (option)','INOX AISI 304, finitura scotch brite con pellicola protettiva.'],
+            ['2025/10/PX.webp','Lamiera inox plastificata (option)','INOX AISI 304 con film PVC rigido 120 µ bianco, atossico.'],
+            ['2025/10/incold-zero.webp','Lamiera antibatterica (option)','Acciaio zincato con film PVC antibatterico, 120 µ.']
+          ]),
+          S('Highlights',[
+            ['2025/10/Pannello-Multi-150x150.webp','Pannello sandwich','Supporti in lamiera zincata preverniciata 30µ e schiuma rigida PUR, RAL 9010.'],
+            ['2025/10/Certificazione-multi_bs2-150x150.webp','Reazione al fuoco','Classe di reazione al fuoco certificata.'],
+            ['2025/10/sistema-di-aggancio-pannelli-150x150.webp','Ganci a doppio effetto','Ganci eccentrici a doppio effetto.'],
+            ['2025/10/Sistema-di-allineamento-pannelli-4-150x150.webp','Allineamento rapido',"Sistema rapido di allineamento tra pannelli e giunti d'angolo."],
+            ['2025/10/Angoli-interni-r15-150x150.webp','Raggio sanitario R15','Angolo sanitario interno arrotondato R15.'],
+            ['2025/10/angolari-multi-cubed-150x150.webp','Angolari 2 / 3 vie','Esterno in lamiera, interno in poliuretano iniettato.'],
+            ['2025/10/Possibilita-di-accoppiamento-150x150.webp','Accoppiamento pareti','Pareti e pavimento di diverso spessore accoppiabili.'],
+            ['2025/10/Porte-armadi-multicabinet-150x150.webp','Porte','Luce netta 610 × 1700 mm.'],
+            ['2025/10/Sportelli-multicabinet-150x150.webp','Sportelli','Luce netta 610 × 800 mm, per ripiani 60×80 o teglie 60×40 cm.']
+          ])
+        ]},
+
+      pannelli:{name:'Pannelli',card:U+'2025/10/Pannelli-GS.webp',tag:'BIGISOPANELS',
+        desc:'BIGISOPANELS: pannelli planari ed ermetici specifici per il freddo, con giunti, elementi di fissaggio, accessori e finiture per celle a temperature positive e negative, magazzini industriali, locali agroalimentari, tunnel frigoriferi e atmosfera controllata.',
+        models:[
+          M('GS 112 · Continuo',['2025/10/Pannelli-GS.webp'],{text:'Pannelli prodotti in continuo, specifici per il freddo.'}),
+          M('PGS 112 · Discontinuo',['2025/07/Pannelli-PGS-2.webp'],{text:'Pannelli prodotti in discontinuo.'}),
+          M('VR · Vetroresina',['2025/07/Pannelli-PM-4.webp'],{text:'Pannelli in vetroresina.'}),
+          M('PM · Medici',['2025/07/Pannelli-PM-4.webp'],{text:'Pannelli medici.'})
+        ],sections:[]},
+
+      porte:{name:'Porte',card:U+'2025/10/Porte-scorrevoli-isotermiche-SC.webp',tag:'6 tipologie isotermiche',
+        desc:'INCOLDISODOORS: ampia gamma di porte isotermiche e di servizio - scorrevoli, su cerniera, pivotanti - con finiture adatte ad ogni applicazione e accessori come la chiusura magnetica.',
+        models:[
+          M('SC · Porte scorrevoli',['2025/10/Porte-scorrevoli-isotermiche-SC.webp'],{text:'Soluzione ideale per separare ambienti refrigerati conservando le temperature interne, con il massimo risparmio energetico. Adattabili grazie all’ampia gamma di accessori e finiture; disponibile l’automazione INCOLD con inverter a seconda del modello.'}),
+          M('CE · Porte su cerniera',['2025/10/Porte-isotermiche-su-cerniera-CE.webp'],{text:'Soluzione robusta e durevole. Componenti studiati per la refrigerazione rendono le porte solide e affidabili; la registrazione è semplice e intuitiva per garantire totale ermeticità.'}),
+          M('SI · Porte semi isolanti',['2025/10/porte-semiisolanti.webp'],{text:'Porte di servizio per accesso rapido ad ambienti climatizzati a temperatura positiva con ΔT ≤ 12 °C, minimizzando i consumi. Ideali per uffici, servizi igienici e spogliatoi, dal design semplice e pulito.'}),
+          M('VV · Porte va e vieni',['2025/10/porte-va-e-vieni.webp'],{text:'Progettate per le zone ad alto traffico - ingressi, corridoi, zone di carico/scarico e cucine. Gli oblò sui battenti ottimizzano la visibilità.'}),
+          M('Porte in PVC',['2025/10/tende-a-strisce.webp'],{text:'Installabili in corrispondenza delle porte frigorifere per limitare le dispersioni termiche o l’ingresso di aria calda (e la formazione di condensa) durante apertura e chiusura.'}),
+          M('Porte rapide',['2025/10/fold-gialla-600x396.webp'],{text:'Tastierino integrato sul montante per controllare e programmare la porta senza ingombri laterali; scheda elettronica alloggiata sul motore. Completamente pre-cablate per un’installazione rapida e semplice.'})
+        ],sections:[]},
+
+      scaffalature:{name:'Scaffalature',card:U+'2025/10/Assieme-rev3_01.webp',tag:'Easyrack · Drink Rack',
+        desc:'Due tipologie di scaffalature a corredo delle celle: Easyrack modulare in alluminio/polietilene adatto agli alimenti, e Drink Rack per esporre bottiglie, lattine e scatole di piccole dimensioni.',
+        models:[
+          M('EASYRACK',['2025/10/Assieme-rev3_01.webp'],{
+            text:'Sistema di scaffalatura modulare per l’allestimento di celle frigorifere. Range di temperatura -40 °C / +40 °C. Struttura portante in alluminio anodizzato, con ripiani a doghe in polietilene alta densità adatto al contatto con alimenti.',
+            carat:['Scaffalatura alluminio / polietilene','Composizione lineare o ad angolo','Doghe in polietilene alta densità per alimenti','Piano e montante preassemblati','Mensole angolari ad aggancio rapido'],
+            spec:[['Profondità ripiani','300 · 400 · 500 mm'],['Lunghezza ripiani','multipli di 100, da 640 a 1540 mm'],['Altezza montanti','1600 · 1750 · 1900 mm'],['Posizionamento ripiani','ogni 150 mm'],['Carico max tra 2 montanti','300 kg · 600 kg con barra stabilizzatrice (option)']]
+          }),
+          M('DRINK RACK',['2025/10/Assieme-rev3_02.webp'],{
+            text:'Scaffalatura per esporre bottiglie, lattine e scatole di piccole dimensioni. Ottima visualizzazione del prodotto grazie all’inclinazione dei piani, con scivolamento della merce e riempimento automatico della prima fila; divisori regolabili.',
+            carat:['Struttura in acciaio zincato e verniciato','Piani inclinati 10° con additivo antiscivolo','Divisori disponibili in 2 altezze','Divisori regolabili'],
+            spec:[['Dimensione ripiani','650 / 750 × 500 mm'],['Inclinazione ripiani','10°'],['Altezza ripiani','89 / 127 mm']]
+          })
+        ],sections:[]},
+
+      impianti:{name:'Impianti',card:U+'2025/10/Accavallati.webp',tag:'5 soluzioni di refrigerazione',
+        desc:'Per refrigerare le celle forniamo una vasta gamma di impianti per temperature positive e negative, adatti a tutte le esigenze.',
+        models:[
+          M('FA · Monoblocchi accavallati',['2025/10/Accavallati.webp'],{text:'Serie FA per la conservazione di prodotti freschi e già congelati di aziende medie e piccole. Installabili a cavallo della parete della cella.'}),
+          M('FT · Monoblocchi tampone',['2025/10/A-tampone.webp'],{text:'Serie FT: gruppi frigoriferi con unità condensante, unità evaporante e quadro di comando. Prodotto di facile installazione, con ingombri contenuti.'}),
+          M('SF · Monoblocchi a soffitto',['2025/10/A-soffitto.webp'],{text:'Serie SF per montaggio “a soffitto” con foro sul tetto della cella: soluzione ideale per non sottrarre spazio ai locali.'}),
+          M('ST · Split',['2025/10/split.webp'],{text:'Serie ST: gruppi frigoriferi con unità condensante, unità evaporante e quadro di comando. Facile installazione e ingombri contenuti.'}),
+          M('STS · Split evaporatore statico',['2025/10/split-con-evaporatore-statico.webp'],{text:'Serie STS: gruppi frigoriferi con evaporatore statico, unità condensante e quadro di comando. Facile installazione e ingombri contenuti.'})
+        ],sections:[]},
+
+      speciali:{name:'Progetti speciali',card:U+'2025/10/celle-inox-600x440.webp',tag:'Coibentazioni su misura',
+        desc:'Coibentazioni per settori che richiedono progetti speciali - panificazione, pastorizzazione e altro - realizzate su misura con materiali adatti e grande esperienza.',
+        models:[
+          M('Panificazione',['2025/10/celle-inox-600x440.webp'],{text:'Coibentazioni per celle e armadi di lievitazione e fermalievitazione. Disponibili con sportelli di ispezione, in varie finiture, anche con pavimento riscaldato. Tutte le realizzazioni sono fatte su misura.'}),
+          M('Abbattimento e surgelazione',['2025/10/marina-600x400.webp'],{text:'Coibentazione per abbattitori e surgelatori: struttura in poliuretano iniettato ad alta intensità e ottima unità condensatrice per frenare la proliferazione batterica. Disponibili totalmente in inox, rampa compresa.'}),
+          M('Modellaggio cioccolato',['2025/10/Modellaggio-1-600x600.webp'],{text:'Coibentazioni speciali con pannelli in acciaio inox per facilitare l’ispezione e la manutenzione nelle linee di modellaggio dei cioccolatini.'}),
+          M('Pastorizzazione',['2025/10/Cella-pastorizzazione.1-600x600.webp'],{text:'Coibentazioni per spirali di pastorizzazione: celle coibentate INCOLD che portano i prodotti confezionati alle giuste temperature nei tempi prescritti, con risultati omogenei e di alta qualità.'}),
+          M('Display · Panorama box',['2025/10/panorama-box-active-13.10-1-600x600.webp'],{text:'PANORAMA BOX: concept di refrigerazione, presentazione e distribuzione della merce nel punto vendita. Flessibile, autoportante e trasparente, con caricamento laterale, frontale o da retro.'})
+        ],sections:[]}
+    };
+    var ORDER=['modulari','multi','pannelli','porte','scaffalature','impianti','speciali'];
+
+    document.getElementById('cards').innerHTML=ORDER.map(function(k){var f=FAM[k];
+      return '<button class="card" type="button" data-open="'+k+'"><div class="ph"><div class="pz ct"><img src="'+f.card+'" alt="'+esc(f.name)+'" loading="lazy"></div></div>'
+        +'<div class="bd"><span class="badge">INCOLD</span><h3>'+esc(f.name)+'</h3><p>'+esc(f.tag)+'</p><div class="go">Scopri →</div></div></button>';
+    }).join('');
+
+    function secHTML(f){
+      if(!f.sections||!f.sections.length) return '';
+      return f.sections.map(function(sec){
+        return '<h6 class="eyer">'+esc(sec.title)+'</h6><ul class="seclist">'+sec.items.map(function(it){
+          return '<li class="secitem"><span class="pz ct thumb"><img src="'+it.img+'" alt="'+esc(it.name)+'" loading="lazy"></span>'
+            +'<span class="sectxt"><b>'+esc(it.name)+'</b>'+esc(it.desc)+'</span></li>';
+        }).join('')+'</ul>';
+      }).join('');
+    }
+    function renderFam(k){
+      var f=FAM[k];
+      var chips=f.models.map(function(m,i){return '<button class="mchip'+(i===0?' on':'')+'" type="button" data-i="'+i+'">'+esc(m.name)+'</button>';}).join('');
+      return '<div class="top"><button class="back" type="button" data-back><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg> Indietro</button><span class="badge">INCOLD</span><h2>'+esc(f.name)+'</h2></div>'
+        +'<div class="fdesc">'+esc(f.desc)+'</div>'
+        +'<div class="modelbar" data-fam="'+k+'">'+chips+'</div>'
+        +'<div class="fbody">'
+          +'<div class="gal"><div class="main pz ct"><img id="gm-'+k+'"></div><div class="thumbs" id="gt-'+k+'"></div></div>'
+          +'<div class="fspec"><h5 id="mn-'+k+'"></h5><div id="fs-'+k+'"></div><div id="sec-'+k+'">'+secHTML(f)+'</div></div>'
+        +'</div>';
+    }
+    ORDER.forEach(function(k){ document.getElementById('v-'+k).innerHTML=renderFam(k); });
+
+    var cur={};
+    function setModel(k,i){
+      var f=FAM[k],m=f.models[i]; cur[k]={model:i};
+      document.getElementById('mn-'+k).textContent=m.name;
+      var html='';
+      if(m.text) html+='<p class="mtext">'+esc(m.text)+'</p>';
+      if(m.spec.length) html+=m.spec.map(function(s){return '<div class="frow"><span class="l">'+esc(s[0])+'</span><span class="v">'+esc(s[1])+'</span></div>';}).join('');
+      if(m.carat.length) html+='<h6 class="eyer">Caratteristiche tecniche</h6><ul class="carat">'+m.carat.map(function(x){return '<li>'+CK+'<span>'+esc(x)+'</span></li>';}).join('')+'</ul>';
+      document.getElementById('fs-'+k).innerHTML=html;
+      var gm=document.getElementById('gm-'+k); gm.src=m.imgs[0]; gm.alt=m.name;
+      var gt=document.getElementById('gt-'+k);
+      gt.innerHTML=m.imgs.map(function(u,j){return '<button class="t'+(j===0?' on':'')+'" type="button" data-img="'+j+'"><span class="pz"><img src="'+u+'" alt="'+esc(m.name)+'" loading="lazy"></span></button>';}).join('');
+      gt.classList.toggle('hide',m.imgs.length<2);
+      var bar=document.querySelector('.modelbar[data-fam="'+k+'"]');
+      if(bar) bar.querySelectorAll('.mchip').forEach(function(c,ci){c.classList.toggle('on',ci===i);});
+      var fs=document.querySelector('#v-'+k+' .fspec'); if(fs) fs.scrollTop=0;
+    }
+    ORDER.forEach(function(k){ setModel(k,0); });
+
+    function show(v){ root.querySelectorAll('.view').forEach(function(el){el.classList.toggle('on', el.getAttribute('data-view')===v);}); }
+    root.addEventListener('click',function(e){
+      var op=e.target.closest('[data-open]'); if(op){ var v=op.getAttribute('data-open'); show(v); setModel(v,0); return; }
+      if(e.target.closest('[data-back]')){ show('home'); return; }
+      var mc=e.target.closest('.mchip'); if(mc){ var k=mc.closest('.modelbar').getAttribute('data-fam'); setModel(k,+mc.getAttribute('data-i')); return; }
+      var th=e.target.closest('.thumbs .t'); if(th){ var view=th.closest('.view'); var k=view.getAttribute('data-view'); var j=+th.getAttribute('data-img');
+        var m=FAM[k].models[cur[k].model]; var gm=document.getElementById('gm-'+k); gm.src=m.imgs[j]; gm.alt=m.name;
+        view.querySelectorAll('.thumbs .t').forEach(function(x){x.classList.remove('on');}); th.classList.add('on'); return; }
+    });
+    root.addEventListener('contextmenu',function(e){ if(e.target.closest('.pz,img')) e.preventDefault(); });
+    root.addEventListener('dragstart',function(e){ if(e.target.tagName==='IMG') e.preventDefault(); });
+  })();
+  </script>
+</div>

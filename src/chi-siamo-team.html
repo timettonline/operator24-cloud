@@ -1,0 +1,330 @@
+<!-- WIDGET TEAM FRIGO CONTROL — incollare in un blocco HTML -->
+<section class="fc-team-widget" aria-labelledby="fc-team-title">
+  <div class="fc-team-shell">
+    <header class="fc-team-header" id="fc-intestazione"></header>
+    <div class="fc-team-grid" id="fc-griglia"></div>
+  </div>
+</section>
+
+<style>
+  .fc-team-widget,
+  .fc-team-widget * {
+    box-sizing: border-box;
+  }
+
+  .fc-team-widget {
+    --fc-bg: #020318;
+    --fc-panel: #070a2e;
+    --fc-blue: #175cff;
+    --fc-violet: #6951ff;
+    --fc-text: #f7f8ff;
+    --fc-muted: #b8bdd7;
+    --fc-line: rgba(87, 112, 255, 0.34);
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    width: 100%;
+    padding: clamp(64px, 8vw, 116px) 24px;
+    color: var(--fc-text);
+    background:
+      radial-gradient(circle at 4% 8%, rgba(41, 76, 255, 0.22), transparent 30%),
+      radial-gradient(circle at 96% 88%, rgba(91, 38, 255, 0.18), transparent 34%),
+      var(--fc-bg);
+    font-family: inherit, Arial, sans-serif;
+  }
+
+  .fc-team-widget::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    inset: 0;
+    opacity: 0.32;
+    background-image:
+      linear-gradient(rgba(78, 103, 255, 0.08) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(78, 103, 255, 0.08) 1px, transparent 1px);
+    background-size: 72px 72px;
+    -webkit-mask-image: linear-gradient(to bottom, black, transparent 78%);
+    mask-image: linear-gradient(to bottom, black, transparent 78%);
+    pointer-events: none;
+  }
+
+  .fc-team-shell {
+    width: min(1380px, 100%);
+    margin-inline: auto;
+  }
+
+  .fc-team-header {
+    display: grid;
+    grid-template-columns: minmax(280px, 0.8fr) minmax(340px, 1fr);
+    align-items: end;
+    gap: clamp(28px, 6vw, 96px);
+    margin-bottom: clamp(40px, 5vw, 72px);
+    padding-bottom: clamp(24px, 3vw, 38px);
+    border-bottom: 1px solid var(--fc-line);
+  }
+
+  .fc-team-kicker {
+    margin: 0 0 12px;
+    color: #82a6ff;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+
+  .fc-team-header h2 {
+    margin: 0;
+    color: var(--fc-text);
+    font-size: clamp(42px, 6vw, 78px);
+    font-weight: 700;
+    letter-spacing: -0.045em;
+    line-height: 0.95;
+  }
+
+  .fc-team-intro {
+    max-width: 650px;
+    margin: 0;
+    color: var(--fc-muted);
+    font-size: clamp(17px, 1.6vw, 21px);
+    line-height: 1.65;
+  }
+
+  .fc-team-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(18px, 2.2vw, 32px);
+  }
+
+  .fc-team-card {
+    position: relative;
+    overflow: hidden;
+    min-width: 0;
+    border: 1px solid rgba(117, 132, 255, 0.22);
+    border-radius: 24px;
+    background:
+      linear-gradient(145deg, rgba(18, 25, 78, 0.96), rgba(3, 5, 27, 0.98));
+    box-shadow: 0 24px 70px rgba(0, 0, 24, 0.38);
+    transition: transform 280ms ease, border-color 280ms ease, box-shadow 280ms ease;
+  }
+
+  .fc-team-card::after {
+    content: "";
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--fc-blue), var(--fc-violet));
+    transform: scaleX(0.24);
+    transform-origin: left;
+    transition: transform 280ms ease;
+  }
+
+  .fc-team-card:hover {
+    transform: translateY(-7px);
+    border-color: rgba(99, 127, 255, 0.62);
+    box-shadow: 0 28px 80px rgba(18, 47, 194, 0.22);
+  }
+
+  .fc-team-card:hover::after {
+    transform: scaleX(1);
+  }
+
+  .fc-team-photo {
+    position: relative;
+    overflow: hidden;
+    aspect-ratio: 1 / 1;
+    background: #0b0e2f;
+  }
+
+  .fc-team-photo::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(to top, rgba(3, 5, 29, 0.72), transparent 44%),
+      linear-gradient(135deg, rgba(31, 63, 255, 0.12), transparent 52%);
+    pointer-events: none;
+  }
+
+  .fc-team-photo img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    filter: saturate(0.88) contrast(1.04);
+    transition: transform 600ms cubic-bezier(0.2, 0.7, 0.2, 1), filter 300ms ease;
+  }
+
+  .fc-team-card:hover .fc-team-photo img {
+    transform: scale(1.035);
+    filter: saturate(1) contrast(1.04);
+  }
+
+  .fc-team-content {
+    min-height: 250px;
+    padding: clamp(24px, 2.4vw, 34px);
+  }
+
+  .fc-team-role {
+    min-height: 2.6em;
+    margin: 0 0 10px;
+    color: #7fa4ff;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.105em;
+    line-height: 1.35;
+    text-transform: uppercase;
+  }
+
+  .fc-team-content h3 {
+    margin: 0 0 16px;
+    color: var(--fc-text);
+    font-size: clamp(24px, 2.2vw, 31px);
+    font-weight: 650;
+    letter-spacing: -0.025em;
+    line-height: 1.12;
+  }
+
+  .fc-team-content > p:last-child {
+    margin: 0;
+    color: var(--fc-muted);
+    font-size: 16px;
+    line-height: 1.68;
+  }
+
+  @media (max-width: 980px) {
+    .fc-team-header {
+      grid-template-columns: 1fr;
+      align-items: start;
+      gap: 22px;
+    }
+
+    .fc-team-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .fc-team-content {
+      min-height: 244px;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .fc-team-widget {
+      padding: 56px 16px 64px;
+    }
+
+    .fc-team-header {
+      margin-bottom: 30px;
+    }
+
+    .fc-team-header h2 {
+      font-size: clamp(42px, 14vw, 58px);
+    }
+
+    .fc-team-grid {
+      grid-template-columns: 1fr;
+      gap: 18px;
+    }
+
+    .fc-team-card {
+      display: grid;
+      grid-template-columns: 118px minmax(0, 1fr);
+      align-items: stretch;
+      border-radius: 18px;
+    }
+
+    .fc-team-photo {
+      height: 100%;
+      min-height: 220px;
+      aspect-ratio: auto;
+    }
+
+    .fc-team-content {
+      min-height: 0;
+      padding: 22px 18px;
+    }
+
+    .fc-team-role {
+      min-height: 0;
+      margin-bottom: 9px;
+      font-size: 10px;
+      letter-spacing: 0.08em;
+    }
+
+    .fc-team-content h3 {
+      margin-bottom: 12px;
+      font-size: 23px;
+    }
+
+    .fc-team-content > p:last-child {
+      font-size: 14px;
+      line-height: 1.55;
+    }
+  }
+
+  @media (max-width: 420px) {
+    .fc-team-card {
+      grid-template-columns: 104px minmax(0, 1fr);
+    }
+
+    .fc-team-photo {
+      min-height: 236px;
+    }
+
+    .fc-team-content {
+      padding: 20px 15px;
+    }
+
+    .fc-team-content h3 {
+      font-size: 20px;
+    }
+
+    .fc-team-content > p:last-child {
+      font-size: 13.5px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .fc-team-card,
+    .fc-team-card::after,
+    .fc-team-photo img {
+      transition: none;
+    }
+  }
+</style>
+
+<!--FC-KIT-->
+<script>
+(function () {
+  var E = FCKit.esc;
+  var DATI = {"kicker":"Le persone dietro ogni impianto","titolo":"Il nostro team","intro":"Competenze diverse, un unico obiettivo: offrirti un lavoro preciso e un servizio affidabile, dal primo sopralluogo all’assistenza nel tempo.","persone":[{"nome":"Walter Meyerhans","ruolo":"Fondatore e Responsabile Operativo","descrizione":"Tecnico frigorista AFC. Dal 2008 mette esperienza, visione e conoscenza del territorio al servizio di soluzioni affidabili.","foto":"https://dgvrlpubiuqxsvkjtrdh.supabase.co/storage/v1/object/public/media/incorporate/d61701d60dcfcb99.webp"},{"nome":"Daniele Meyerhans","ruolo":"Montaggi Clima e Magazzino","descrizione":"Tecnico frigorista AFC. Coordina i montaggi clima e la gestione del magazzino con precisione e attenzione ai dettagli.","foto":"https://dgvrlpubiuqxsvkjtrdh.supabase.co/storage/v1/object/public/media/incorporate/37877d0da7a4d41c.webp"},{"nome":"Fabrizio Affinito","ruolo":"Responsabile delle Manutenzioni","descrizione":"Tecnico frigorista. Guida le manutenzioni per mantenere ogni impianto efficiente e ridurre i fermi nel tempo.","foto":"https://dgvrlpubiuqxsvkjtrdh.supabase.co/storage/v1/object/public/media/incorporate/0ed76e6ffa629a71.webp"},{"nome":"Fabio Polizzi","ruolo":"Responsabile di Progetto","descrizione":"Tecnico frigorista. Segue i progetti in ogni fase, per interventi ordinati, puntuali e affidabili.","foto":"https://dgvrlpubiuqxsvkjtrdh.supabase.co/storage/v1/object/public/media/incorporate/e2a96a9586757d2b.webp"},{"nome":"Mithuran Pushprasa","ruolo":"Riparazioni e Apprendisti","descrizione":"Tecnico frigorista AFC. Gestisce le riparazioni e accompagna la crescita degli apprendisti, per un servizio sempre pronto.","foto":"https://dgvrlpubiuqxsvkjtrdh.supabase.co/storage/v1/object/public/media/incorporate/6c2ebab93dbd78bd.webp"},{"nome":"Edi Dushica","ruolo":"Apprendista 3° anno","descrizione":"Cresce sul campo al fianco dei nostri tecnici, sviluppando ogni giorno le competenze che assicurano qualità anche nel futuro.","foto":"https://dgvrlpubiuqxsvkjtrdh.supabase.co/storage/v1/object/public/media/incorporate/c5e89b89099a40f4.webp"},{"nome":"Rayan Tawfeek","ruolo":"Apprendista 2° anno","descrizione":"Muove i primi passi tra installazioni e interventi di assistenza, imparando sul campo al fianco del team.","foto":"https://dgvrlpubiuqxsvkjtrdh.supabase.co/storage/v1/object/public/media/incorporate/ed815e80e8b95317.webp"},{"nome":"Natalia Nahorna","ruolo":"Amministrazione e CRM","descrizione":"Cura amministrazione, CRM e organizzazione per offrirti un’esperienza chiara, ordinata e vicina alle tue necessità.","foto":"https://dgvrlpubiuqxsvkjtrdh.supabase.co/storage/v1/object/public/media/incorporate/1286cd0b6bd9994f.webp"},{"nome":"Anna Meyerhans","ruolo":"Responsabile Finanze e Marketing","descrizione":"Cura organizzazione e comunicazione per offrirti un’esperienza chiara, ordinata e vicina alle tue necessità.","foto":"https://dgvrlpubiuqxsvkjtrdh.supabase.co/storage/v1/object/public/media/incorporate/ef343f9d83f9c8ac.webp"}]};
+  var SCHEMA = [
+    { t: "testo", k: "kicker", l: "Scritta piccola sopra il titolo" },
+    { t: "testo", k: "titolo", l: "Titolo" },
+    { t: "area", k: "intro", l: "Testo introduttivo" },
+    { t: "lista", k: "persone", l: "Persone del team", agg: "Aggiungi una persona", titolo: "nome", miniatura: "foto", min: 1,
+      aiuto: "Per l'ordine usa le frecce ↑ ↓. Le foto vengono ritagliate in automatico.",
+      nuovo: { nome: "", ruolo: "", descrizione: "", foto: "" },
+      voce: { t: "gruppo", campi: [
+        { t: "testo", k: "nome", l: "Nome e cognome" },
+        { t: "testo", k: "ruolo", l: "Ruolo" },
+        { t: "area", k: "descrizione", l: "Descrizione" },
+        { t: "img", k: "foto", l: "Foto", aiuto: "Meglio quadrata, almeno 700×700 pixel." }
+      ] } }
+  ];
+  function render(d) {
+    document.getElementById("fc-intestazione").innerHTML =
+      '<div><p class="fc-team-kicker">' + E(d.kicker) + '</p><h2 id="fc-team-title">' + E(d.titolo) + "</h2></div>" +
+      '<p class="fc-team-intro">' + E(d.intro) + "</p>";
+    document.getElementById("fc-griglia").innerHTML = (d.persone || []).map(function (p, i) {
+      return '<article class="fc-team-card"><div class="fc-team-photo"><img src="' + E(p.foto) + '" alt="' + E(p.nome + ", " + p.ruolo) +
+        '" width="720" height="720"' + (i ? ' loading="lazy"' : "") + '></div><div class="fc-team-content"><p class="fc-team-role">' + E(p.ruolo) +
+        "</p><h3>" + E(p.nome) + "</h3><p>" + E(p.descrizione) + "</p></div></article>";
+    }).join("");
+  }
+  FCKit.avvia({ id: "chi-siamo-team", nome: "Chi siamo · Il nostro team", dati: DATI, schema: SCHEMA, render: render,
+                ingranaggio: { pos: "br", tono: "scuro" } });
+})();
+</script>

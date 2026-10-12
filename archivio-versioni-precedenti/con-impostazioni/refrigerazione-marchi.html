@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: #080a24;
+  color: #ffffff;
+  font-family: Helvetica, Arial, sans-serif;
+}
+
+body {
+  overflow-x: hidden;
+}
+
+
+/* =========================
+   SEZIONE
+========================= */
+
+.fc-marchi {
+  width: 100%;
+  padding: 65px 0 70px;
+
+  background:
+    radial-gradient(
+      circle at 20% 35%,
+      rgba(23, 92, 255, 0.18),
+      transparent 38%
+    ),
+    radial-gradient(
+      circle at 80% 65%,
+      rgba(70, 90, 210, 0.10),
+      transparent 40%
+    ),
+    #080a24;
+
+  text-align: center;
+  overflow: hidden;
+}
+
+
+.fc-marchi-inner {
+  width: 100%;
+  max-width: 1150px;
+  margin: 0 auto;
+  padding: 0 25px;
+}
+
+
+/* =========================
+   TITOLO
+========================= */
+
+.fc-marchi h2 {
+  margin: 0 0 15px;
+
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: 20px;
+  line-height: 1.3;
+  font-weight: 600;
+
+  color: #ffffff;
+}
+
+
+/* =========================
+   TESTO
+========================= */
+
+.fc-marchi-intro {
+  max-width: 900px;
+  margin: 0 auto;
+
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  font-weight: 400;
+
+  color: #eeeeee;
+}
+
+
+.fc-marchi-project {
+  max-width: 850px;
+  margin: 14px auto 42px;
+
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.55;
+  font-weight: 400;
+
+  color: #ffffff;
+}
+
+
+.fc-marchi-project strong {
+  font-weight: 600;
+}
+
+
+/* =========================
+   CAROUSEL
+========================= */
+
+.fc-marquee {
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+
+/* sfumatura laterale */
+
+.fc-marquee::before,
+.fc-marquee::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+
+  width: 100px;
+
+  z-index: 5;
+  pointer-events: none;
+}
+
+
+.fc-marquee::before {
+  left: 0;
+
+  background:
+    linear-gradient(
+      90deg,
+      #080a24 0%,
+      rgba(8, 10, 36, 0) 100%
+    );
+}
+
+
+.fc-marquee::after {
+  right: 0;
+
+  background:
+    linear-gradient(
+      270deg,
+      #080a24 0%,
+      rgba(8, 10, 36, 0) 100%
+    );
+}
+
+
+/* =========================
+   TRACK
+========================= */
+
+.fc-marquee-track {
+  display: flex;
+  width: max-content;
+
+  animation:
+    fc-marchi-scroll
+    calc(34s * var(--fc-k, 1))
+    linear
+    infinite;
+
+  will-change: transform;
+}
+
+
+/* =========================
+   GRUPPI
+========================= */
+
+.fc-marquee-group {
+  display: flex;
+  align-items: center;
+
+  gap: 22px;
+
+  padding-right: 22px;
+}
+
+
+/* =========================
+   LOGO BOX
+========================= */
+
+.fc-logo {
+  position: relative;
+
+  flex: 0 0 215px;
+
+  width: 215px;
+  height: 100px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 15px 22px;
+
+  background: #ffffff;
+
+  border-radius: 9px;
+
+  overflow: hidden;
+}
+
+
+/* =========================
+   IMMAGINI
+========================= */
+
+.fc-logo img {
+  display: block;
+
+  width: auto;
+  height: auto;
+
+  max-width: 100%;
+  max-height: 62px;
+
+  object-fit: contain;
+}
+
+
+/* =========================
+   FALLBACK TESTUALE
+========================= */
+
+.fc-logo-fallback {
+  display: none;
+
+  font-family: Helvetica, Arial, sans-serif;
+
+  color: #111111;
+
+  font-size: 18px;
+  line-height: 1.15;
+
+  font-weight: 600;
+
+  text-align: center;
+}
+
+
+.fc-logo img.img-error {
+  display: none;
+}
+
+
+.fc-logo img.img-error + .fc-logo-fallback {
+  display: block;
+}
+
+
+/* dimensioni specifiche */
+
+.logo-everlasting img {
+  max-width: 180px;
+  max-height: 55px;
+}
+
+.logo-kibernetik img {
+  max-width: 180px;
+  max-height: 45px;
+}
+
+.logo-incold img {
+  max-width: 180px;
+  max-height: 60px;
+}
+
+.logo-pastorfrigor img {
+  max-width: 190px;
+  max-height: 58px;
+}
+
+.logo-eliwell img {
+  max-width: 180px;
+  max-height: 58px;
+}
+
+.logo-rivacold img {
+  max-width: 190px;
+  max-height: 58px;
+}
+
+
+/* =========================
+   ANIMAZIONE
+========================= */
+
+@keyframes fc-marchi-scroll {
+
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-50%);
+  }
+
+}
+
+
+/* pausa mouse */
+
+.fc-marquee:hover .fc-marquee-track {
+  animation-play-state: paused;
+}
+
+
+/* =========================
+   TABLET
+========================= */
+
+@media (max-width: 900px) {
+
+  .fc-marchi {
+    padding: 55px 0 60px;
+  }
+
+  .fc-marquee-track {
+    animation-duration: calc(29s * var(--fc-k, 1));
+  }
+
+  .fc-logo {
+
+    flex-basis: 185px;
+
+    width: 185px;
+    height: 88px;
+
+    padding: 12px 18px;
+  }
+
+  .fc-marquee-group {
+
+    gap: 16px;
+
+    padding-right: 16px;
+  }
+
+}
+
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 600px) {
+
+  .fc-marchi {
+    padding: 50px 0 55px;
+  }
+
+  .fc-marchi-inner {
+    padding: 0 18px;
+  }
+
+  .fc-marchi h2 {
+    font-size: 19px;
+  }
+
+  .fc-marchi-intro,
+  .fc-marchi-project {
+    font-size: 15px;
+  }
+
+  .fc-marchi-project {
+    margin-bottom: 34px;
+  }
+
+
+  .fc-logo {
+
+    flex-basis: 160px;
+
+    width: 160px;
+    height: 78px;
+
+    padding: 10px 14px;
+  }
+
+
+  .logo-everlasting img,
+  .logo-kibernetik img,
+  .logo-incold img,
+  .logo-pastorfrigor img,
+  .logo-eliwell img,
+  .logo-rivacold img {
+
+    max-width: 145px;
+    max-height: 46px;
+  }
+
+
+  .fc-logo-fallback {
+    font-size: 14px;
+  }
+
+
+  .fc-marquee-track {
+    animation-duration: calc(24s * var(--fc-k, 1));
+  }
+
+
+  .fc-marquee::before,
+  .fc-marquee::after {
+    width: 50px;
+  }
+
+}
+
+
+/* =========================
+   RIDUZIONE MOVIMENTO
+========================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+  .fc-marquee-track {
+    animation: none;
+  }
+
+}
+
+</style>
+</head>
+
+<body>
+
+<section class="fc-marchi">
+  <div class="fc-marchi-inner" id="fc-testi"></div>
+  <div class="fc-marquee">
+    <div class="fc-marquee-track" id="fc-track"></div>
+  </div>
+</section>
+
+<!--FC-KIT-->
+<script>
+(function () {
+  var E = FCKit.esc;
+  var DATI = {
+    titolo: "Marchi scelti con esperienza",
+    intro: "Nella refrigerazione non esiste un’unica soluzione adatta a tutto. In base al tipo di impianto e alle esigenze del cliente ci affidiamo a marchi e fornitori specializzati che negli anni ci hanno dato i migliori riscontri in termini di affidabilità, qualità, disponibilità dei ricambi e gestione della garanzia.",
+    progetto: "A seconda del progetto lavoriamo con **Everlasting, Kibernetik, Incold, Pastorfrigor, Eliwell e Rivacold.**",
+    loghi: [
+      { nome: "Everlasting",  img: "https://www.caffinigroup.it/public/img/everlasting-193517.png", dim: "logo-everlasting", riserva: "EVERLASTING" },
+      { nome: "Kibernetik",   img: "https://static.digitecgalaxus.ch/im/Files/6/1/0/2/8/6/5/OriginalLogo_4652_Kibernetik.png?impolicy=resize-crop&resizeHeight=70&resizeWidth=140", dim: "logo-kibernetik", riserva: "KIBERNETIK" },
+      { nome: "Incold",       img: "https://cdn.freebiesupply.com/logos/large/2x/incold-logo-png-transparent.png", dim: "logo-incold", riserva: "INCOLD" },
+      { nome: "Pastorfrigor", img: "https://www.pastorfrigor.it/pr-contenuto/uploads/2017/11/3.jpg", dim: "logo-pastorfrigor", riserva: "pastorfrigor" },
+      { nome: "Eliwell",      img: "https://www.nexinstrument.com/assets/images/logo-manufacturer/Eliwell-logo_15196.png", dim: "logo-eliwell", riserva: "eliwell" },
+      { nome: "Rivacold",     img: "https://www.rivacold.com/media/userfiles/images/RIVACOLD%20logo_eng_20-11-15%283%29.jpg", dim: "logo-rivacold", riserva: "RIVACOLD" }
+    ]
+  };
+  var DIM = [["", "Standard (fino a 62 px di altezza)"], ["logo-kibernetik", "Basso (180×45)"], ["logo-everlasting", "Medio (180×55)"],
+             ["logo-eliwell", "Medio-alto (180×58)"], ["logo-rivacold", "Largo (190×58)"], ["logo-incold", "Alto (180×60)"]];
+  var SCHEMA = [
+    { t: "testo", k: "titolo", l: "Titolo" },
+    { t: "area", k: "intro", l: "Testo introduttivo", righe: 4 },
+    { t: "area", k: "progetto", l: "Frase sui marchi", righe: 2, aiuto: "Scrivi **testo** tra due asterischi doppi per il grassetto." },
+    { t: "lista", k: "loghi", l: "Loghi dei marchi", agg: "Aggiungi un marchio", titolo: "nome", miniatura: "img", min: 1,
+      aiuto: "I loghi scorrono in un ciclo continuo; la velocità si adatta da sola al numero di loghi.",
+      nuovo: { nome: "", img: "", dim: "", riserva: "" },
+      voce: { t: "gruppo", campi: [
+        { t: "testo", k: "nome", l: "Nome del marchio" },
+        { t: "img", k: "img", l: "Logo" },
+        { t: "sel", k: "dim", l: "Dimensione nel riquadro", opz: DIM },
+        { t: "testo", k: "riserva", l: "Testo di riserva", aiuto: "Compare al posto del logo se l'immagine non si carica." }
+      ] } }
+  ];
+  function render(d) {
+    var l = d.loghi || [];
+    document.getElementById("fc-testi").innerHTML =
+      "<h2>" + E(d.titolo) + '</h2><p class="fc-marchi-intro">' + E(d.intro) + "</p>" +
+      '<p class="fc-marchi-project">' + E(d.progetto).replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>") + "</p>";
+    var gruppo = function (copia) {
+      return '<div class="fc-marquee-group"' + (copia ? ' aria-hidden="true"' : "") + ">" + l.map(function (x) {
+        return '<div class="fc-logo' + (x.dim ? " " + E(x.dim) : "") + '"><img src="' + E(x.img) + '" alt="' + (copia ? "" : E(x.nome)) +
+               '" onerror="this.classList.add(\'img-error\');"><span class="fc-logo-fallback">' + E(x.riserva || x.nome) + "</span></div>";
+      }).join("") + "</div>";
+    };
+    var t = document.getElementById("fc-track");
+    t.innerHTML = gruppo(false) + gruppo(true);
+    t.style.setProperty("--fc-k", String(l.length / 6));
+  }
+  FCKit.avvia({ id: "refrigerazione-marchi", nome: "Refrigerazione · Marchi scelti con esperienza", dati: DATI, schema: SCHEMA,
+                render: render, ingranaggio: { pos: "br", tono: "scuro" } });
+})();
+</script>
+
+</body>
+</html>

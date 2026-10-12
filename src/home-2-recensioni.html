@@ -1,0 +1,301 @@
+ <!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Frigo Control Sagl - Recensioni</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background: transparent;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .slider-container {
+      width: 100%;
+      height: 220px;
+      overflow: hidden;
+      position: relative;
+      background: transparent;
+      border: none;
+      display: flex;
+      align-items: center;
+    }
+
+    .slider-track {
+      display: flex;
+      width: calc(550px * 28);
+      animation: scroll-left 140s linear infinite;
+    }
+
+    .slide {
+      width: 550px;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 25px 20px;
+      margin: 10px;
+      background: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+      font-size: 1rem;
+      color: #333;
+      text-align: center;
+      transition: transform 0.3s ease;
+    }
+
+    .slide:hover {
+      transform: scale(1.03);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+    }
+
+    .stars {
+      margin-top: 10px;
+      color: #FFD700;
+      font-size: 1.4rem;
+      letter-spacing: 2px;
+    }
+
+    .author {
+      margin-top: 8px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #555;
+    }
+
+    @keyframes scroll-left {
+      0% { transform: translateX(-50%); }
+      100% { transform: translateX(0); }
+    }
+
+    /* Ottimizzazione per tablet */
+    @media (max-width: 768px) {
+      .slider-container {
+        height: 200px;
+      }
+      .slider-track {
+        width: calc(400px * 28);
+      }
+      .slide {
+        width: 400px;
+        font-size: 0.97rem;
+        padding: 20px 15px;
+        margin: 8px;
+      }
+    }
+
+    /* Ottimizzazione per smartphone */
+    @media (max-width: 600px) {
+      .slider-container {
+        height: 200px;
+      }
+      .slider-track {
+        width: calc(340px * 28);
+        animation: scroll-left 155s linear infinite;
+      }
+      .slide {
+        width: 340px;
+        font-size: 0.92rem;
+        padding: 18px 14px;
+        margin: 6px;
+        border-radius: 12px;
+      }
+      .stars {
+        font-size: 1.3rem;
+        margin-top: 8px;
+      }
+      .author {
+        font-size: 0.85rem;
+        margin-top: 6px;
+      }
+    }
+
+    /* Ottimizzazione per schermi molto piccoli */
+    @media (max-width: 400px) {
+      .slider-container {
+        height: 210px;
+      }
+      .slider-track {
+        width: calc(300px * 28);
+        animation: scroll-left 165s linear infinite;
+      }
+      .slide {
+        width: 300px;
+        font-size: 0.88rem;
+        padding: 16px 12px;
+        margin: 5px;
+        border-radius: 10px;
+        line-height: 1.4;
+      }
+      .stars {
+        font-size: 1.2rem;
+        margin-top: 7px;
+        letter-spacing: 1px;
+      }
+      .author {
+        font-size: 0.82rem;
+        margin-top: 5px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .slider-track { animation: none; }
+    }
+  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div class="slider-container">
+  <div class="slider-track">
+    <div class="slide">
+      "Ci siamo affidati a Frigo Control per l'installazione dell'aria condizionata nella nostra nuova casa e siamo rimasti estremamente soddisfatti del servizio."
+      <div class="stars">★★★★★</div>
+      <div class="author">- Valerio Bassi</div>
+    </div>
+    <div class="slide">
+      "Abbiamo scelto Frigo Control Sagl per la fornitura e l'installazione del nostro climatizzatore e l'esperienza è stata estremamente positiva."
+      <div class="stars">★★★★★</div>
+      <div class="author">- Anto Zrakic</div>
+    </div>
+    <div class="slide">
+      "Abbiamo scelto Frigo Control Sagl per l'installazione del secondo climatizzatore, in quanto già la prima esperienza è stata molto positiva."
+      <div class="stars">★★★★★</div>
+      <div class="author">- Alessia Genini</div>
+    </div>
+    <div class="slide">
+      "Avevamo da tempo un problema con un climatizzatore, abbiamo chiamato Frigo Control che è venuta subito a farci un preventivo malgrado la stagione super calda."
+      <div class="stars">★★★★★</div>
+      <div class="author">- Elisa</div>
+    </div>
+    <div class="slide">
+      "È la seconda volta che la ditta interviene a casa mia, la prima per la cella frigo. Veloci, gentili e molto semplici nelle spiegazioni."
+      <div class="stars">★★★★★</div>
+      <div class="author">- Paolo Barca</div>
+    </div>
+    <div class="slide">
+      "Professionalità e precisione al top!"
+      <div class="stars">★★★★★</div>
+      <div class="author">- Teo De Luca</div>
+    </div>
+    <div class="slide">
+      "Desideriamo consigliare vivamente Walter, Fabio e tutto lo staff per l'eccellente lavoro svolto nella realizzazione da zero del nostro nuovo impianto."
+      <div class="stars">★★★★★</div>
+      <div class="author">- Andrea Pace</div>
+    </div>
+    <div class="slide">
+      "Abbiamo effettuato il servizio di manutenzione dell'aria condizionata e ci siamo trovati molto bene. Non appena li abbiamo chiamati si sono messi subito a disposizione."
+      <div class="stars">★★★★★</div>
+      <div class="author">- Iuana De Felice</div>
+    </div>
+    <div class="slide">
+      "Personale gentile e prontezza d'intervento impeccabile. Davvero un'azienda sulla quale poter contare."
+      <div class="stars">★★★★★</div>
+      <div class="author">- Alberto Battaglia</div>
+    </div>
+    <div class="slide">
+      "Lo staff di Frigo Control si è occupato dell'installazione di un impianto di climatizzazione nel mio appartamento. I due incaricati hanno mostrato grande professionalità."
+      <div class="stars">★★★★★</div>
+      <div class="author">- Damiano Caramanica</div>
+    </div>
+    <div class="slide">
+      "Ditta molto seria, da noi conosciuta da anni. Il servizio è ottimo."
+      <div class="stars">★★★★★</div>
+      <div class="author">- Jean-Marie Perriard</div>
+    </div>
+    <div class="slide">
+      "L'impianto è stato effettuato con professionalità a mia piena soddisfazione e nei tempi concordati, con apparecchi di alta qualità. Bravi."
+      <div class="stars">★★★★★</div>
+      <div class="author">- Gabriele Scalmazzi</div>
+    </div>
+    <div class="slide">
+      "Ho avuto un'ottima esperienza con Frigo Control. Il lavoro è stato svolto in modo preciso e professionale. I tecnici sono stati puntuali, disponibili e molto competenti."
+      <div class="stars">★★★★★</div>
+      <div class="author">- Davide Bonaiuti</div>
+    </div>
+    <div class="slide">
+      "Frigo Control è una ditta seria e competente. Abbiamo effettuato la manutenzione annuale. Tutto tip top."
+      <div class="stars">★★★★★</div>
+      <div class="author">- Luca Piccolo</div>
+    </div>
+
+    <!-- Duplicate per loop continuo -->
+    <div class="slide">
+      "Ci siamo affidati a Frigo Control per l'installazione dell'aria condizionata nella nostra nuova casa e siamo rimasti estremamente soddisfatti del servizio."
+      <div class="stars">★★★★★</div>
+      <div class="author">- Valerio Bassi</div>
+    </div>
+    <div class="slide">
+      "Abbiamo scelto Frigo Control Sagl per la fornitura e l'installazione del nostro climatizzatore e l'esperienza è stata estremamente positiva."
+      <div class="stars">★★★★★</div>
+      <div class="author">- Anto Zrakic</div>
+    </div>
+    <div class="slide">
+      "Abbiamo scelto Frigo Control Sagl per l'installazione del secondo climatizzatore, in quanto già la prima esperienza è stata molto positiva."
+      <div class="stars">★★★★★</div>
+      <div class="author">- Alessia Genini</div>
+    </div>
+    <div class="slide">
+      "Avevamo da tempo un problema con un climatizzatore, abbiamo chiamato Frigo Control che è venuta subito a farci un preventivo malgrado la stagione super calda."
+      <div class="stars">★★★★★</div>
+      <div class="author">- Elisa</div>
+    </div>
+    <div class="slide">
+      "È la seconda volta che la ditta interviene a casa mia, la prima per la cella frigo. Veloci, gentili e molto semplici nelle spiegazioni."
+      <div class="stars">★★★★★</div>
+      <div class="author">- Paolo Barca</div>
+    </div>
+    <div class="slide">
+      "Professionalità e precisione al top!"
+      <div class="stars">★★★★★</div>
+      <div class="author">- Teo De Luca</div>
+    </div>
+    <div class="slide">
+      "Desideriamo consigliare vivamente Walter, Fabio e tutto lo staff per l'eccellente lavoro svolto nella realizzazione da zero del nostro nuovo impianto."
+      <div class="stars">★★★★★</div>
+      <div class="author">- Andrea Pace</div>
+    </div>
+    <div class="slide">
+      "Abbiamo effettuato il servizio di manutenzione dell'aria condizionata e ci siamo trovati molto bene. Non appena li abbiamo chiamati si sono messi subito a disposizione."
+      <div class="stars">★★★★★</div>
+      <div class="author">- Iuana De Felice</div>
+    </div>
+    <div class="slide">
+      "Personale gentile e prontezza d'intervento impeccabile. Davvero un'azienda sulla quale poter contare."
+      <div class="stars">★★★★★</div>
+      <div class="author">- Alberto Battaglia</div>
+    </div>
+    <div class="slide">
+      "Lo staff di Frigo Control si è occupato dell'installazione di un impianto di climatizzazione nel mio appartamento. I due incaricati hanno mostrato grande professionalità."
+      <div class="stars">★★★★★</div>
+      <div class="author">- Damiano Caramanica</div>
+    </div>
+    <div class="slide">
+      "Ditta molto seria, da noi conosciuta da anni. Il servizio è ottimo."
+      <div class="stars">★★★★★</div>
+      <div class="author">- Jean-Marie Perriard</div>
+    </div>
+    <div class="slide">
+      "L'impianto è stato effettuato con professionalità a mia piena soddisfazione e nei tempi concordati, con apparecchi di alta qualità. Bravi."
+      <div class="stars">★★★★★</div>
+      <div class="author">- Gabriele Scalmazzi</div>
+    </div>
+    <div class="slide">
+      "Ho avuto un'ottima esperienza con Frigo Control. Il lavoro è stato svolto in modo preciso e professionale. I tecnici sono stati puntuali, disponibili e molto competenti."
+      <div class="stars">★★★★★</div>
+      <div class="author">- Davide Bonaiuti</div>
+    </div>
+    <div class="slide">
+      "Frigo Control è una ditta seria e competente. Abbiamo effettuato la manutenzione annuale. Tutto tip top."
+      <div class="stars">★★★★★</div>
+      <div class="author">- Luca Piccolo</div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

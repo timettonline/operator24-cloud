@@ -1,0 +1,227 @@
+<!-- =====================================================================
+     Frigo Control Ticino — Abbattitori surgelatori (Everlasting) — APP FISSA
+     - App-shell: riempie l'elemento e NON cresce mai
+     - Home: 3 gamme (Basic Tray / Professional Tray / King Trolley a carrello)
+     - Ogni gamma: selettore modelli + foto + scheda tecnica + caratteristiche/pannello/vantaggi/cicli
+     - Su Wix: Incorpora HTML -> larghezza e altezza (consigliato ~700px)
+     ===================================================================== -->
+<div id="fc-app">
+  <style>
+  html,body{height:100%;margin:0;padding:0;overflow:hidden}
+  #fc-app *{box-sizing:border-box;margin:0;padding:0}
+  #fc-app{
+    --blu:#0a3d62;--blu2:#1e6091;--accent:#00a8e8;--grigio:#f4f6f8;--bordo:#e3e9ef;--testo:#22303a;--muto:#6b7b88;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    color:var(--testo);position:relative;height:100%;width:100%;overflow:hidden;
+    background:linear-gradient(180deg,#ffffff 0%,#eef4f8 100%);-webkit-tap-highlight-color:transparent;
+  }
+  #fc-app img{max-width:100%;display:block}
+  #fc-app h1,#fc-app h2,#fc-app h3,#fc-app h4,#fc-app h5,#fc-app h6{color:var(--blu);line-height:1.15}
+  #fc-app .pz{position:relative;overflow:hidden;border-radius:10px;background:#eef2f5}
+  #fc-app .pz img{width:100%;height:100%;object-fit:cover;-webkit-user-drag:none;user-select:none;pointer-events:none}
+  #fc-app .pz.ct img{object-fit:contain;background:#fff}
+  #fc-app .pz::after{content:"";position:absolute;inset:0;z-index:2}
+
+  #fc-app .view{position:absolute;top:0;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:1200px;display:none;flex-direction:column;padding:clamp(12px,2vw,22px);gap:10px}
+  #fc-app .view.on{display:flex;animation:fd .25s ease}
+  @keyframes fd{from{opacity:0}to{opacity:1}}
+
+  #fc-app .kick{letter-spacing:.12em;text-transform:uppercase;font-size:.6rem;font-weight:800;color:var(--accent);text-align:center;flex:0 0 auto}
+  #fc-app .home h1{font-size:clamp(1rem,2.2vw,1.5rem);font-weight:800;text-align:center;flex:0 0 auto}
+  #fc-app .home .sub{text-align:center;color:var(--muto);font-size:.82rem;max-width:820px;margin:0 auto;flex:0 0 auto;line-height:1.45}
+  #fc-app .cards{flex:1;min-height:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px;align-content:center;overflow-y:auto}
+  #fc-app .card{display:flex;flex-direction:column;border:1px solid var(--bordo);border-radius:14px;overflow:hidden;background:#fff;box-shadow:0 8px 22px rgba(10,61,98,.10);cursor:pointer;text-align:left;font:inherit;color:inherit;padding:0}
+  #fc-app .card:hover{box-shadow:0 14px 30px rgba(10,61,98,.18)}
+  #fc-app .card .ph{aspect-ratio:4/3;flex:0 0 auto}
+  #fc-app .card .ph .pz{height:100%}
+  #fc-app .card .bd{flex:0 0 auto;padding:11px 14px 13px}
+  #fc-app .badge{display:inline-block;font-size:.56rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;padding:3px 8px;border-radius:999px;color:#fff;background:linear-gradient(135deg,#0a3d62,#1e6091)}
+  #fc-app .card h3{font-size:.98rem;margin:6px 0 3px}
+  #fc-app .card p{font-size:.75rem;color:var(--muto);line-height:1.35}
+  #fc-app .card .go{margin-top:6px;font-weight:700;color:var(--accent);font-size:.75rem}
+  #fc-app .foot{flex:0 0 auto;text-align:center;color:var(--muto);font-size:.7rem}
+
+  #fc-app .top{flex:0 0 auto;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  #fc-app .back{background:none;border:none;cursor:pointer;color:var(--blu);font-weight:700;font-size:.82rem;display:inline-flex;align-items:center;gap:6px;font-family:inherit;padding:2px 4px}
+  #fc-app .back:hover{color:var(--accent)}
+  #fc-app .top h2{font-size:clamp(.98rem,1.8vw,1.25rem)}
+  #fc-app .fdesc{flex:0 0 auto;font-size:.8rem;color:var(--muto);line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  #fc-app .modelbar{flex:0 0 auto;display:flex;gap:6px;overflow-x:auto;padding-bottom:3px;-webkit-overflow-scrolling:touch}
+  #fc-app .mchip{white-space:nowrap;border:1px solid var(--bordo);background:#fff;border-radius:999px;padding:6px 12px;font-size:.74rem;font-weight:700;color:var(--muto);cursor:pointer;font-family:inherit}
+  #fc-app .mchip.on{background:linear-gradient(135deg,var(--blu),var(--blu2));color:#fff;border-color:transparent}
+  #fc-app .fbody{flex:1;min-height:0;display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:640px){#fc-app .fbody{grid-template-columns:1fr;grid-template-rows:minmax(150px,40%) 1fr;overflow:hidden}}
+  #fc-app .gal{min-height:0;display:flex;flex-direction:column;gap:8px}
+  #fc-app .gal .main{flex:1;min-height:0}
+  #fc-app .gal .thumbs{flex:0 0 auto;display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
+  #fc-app .gal .thumbs.hide{display:none}
+  #fc-app .gal .thumbs .t{height:44px;border:2px solid transparent;border-radius:7px;overflow:hidden;cursor:pointer;padding:0;background:none}
+  #fc-app .gal .thumbs .t.on{border-color:var(--accent)}
+  #fc-app .gal .thumbs .t .pz,#fc-app .gal .thumbs .t img{height:100%;border-radius:0}
+  #fc-app .fspec{min-height:0;display:flex;flex-direction:column;overflow:auto}
+  #fc-app .fspec h5{font-size:1rem;margin-bottom:6px}
+  #fc-app .mtext{font-size:.82rem;line-height:1.5;color:var(--testo);margin-bottom:8px}
+  #fc-app .frow{display:flex;justify-content:space-between;gap:14px;padding:6px 0;border-bottom:1px dashed var(--bordo);font-size:.78rem}
+  #fc-app .frow .l{color:var(--muto);flex:0 0 auto;max-width:52%}
+  #fc-app .frow .v{font-weight:700;color:var(--blu);text-align:right}
+  #fc-app h6.eyer{font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muto);margin:12px 0 6px}
+  #fc-app .blist{list-style:none;display:grid;gap:4px}
+  #fc-app .blist li{display:flex;gap:7px;font-size:.79rem;align-items:flex-start;line-height:1.35}
+  #fc-app .blist li svg{flex:0 0 13px;margin-top:3px;color:var(--accent)}
+  </style>
+
+  <div class="view home on" data-view="home">
+    <div class="kick">Frigo Control Ticino · Everlasting</div>
+    <h1>Abbattitori surgelatori</h1>
+    <div class="sub">Abbattitori di temperatura per surgelare gli alimenti in tempi rapidi, mantenendo sotto controllo la proliferazione batterica e preservando le proprietà organolettiche. Modelli a teglie o a carrello per ristorazione, pasticceria, gelateria, panificazione e pizzeria.</div>
+    <div class="cards" id="cards"></div>
+    <div class="foot">Everlasting · Abbattimento +90/+3°C · Surgelazione +90/−18°C al cuore · Sopralluogo e assistenza in Ticino</div>
+  </div>
+
+  <div class="view" data-view="basic" id="v-basic"></div>
+  <div class="view" data-view="professional" id="v-professional"></div>
+  <div class="view" data-view="king" id="v-king"></div>
+
+  <script>
+  (function(){
+    var root=document.getElementById('fc-app');
+    if(root.dataset.init) return; root.dataset.init='1';
+    var U='https://frigocontrolch.10web.me/wp-content/uploads/';
+    var CK='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>';
+    function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+    function M(name,imgs,text,spec){return {name:name,imgs:imgs.map(function(u){return U+u;}),text:text||'',spec:spec||[]};}
+    function SEC(title,items){return {title:title,items:items};}
+
+    var VANTAGGI=['Migliore gestione del lavoro in cucina e servizio più efficiente, con più margine','Conservazione più lunga degli alimenti e riduzione degli scarti','Elevata efficienza e bassi consumi grazie all’isolamento in PUR ad alta densità','Alimenti salubri, proprietà nutritive e organolettiche intatte','Facilità d’uso con interfaccia touch user-friendly'];
+
+    var FAM={
+      basic:{name:'Basic Tray',card:U+'2025/09/basic-tray-04-1.webp',tag:'Abbattitori a teglie · 2 modelli',
+        desc:'Gamma dal design elegante ed essenziale e ad alto risparmio energetico, svolge sia le funzioni di abbattimento che di surgelazione. Semplice e pratica, adatta a qualunque tipologia di cucina.',
+        models:[
+          M('Basic Tray 04',['2025/09/basic-tray-04-1.webp','2025/09/basic-tray-04.webp','2025/09/basic-tray-04-3.webp','2025/09/basic-tray-04-1-1.webp'],'',[
+            ['Formato','GN 1/1'],['Codice','BAB060'],['Refrigerante','R290 Green'],
+            ['Abbattimento +90/+3°C','10 kg'],['Surgelazione +90/−18°C','7 kg'],
+            ['Dimensioni','L 652 × P 706 × H 540 mm'],['Con imballo','L 712 × P 766 × H 731 mm'],
+            ['Capacità teglie GN 1/1','4 (70mm) · 5 (52,5mm) · 7 (35mm)'],['Vaschette gelato / griglie','4 / 1'],
+            ['Peso N / L','49 / 60 kg'],['Tensione','230V · 50 Hz'],
+            ['Potenza frig. (−25/55°C)','610 W'],['Potenza assorbita','670 W · 3,4 A'],
+            ['Interno / esterno','acciaio inox AISI 304']
+          ]),
+          M('Basic Tray 15',['2025/09/basic-tray-15-1-600x600.webp','2025/09/basic-tray-15-2-600x600.webp','2025/09/basic-tray-15-3.webp'],'',[
+            ['Formato','GN 1/1 · EN 60×40'],['Codice','BAF000'],['Refrigerante','R452A'],
+            ['Abbattimento +90/+3°C','64 kg'],['Surgelazione +90/−18°C','52 kg'],
+            ['Dimensioni','L 780 × P 798 × H 1817 mm'],['Con imballo','L 840 × P 882 × H 2024 mm'],
+            ['Capacità teglie GN 1/1','15 (70mm) · 20 (52,5mm) · 30 (35mm)'],['Vaschette gelato / griglie','18 / 6'],
+            ['Peso N / L','216 / 228 kg'],['Tensione','400V · 3N · 50 Hz'],
+            ['Potenza frig. (−25/55°C)','3054 W'],['Potenza assorbita','3300 W · 6 A'],
+            ['Interno / esterno','acciaio inox AISI 304']
+          ])
+        ],
+        sections:[
+          SEC('Caratteristiche',['Acciaio inox AISI 304','Vano tecnico e fondo esterno in lamiera zincata a caldo','Schiena esterna in acciaio inox AISI 304','Unità condensatrice tropicalizzata','Refrigerante R452A · R290 Green (modelli MINI e Basic Tray 04)','Sbrinamento manuale a ventilazione forzata','Ventilatori ad alta efficienza · evaporatore con vernice anticorrosione','Isolamento in poliuretano ecologico ad alta densità','Versione remota (REM) con valvola termostatica (solo mod. 05-07-10-15)','Top rinforzato su tutti i modelli']),
+          SEC('Pannello di controllo',['Registro allarmi HACCP','Abbattimento rapido +90/+3°C con sonda al cuore o a tempo','Surgelazione rapida +90/−18°C con sonda al cuore o a tempo','Fase automatica di conservazione a fine ciclo','Scelta tra cicli HARD e SOFT (Basic Tray MINI solo a tempo)']),
+          SEC('Vantaggi',VANTAGGI)
+        ]},
+
+      professional:{name:'Professional Tray',card:U+'2025/09/professional-tray-05-1-600x600.webp',tag:'Multifunzione a teglie · 2 modelli',
+        desc:'Progettati con particolare attenzione al risparmio energetico: un unico prodotto per abbattimento, surgelazione, sanificazione del pesce, fermalievitazione, lenta cottura, indurimento gelato e molto altro.',
+        models:[
+          M('Professional Tray 05',['2025/09/professional-tray-05-1-600x600.webp','2025/09/professional-tray-05-2-600x600.webp','2025/09/professional-tray-05-3-600x600.webp','2025/09/professional-tray-05-4.webp'],'',[
+            ['Formato','GN 1/1 · EN 60×40'],['Codice','BBC000'],['Refrigerante','R452A'],
+            ['Abbattimento +90/+3°C','27 kg'],['Surgelazione +90/−18°C','20 kg'],
+            ['Dimensioni','L 780 × P 803 × H 937 mm'],['Dimensioni MULTI','L 780 × P 918 × H 937 mm'],
+            ['Temp. MULTI (opz. caldo)','−40 / +75 °C'],['Con imballo','L 840 × P 882 × H 1134 mm'],
+            ['Capacità teglie GN 1/1','5 (70mm) · 6 (52,5mm) · 9 (35mm)'],['Vaschette gelato / griglie','6 / 2'],
+            ['Peso N / L','129 / 141 kg'],['Tensione','230V · 50 Hz'],
+            ['Potenza frig. (−25/55°C)','713 W'],['Potenza assorbita','900 W · 5,7 A']
+          ]),
+          M('Professional Tray 20',['2025/09/professional-tray-20-1-600x600.webp','2025/09/professional-tray-20-2-600x600.webp','2025/09/professional-tray-20-3.webp'],'',[
+            ['Formato','GN 1/1 · EN 60×40'],['Codice','BAF000'],['Refrigerante','R452A'],
+            ['Abbattimento +90/+3°C','82 kg'],['Surgelazione +90/−18°C','65 kg'],
+            ['Dimensioni','L 780 × P 800 × H 2207 mm'],['Dimensioni MULTI','L 780 × P 915 × H 2205 mm'],
+            ['Temp. MULTI (opz. caldo)','−40 / +75 °C'],['Con imballo','L 840 × P 882 × H 2369 mm'],
+            ['Capacità teglie GN 1/1','21 (70mm) · 27 (52,5mm) · 41 (35mm)'],['Vaschette gelato / griglie','24 / 8'],
+            ['Peso N / L','227 / 240 kg'],['Tensione','400V · 3N · 50 Hz'],
+            ['Potenza frig. (−25/55°C)','2451 W'],['Potenza assorbita','4,1 kW · 9,3 A']
+          ])
+        ],
+        sections:[
+          SEC('Caratteristiche',['Acciaio inox AISI 304 · fondo esterno in lamiera zincata a caldo','Schiena esterna in acciaio inox AISI 304','Unità condensatrice tropicalizzata · Refrigerante R452A','Sbrinamento automatico a gas caldo (manuale nelle versioni REM)','Ventilatori ad alta efficienza · evaporatore con vernice anticorrosione','Isolamento 60 mm poliuretano ecologico alta densità','Versione remota (REM) con valvola termostatica inclusa','Umidificatore a vapore (versione MULTI)','Connessione remota wi-fi (opt.) · Porta seriale RS-485']),
+          SEC('Pannello di controllo',['Registro allarmi HACCP','Abbattimento rapido +90/+3°C con sonda al cuore o a tempo','Surgelazione rapida +90/−18°C con sonda al cuore o a tempo','Fase automatica di conservazione a fine ciclo · cicli HARD e SOFT','Porta seriale RS485 per sistemi di supervisione','Inserimento cicli personalizzati','Touch screen facile e intuitivo','Modulo WI-FI per gestione remota (optional)','Umidità regolabile da 40% a 95%']),
+          SEC('Cicli base',['Pre-raffreddamento','Abbattimento hard/soft a tempo + conservazione (+90/+3°C)','Surgelazione hard/soft a tempo + conservazione (+90/−18°C)','Abbattimento hard/soft a temperatura con sonda al cuore + conservazione automatica','Surgelazione hard/soft a temperatura con sonda al cuore + conservazione automatica','Sanificazione pesce: elimina parassiti come l’Anisakis','Asciugatura camera interna a ventilazione forzata (porta chiusa)']),
+          SEC('Cicli Multifunzione (optional)',['Lenta cottura a temperatura controllata con apporto di vapore','Scongelamento in sicurezza fino a +3°C','Lievitazione con controllo di temperatura e umidità','La versione Multifunzione richiede il collegamento alla rete idrica']),
+          SEC('Vantaggi',VANTAGGI)
+        ]},
+
+      king:{name:'King Trolley',card:U+'2025/08/abbattitori-carrello-everlasting-ticino-600x250.webp',tag:'Abbattitori a carrello',
+        desc:'Abbattitori surgelatori di temperatura a carrello: struttura solida e resistente per la moderna ristorazione, catering, centri di cottura e laboratori, con la massima affidabilità in ogni contesto.',
+        models:[
+          M('King Trolley',['2025/08/abbattitori-carrello-everlasting-ticino-600x250.webp'],'Grazie alla tecnologia all’avanguardia e alla semplicità d’uso, gli abbattitori a carrello King Trolley abbassano rapidamente la temperatura degli alimenti mantenendo inalterati sapori e proprietà nutritive. Perfetti per piccole e medie imprese, catering, centri di cottura e laboratori, garantiscono la massima affidabilità con carichi elevati.',[])
+        ],
+        sections:[
+          SEC('Caratteristiche',['Paracolpi perimetrale interno in acciaio inox AISI 304','Pavimento rinforzato per l’utilizzo con carrelli · rampa di accesso inox AISI 304','Giunzioni pannelli con ganci eccentrici e angoli arrotondati','Acciaio inox AISI 304 · fondo esterno in lamiera zincata a caldo','Unità condensatrice remota tropicalizzata, silenziata e carenata (per esterno)','Refrigerante R452A · sbrinamento automatico a gas caldo','Isolamento 100 mm PUR alta densità (70 mm per King Trolley 20)','Consegnati semi-assemblati o smontati','Evaporatori con vernice anticorrosione e ventilatori ad alta efficienza','Connessione remota wi-fi (opt.) · Porta seriale RS-485']),
+          SEC('Pannello di controllo',['Registro allarmi HACCP','Abbattimento rapido +90/+3°C con sonda al cuore o a tempo','Surgelazione rapida +90/−18°C con sonda al cuore o a tempo','Fase automatica di conservazione a fine ciclo · cicli HARD e SOFT','Porta seriale RS485 per sistemi di supervisione','Inserimento cicli personalizzati','Modulo WI-FI per gestione remota (optional)']),
+          SEC('Cicli di funzionamento',['Pre-raffreddamento','Abbattimento hard/soft a tempo + conservazione','Surgelazione hard/soft a tempo + conservazione','Gelato: surgelazione a tempo per indurimento gelato','Cioccolato: raffreddamento sicuro senza cristallizzazione di zuccheri o grassi','Abbattimento / surgelazione a temperatura con sonda + conservazione automatica','Sanificazione pesce (Anisakis) · asciugatura camera interna']),
+          SEC('Versioni',['Porta: 90 cm o 110 cm di passaggio netto (tranne King Trolley 20)','Potenza: L base · P maggiorata (tranne King Trolley 20 Compact)','Con o senza unità remota REM (unità in pressione positiva di azoto)','Configurazione: 1 porta o 2 porte passanti (tranne King Trolley 20)']),
+          SEC('Vantaggi',VANTAGGI)
+        ]}
+    };
+    var ORDER=['basic','professional','king'];
+
+    document.getElementById('cards').innerHTML=ORDER.map(function(k){var f=FAM[k];
+      return '<button class="card" type="button" data-open="'+k+'"><div class="ph"><div class="pz ct"><img src="'+f.card+'" alt="'+esc(f.name)+'" loading="lazy"></div></div>'
+        +'<div class="bd"><span class="badge">Everlasting</span><h3>'+esc(f.name)+'</h3><p>'+esc(f.tag)+'</p><div class="go">Scopri →</div></div></button>';
+    }).join('');
+
+    function secHTML(f){
+      return f.sections.map(function(sec){
+        return '<h6 class="eyer">'+esc(sec.title)+'</h6><ul class="blist">'+sec.items.map(function(it){
+          return '<li>'+CK+'<span>'+esc(it)+'</span></li>';
+        }).join('')+'</ul>';
+      }).join('');
+    }
+    function renderFam(k){
+      var f=FAM[k];
+      var chips=f.models.map(function(m,i){return '<button class="mchip'+(i===0?' on':'')+'" type="button" data-i="'+i+'">'+esc(m.name)+'</button>';}).join('');
+      return '<div class="top"><button class="back" type="button" data-back><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg> Indietro</button><span class="badge">Everlasting</span><h2>'+esc(f.name)+'</h2></div>'
+        +'<div class="fdesc">'+esc(f.desc)+'</div>'
+        +'<div class="modelbar" data-fam="'+k+'">'+chips+'</div>'
+        +'<div class="fbody">'
+          +'<div class="gal"><div class="main pz ct"><img id="gm-'+k+'"></div><div class="thumbs" id="gt-'+k+'"></div></div>'
+          +'<div class="fspec"><h5 id="mn-'+k+'"></h5><div id="fs-'+k+'"></div><div id="sec-'+k+'">'+secHTML(f)+'</div></div>'
+        +'</div>';
+    }
+    ORDER.forEach(function(k){ document.getElementById('v-'+k).innerHTML=renderFam(k); });
+
+    var cur={};
+    function setModel(k,i){
+      var f=FAM[k],m=f.models[i]; cur[k]={model:i};
+      document.getElementById('mn-'+k).textContent=m.name;
+      var html='';
+      if(m.text) html+='<p class="mtext">'+esc(m.text)+'</p>';
+      if(m.spec.length) html+=m.spec.map(function(s){return '<div class="frow"><span class="l">'+esc(s[0])+'</span><span class="v">'+esc(s[1])+'</span></div>';}).join('');
+      document.getElementById('fs-'+k).innerHTML=html;
+      var gm=document.getElementById('gm-'+k); gm.src=m.imgs[0]; gm.alt=m.name;
+      var gt=document.getElementById('gt-'+k);
+      gt.innerHTML=m.imgs.map(function(u,j){return '<button class="t'+(j===0?' on':'')+'" type="button" data-img="'+j+'"><span class="pz"><img src="'+u+'" alt="'+esc(m.name)+'" loading="lazy"></span></button>';}).join('');
+      gt.classList.toggle('hide',m.imgs.length<2);
+      var bar=document.querySelector('.modelbar[data-fam="'+k+'"]');
+      if(bar) bar.querySelectorAll('.mchip').forEach(function(c,ci){c.classList.toggle('on',ci===i);});
+      var fs=document.querySelector('#v-'+k+' .fspec'); if(fs) fs.scrollTop=0;
+    }
+    ORDER.forEach(function(k){ setModel(k,0); });
+
+    function show(v){ root.querySelectorAll('.view').forEach(function(el){el.classList.toggle('on', el.getAttribute('data-view')===v);}); }
+    root.addEventListener('click',function(e){
+      var op=e.target.closest('[data-open]'); if(op){ var v=op.getAttribute('data-open'); show(v); setModel(v,0); return; }
+      if(e.target.closest('[data-back]')){ show('home'); return; }
+      var mc=e.target.closest('.mchip'); if(mc){ var k=mc.closest('.modelbar').getAttribute('data-fam'); setModel(k,+mc.getAttribute('data-i')); return; }
+      var th=e.target.closest('.thumbs .t'); if(th){ var view=th.closest('.view'); var k=view.getAttribute('data-view'); var j=+th.getAttribute('data-img');
+        var m=FAM[k].models[cur[k].model]; var gm=document.getElementById('gm-'+k); gm.src=m.imgs[j]; gm.alt=m.name;
+        view.querySelectorAll('.thumbs .t').forEach(function(x){x.classList.remove('on');}); th.classList.add('on'); return; }
+    });
+    root.addEventListener('contextmenu',function(e){ if(e.target.closest('.pz,img')) e.preventDefault(); });
+    root.addEventListener('dragstart',function(e){ if(e.target.tagName==='IMG') e.preventDefault(); });
+  })();
+  </script>
+</div>

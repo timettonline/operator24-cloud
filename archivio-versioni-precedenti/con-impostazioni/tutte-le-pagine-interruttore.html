@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+
+<style>
+
+body {
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  font-family: Helvetica, Arial, sans-serif;
+}
+
+/* CONTENITORE */
+
+.toggle-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* TOGGLE */
+
+.toggle-switch {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* TESTI */
+
+.toggle-link {
+  text-decoration: none;
+  color: rgba(255,255,255,0.45);
+  white-space: nowrap;
+
+  transition: color 0.25s ease;
+}
+
+.toggle-link:hover {
+  color: #ffffff;
+}
+
+/* TESTO ATTIVO */
+
+.toggle-link.active {
+  color: #ffffff;
+  font-weight: 600;
+}
+
+/* TOGGLE CENTRALE */
+
+.toggle-button {
+  position: relative;
+
+  width: 52px;
+  height: 28px;
+
+  border: 1px solid rgba(255,255,255,0.35);
+  border-radius: 30px;
+
+  background: rgba(255,255,255,0.08);
+
+  display: block;
+  flex-shrink: 0;
+
+  transition: border-color 0.25s ease;
+}
+
+.toggle-button:hover {
+  border-color: rgba(255,255,255,0.65);
+}
+
+/* PALLINO BLU */
+
+.toggle-dot {
+  position: absolute;
+
+  top: 4px;
+  left: 4px;
+
+  width: 20px;
+  height: 20px;
+
+  border-radius: 50%;
+
+  background: #2153D3;
+
+  box-shadow: 0 2px 8px rgba(33,83,211,0.35);
+
+  transition: transform 0.3s ease;
+}
+
+/* PALLINO A SINISTRA = REFRIGERAZIONE */
+
+.toggle-button.refrigerazione .toggle-dot {
+  transform: translateX(0);
+}
+
+
+/* MOBILE */
+
+@media (max-width: 600px) {
+
+  .toggle-switch {
+    gap: 9px;
+    font-size: 14px;
+  }
+
+  .toggle-button {
+    width: 48px;
+    height: 26px;
+  }
+
+  .toggle-dot {
+    width: 18px;
+    height: 18px;
+    top: 3px;
+    left: 3px;
+  }
+
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="toggle-container">
+  <div class="toggle-switch" id="fc-root"></div>
+</div>
+
+<!--FC-KIT-->
+<script>
+(function () {
+  var E = FCKit.esc;
+  var DATI = {
+    sinistra: { testo: "REFRIGERAZIONE",  link: "https://timettonline.wixsite.com/website-28/refrigerazione" },
+    destra:   { testo: "CLIMATIZZAZIONE", link: "https://timettonline.wixsite.com/website-28/climatizzazione-1" }
+  };
+  var SCHEMA = [
+    { t: "gruppo", k: "sinistra", l: "Voce a sinistra (evidenziata)", campi: [
+      { t: "testo", k: "testo", l: "Testo" }, { t: "link", k: "link", l: "Pagina di destinazione" } ] },
+    { t: "gruppo", k: "destra", l: "Voce a destra", aiuto: "Anche l'interruttore centrale porta a questa pagina.", campi: [
+      { t: "testo", k: "testo", l: "Testo" }, { t: "link", k: "link", l: "Pagina di destinazione" } ] }
+  ];
+  function render(d) {
+    document.getElementById("fc-root").innerHTML =
+      '<a href="' + E(d.sinistra.link) + '" class="toggle-link active">' + E(d.sinistra.testo) + "</a>" +
+      '<a href="' + E(d.destra.link) + '" class="toggle-button refrigerazione" aria-label="Vai a ' + E(d.destra.testo.toLowerCase()) + '"><span class="toggle-dot"></span></a>' +
+      '<a href="' + E(d.destra.link) + '" class="toggle-link">' + E(d.destra.testo) + "</a>";
+  }
+  FCKit.avvia({ id: "interruttore", nome: "Tutte le pagine · Interruttore Refrigerazione / Climatizzazione", dati: DATI,
+                schema: SCHEMA, render: render, ingranaggio: { pos: "br", tono: "scuro" } });
+})();
+</script>
+
+</body>
+</html>
